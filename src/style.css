@@ -1424,6 +1424,23 @@ footer a:hover {
   font-weight: 500;
 }
 
+/* Connect Section Wrapper */
+.connect-section {
+  background-color: #ffffff;
+  border-top: 1px solid var(--line);
+}
+
+/* FAQ Section Wrapper */
+.faq-section {
+  background-color: #ffffff;
+  border-top: 1px solid var(--line);
+  padding: 85px 0 100px;
+}
+
+.faq-section .faq {
+  padding: 0;
+}
+
 /* FAQ Section */
 .faq {
   display: grid;
