@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "express": "^5.2.1",
-    "jose": "^6.2.12"
+    "jose": "^6.2.12",
+    "matter-js": "^0.20.0"
   }
 }

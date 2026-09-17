@@ -147,6 +147,9 @@ if (eventModal) {
 }
 
 // Stories Carousel Scroll Control
+import Matter from 'matter-js';
+
+// Stories Carousel Scroll Control
 const storiesTrack = document.getElementById('stories-track');
 const storiesPrevBtn = document.getElementById('stories-prev-btn');
 const storiesNextBtn = document.getElementById('stories-next-btn');
@@ -160,97 +163,174 @@ if (storiesTrack && storiesPrevBtn && storiesNextBtn) {
   });
 }
 
-// Animated App Icon Drop & Mobile Physics / Mouse Gyroscope Movement
-const appIcon = document.getElementById('animated-app-icon');
-const connectSection = document.getElementById('connect');
+// Matter.js 2D Gravity Physics Engine & Rolling Icons Bucket Box
+function initGravityPhysicsBucket() {
+  const container = document.getElementById('gravity-bucket-box');
+  const worldCanvas = document.getElementById('physics-world-canvas');
+  if (!container || !worldCanvas) return;
 
-if (appIcon && connectSection) {
-  // 1. Intersection Observer for Drop-In Animation from top
-  const dropObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting && !appIcon.classList.contains('dropped')) {
-        appIcon.classList.add('dropped');
-        setTimeout(() => {
-          appIcon.classList.add('floating');
-        }, 1150);
-      }
+  const { Engine, Runner, Bodies, Composite, Body, Mouse, MouseConstraint, Events } = Matter;
+
+  // Create Matter.js physics engine with gravity vector
+  const engine = Engine.create({
+    gravity: { x: 0, y: 1.2, scale: 0.001 }
+  });
+
+  let width = container.clientWidth;
+  let height = container.clientHeight;
+
+  // Boundaries (Floor, Left Wall, Right Wall, Ceiling)
+  const wallThickness = 120;
+  let ground = Bodies.rectangle(width / 2, height + wallThickness / 2 - 4, width * 2, wallThickness, { isStatic: true, friction: 0.5, restitution: 0.4 });
+  let leftWall = Bodies.rectangle(-wallThickness / 2 + 4, height / 2, wallThickness, height * 3, { isStatic: true, friction: 0.5, restitution: 0.4 });
+  let rightWall = Bodies.rectangle(width + wallThickness / 2 - 4, height / 2, wallThickness, height * 3, { isStatic: true, friction: 0.5, restitution: 0.4 });
+  let ceiling = Bodies.rectangle(width / 2, -wallThickness / 2 - 300, width * 2, wallThickness, { isStatic: true });
+
+  Composite.add(engine.world, [ground, leftWall, rightWall, ceiling]);
+
+  // App icons to spawn in the physics bucket
+  const iconData = [
+    { type: 'img', src: '/images/app-icon-showcase.png', alt: 'Nature App' },
+    { type: 'badge', emoji: '🍎', label: 'Swift', bg: 'linear-gradient(135deg, #ff5e3a, #ff2a68)' },
+    { type: 'badge', emoji: '🛠️', label: 'Xcode', bg: 'linear-gradient(135deg, #1d72b8, #00c6ff)' },
+    { type: 'badge', emoji: '🎨', label: 'HIG Lab', bg: 'linear-gradient(135deg, #8e44ad, #f39c12)' },
+    { type: 'badge', emoji: '🪪', label: 'SGU Pass', bg: 'linear-gradient(135deg, #0071e3, #42a5f5)' },
+    { type: 'badge', emoji: '⚡', label: 'Playroom', bg: 'linear-gradient(135deg, #11998e, #38ef7d)' },
+    { type: 'badge', emoji: '🧭', label: 'ARKit', bg: 'linear-gradient(135deg, #fc4a1a, #f7b731)' },
+    { type: 'badge', emoji: '💡', label: 'App Idea', bg: 'linear-gradient(135deg, #f093fb, #f5576c)' }
+  ];
+
+  const bodyElements = [];
+  const iconSize = 76;
+
+  // Drop icons in from top opening
+  let hasDropped = false;
+  function dropIcons() {
+    if (hasDropped) return;
+    hasDropped = true;
+
+    iconData.forEach((item, index) => {
+      setTimeout(() => {
+        // Random horizontal drop position
+        const spawnX = Math.random() * (width - 180) + 90;
+        const spawnY = -60 - index * 20;
+
+        // Chamfered rounded rectangle body for realistic physics rolling & tumbling
+        const body = Bodies.rectangle(spawnX, spawnY, iconSize, iconSize, {
+          chamfer: { radius: 18 },
+          restitution: 0.6,  // Realistic bounce
+          friction: 0.2,     // Rolling friction
+          density: 0.002,
+          angle: (Math.random() - 0.5) * 0.6
+        });
+
+        // DOM element corresponding to the physics body
+        const el = document.createElement('div');
+        el.className = 'physics-icon-item';
+        el.style.width = `${iconSize}px`;
+        el.style.height = `${iconSize}px`;
+
+        if (item.type === 'img') {
+          const img = document.createElement('img');
+          img.src = item.src;
+          img.alt = item.alt;
+          img.className = 'physics-icon-img';
+          el.appendChild(img);
+        } else {
+          el.style.background = item.bg;
+          el.style.color = '#ffffff';
+          const badge = document.createElement('span');
+          badge.className = 'physics-icon-badge';
+          badge.textContent = item.emoji;
+          const label = document.createElement('span');
+          label.className = 'physics-icon-label';
+          label.textContent = item.label;
+          label.style.color = '#ffffff';
+          el.appendChild(badge);
+          el.appendChild(label);
+        }
+
+        worldCanvas.appendChild(el);
+        Composite.add(engine.world, body);
+
+        // Apply slight initial angular velocity & downward force
+        Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.2);
+        Body.setVelocity(body, { x: (Math.random() - 0.5) * 4, y: Math.random() * 2 });
+
+        bodyElements.push({ body, el });
+      }, index * 120);
     });
-  }, { threshold: 0.15 });
-
-  dropObserver.observe(connectSection);
-
-  // 2. Physics Movement Variables for Tilt & Gyroscope
-  let targetX = 0;
-  let targetY = 0;
-  let targetRot = 0;
-  let currentX = 0;
-  let currentY = 0;
-  let currentRot = 0;
-  let isInteracting = false;
-  let animFrameId = null;
-
-  function updatePhysics() {
-    if (isInteracting) {
-      currentX += (targetX - currentX) * 0.12;
-      currentY += (targetY - currentY) * 0.12;
-      currentRot += (targetRot - currentRot) * 0.12;
-
-      appIcon.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) rotate(${currentRot}deg)`;
-      animFrameId = requestAnimationFrame(updatePhysics);
-    }
   }
 
-  // Desktop Mouse Parallax Movement
-  connectSection.addEventListener('mousemove', (e) => {
-    const rect = connectSection.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    targetX = (e.clientX - centerX) * 0.15;
-    targetY = (e.clientY - centerY) * 0.15;
-    targetRot = targetX * 0.12;
-
-    if (!isInteracting) {
-      isInteracting = true;
-      appIcon.classList.remove('floating');
-      animFrameId = requestAnimationFrame(updatePhysics);
+  // Mouse & Touch Drag Interaction Physics Constraint
+  const mouse = Mouse.create(container);
+  const mouseConstraint = MouseConstraint.create(engine, {
+    mouse: mouse,
+    constraint: {
+      stiffness: 0.2,
+      render: { visible: false }
     }
   });
 
-  connectSection.addEventListener('mouseleave', () => {
-    targetX = 0;
-    targetY = 0;
-    targetRot = 0;
-    setTimeout(() => {
-      isInteracting = false;
-      if (animFrameId) cancelAnimationFrame(animFrameId);
-      appIcon.classList.add('floating');
-      appIcon.style.transform = '';
-    }, 400);
+  // Prevent wheel scroll locking
+  if (mouseConstraint.mouse.element) {
+    mouseConstraint.mouse.element.removeEventListener('mousewheel', mouseConstraint.mouse.mousewheel);
+    mouseConstraint.mouse.element.removeEventListener('DOMMouseScroll', mouseConstraint.mouse.mousewheel);
+  }
+
+  Composite.add(engine.world, mouseConstraint);
+
+  // Sync DOM elements with Matter body positions on each frame (60 FPS)
+  Events.on(engine, 'afterUpdate', () => {
+    bodyElements.forEach(({ body, el }) => {
+      const x = body.position.x - iconSize / 2;
+      const y = body.position.y - iconSize / 2;
+      const angle = body.angle;
+      el.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${angle}rad)`;
+    });
   });
 
-  // Mobile Phone Motion & Gyroscope Orientation Listener
+  // Run runner & engine
+  const runner = Runner.create();
+  Runner.run(runner, engine);
+
+  // Intersection Observer to drop icons when user scrolls to section
+  const dropObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        dropIcons();
+      }
+    });
+  }, { threshold: 0.2 });
+
+  dropObserver.observe(container);
+
+  // Device Orientation (Gyroscope Gravity for Mobile Phones!)
   if (window.DeviceOrientationEvent) {
     window.addEventListener('deviceorientation', (event) => {
       const gamma = event.gamma; // Left-to-right tilt [-90 to 90]
       const beta = event.beta;   // Front-to-back tilt [-180 to 180]
 
       if (gamma !== null && beta !== null) {
-        // Clamp tilt ranges for smooth phone movement response
-        const tiltX = Math.max(-25, Math.min(25, gamma)) * 1.1;
-        const tiltY = Math.max(-25, Math.min(25, beta - 45)) * 1.1;
+        // Dynamically update physics gravity vector based on phone orientation
+        const gx = Math.max(-2, Math.min(2, gamma / 15));
+        const gy = Math.max(-2, Math.min(2, (beta - 30) / 15));
 
-        targetX = tiltX;
-        targetY = tiltY;
-        targetRot = tiltX * 0.15;
-
-        if (!isInteracting) {
-          isInteracting = true;
-          appIcon.classList.remove('floating');
-          animFrameId = requestAnimationFrame(updatePhysics);
-        }
+        engine.gravity.x = gx;
+        engine.gravity.y = gy;
       }
     }, true);
   }
+
+  // Handle Container Resize
+  window.addEventListener('resize', () => {
+    width = container.clientWidth;
+    height = container.clientHeight;
+
+    Body.setPosition(ground, { x: width / 2, y: height + wallThickness / 2 - 4 });
+    Body.setPosition(rightWall, { x: width + wallThickness / 2 - 4, y: height / 2 });
+  });
 }
+
+initGravityPhysicsBucket();
 
