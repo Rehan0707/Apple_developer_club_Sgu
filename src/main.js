@@ -160,3 +160,97 @@ if (storiesTrack && storiesPrevBtn && storiesNextBtn) {
   });
 }
 
+// Animated App Icon Drop & Mobile Physics / Mouse Gyroscope Movement
+const appIcon = document.getElementById('animated-app-icon');
+const connectSection = document.getElementById('connect');
+
+if (appIcon && connectSection) {
+  // 1. Intersection Observer for Drop-In Animation from top
+  const dropObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !appIcon.classList.contains('dropped')) {
+        appIcon.classList.add('dropped');
+        setTimeout(() => {
+          appIcon.classList.add('floating');
+        }, 1150);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  dropObserver.observe(connectSection);
+
+  // 2. Physics Movement Variables for Tilt & Gyroscope
+  let targetX = 0;
+  let targetY = 0;
+  let targetRot = 0;
+  let currentX = 0;
+  let currentY = 0;
+  let currentRot = 0;
+  let isInteracting = false;
+  let animFrameId = null;
+
+  function updatePhysics() {
+    if (isInteracting) {
+      currentX += (targetX - currentX) * 0.12;
+      currentY += (targetY - currentY) * 0.12;
+      currentRot += (targetRot - currentRot) * 0.12;
+
+      appIcon.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) rotate(${currentRot}deg)`;
+      animFrameId = requestAnimationFrame(updatePhysics);
+    }
+  }
+
+  // Desktop Mouse Parallax Movement
+  connectSection.addEventListener('mousemove', (e) => {
+    const rect = connectSection.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    targetX = (e.clientX - centerX) * 0.15;
+    targetY = (e.clientY - centerY) * 0.15;
+    targetRot = targetX * 0.12;
+
+    if (!isInteracting) {
+      isInteracting = true;
+      appIcon.classList.remove('floating');
+      animFrameId = requestAnimationFrame(updatePhysics);
+    }
+  });
+
+  connectSection.addEventListener('mouseleave', () => {
+    targetX = 0;
+    targetY = 0;
+    targetRot = 0;
+    setTimeout(() => {
+      isInteracting = false;
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+      appIcon.classList.add('floating');
+      appIcon.style.transform = '';
+    }, 400);
+  });
+
+  // Mobile Phone Motion & Gyroscope Orientation Listener
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener('deviceorientation', (event) => {
+      const gamma = event.gamma; // Left-to-right tilt [-90 to 90]
+      const beta = event.beta;   // Front-to-back tilt [-180 to 180]
+
+      if (gamma !== null && beta !== null) {
+        // Clamp tilt ranges for smooth phone movement response
+        const tiltX = Math.max(-25, Math.min(25, gamma)) * 1.1;
+        const tiltY = Math.max(-25, Math.min(25, beta - 45)) * 1.1;
+
+        targetX = tiltX;
+        targetY = tiltY;
+        targetRot = tiltX * 0.15;
+
+        if (!isInteracting) {
+          isInteracting = true;
+          appIcon.classList.remove('floating');
+          animFrameId = requestAnimationFrame(updatePhysics);
+        }
+      }
+    }, true);
+  }
+}
+
