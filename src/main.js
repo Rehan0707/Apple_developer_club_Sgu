@@ -11,10 +11,105 @@ menuButton.addEventListener('click', () => {
   menuButton.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
   navigation.classList.toggle('is-open', isOpen);
 });
-navigation.addEventListener('click', (event) => { if (event.target.closest('a')) closeMenu(); });
+navigation.addEventListener('click', (event) => { if (event.target.closest('a:not(#contact-menu-btn)')) closeMenu(); });
 document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && menuButton.getAttribute('aria-expanded') === 'true') { closeMenu(); menuButton.focus(); } });
-document.addEventListener('click', (event) => { if (!event.target.closest('.local-inner')) closeMenu(); });
+document.addEventListener('click', (event) => { if (!event.target.closest('.local-inner') && !event.target.closest('.nav-flyout-drawer')) closeMenu(); });
 window.matchMedia('(min-width: 701px)').addEventListener('change', closeMenu);
+
+// ── Apple Navigation Mega Flyout Controller ──
+const contactItem = document.getElementById('nav-contact-item');
+const contactTrigger = document.getElementById('contact-menu-btn');
+const contactFlyout = document.getElementById('contact-flyout');
+const flyoutBackdrop = document.getElementById('nav-flyout-backdrop');
+const siteHeader = document.getElementById('site-header');
+
+let flyoutTimeout = null;
+
+function openFlyout() {
+  if (flyoutTimeout) {
+    clearTimeout(flyoutTimeout);
+    flyoutTimeout = null;
+  }
+  if (contactFlyout && contactItem) {
+    contactItem.classList.add('is-active');
+    contactTrigger?.setAttribute('aria-expanded', 'true');
+    contactFlyout.classList.add('is-open');
+    contactFlyout.setAttribute('aria-hidden', 'false');
+    flyoutBackdrop?.classList.add('is-active');
+    siteHeader?.classList.add('has-flyout-open');
+  }
+}
+
+function closeFlyout() {
+  if (contactFlyout && contactItem) {
+    contactItem.classList.remove('is-active');
+    contactTrigger?.setAttribute('aria-expanded', 'false');
+    contactFlyout.classList.remove('is-open');
+    contactFlyout.setAttribute('aria-hidden', 'true');
+    flyoutBackdrop?.classList.remove('is-active');
+    siteHeader?.classList.remove('has-flyout-open');
+  }
+}
+
+function scheduleCloseFlyout(delay = 180) {
+  if (flyoutTimeout) clearTimeout(flyoutTimeout);
+  flyoutTimeout = setTimeout(() => {
+    closeFlyout();
+  }, delay);
+}
+
+if (contactItem && contactFlyout) {
+  // Desktop Hover Handlers
+  contactItem.addEventListener('mouseenter', () => {
+    if (window.innerWidth > 700) openFlyout();
+  });
+  contactItem.addEventListener('mouseleave', () => {
+    if (window.innerWidth > 700) scheduleCloseFlyout(200);
+  });
+
+  contactFlyout.addEventListener('mouseenter', () => {
+    if (window.innerWidth > 700) {
+      if (flyoutTimeout) clearTimeout(flyoutTimeout);
+    }
+  });
+  contactFlyout.addEventListener('mouseleave', () => {
+    if (window.innerWidth > 700) scheduleCloseFlyout(200);
+  });
+
+  // Click Trigger (for mobile or click toggle)
+  contactTrigger?.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (window.innerWidth <= 700) {
+      contactItem.classList.toggle('mobile-expanded');
+    } else {
+      if (contactFlyout.classList.contains('is-open')) {
+        closeFlyout();
+      } else {
+        openFlyout();
+      }
+    }
+  });
+
+  // Close when clicking on backdrop
+  flyoutBackdrop?.addEventListener('click', closeFlyout);
+
+  // Close on escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && contactFlyout.classList.contains('is-open')) {
+      closeFlyout();
+      contactTrigger?.focus();
+    }
+  });
+
+  // Keyboard accessibility
+  contactItem.addEventListener('focusin', openFlyout);
+  document.addEventListener('focusin', (e) => {
+    if (!contactItem.contains(e.target) && !contactFlyout.contains(e.target)) {
+      closeFlyout();
+    }
+  });
+}
+
 document.querySelector('#year').textContent = new Date().getFullYear();
 const navLinks = [...navigation.querySelectorAll('a')];
 const observer = new IntersectionObserver((entries) => {
@@ -334,3 +429,26 @@ function initGravityPhysicsBucket() {
 
 initGravityPhysicsBucket();
 
+// ── Join Transition Loader ────────────────────────────────────────────
+const joinOverlay = document.getElementById('join-loader-overlay');
+
+if (joinOverlay) {
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a[href="/join/"]');
+    if (!link) return;
+
+    e.preventDefault();
+    const dest = link.href;
+
+    // Show overlay — fade in over 300ms
+    joinOverlay.removeAttribute('aria-hidden');
+    joinOverlay.classList.add('is-active');
+    document.body.style.overflow = 'hidden';
+
+    // Navigate once overlay fully covers the screen (300ms fade + 120ms buffer)
+    // The join page then animates in, creating a seamless crossfade
+    setTimeout(() => {
+      window.location.href = dest;
+    }, 420);
+  });
+}
