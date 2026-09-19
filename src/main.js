@@ -279,7 +279,7 @@ function initGravityPhysicsBucket() {
   let ground = Bodies.rectangle(width / 2, height + wallThickness / 2 - 4, width * 2, wallThickness, { isStatic: true, friction: 0.5, restitution: 0.4 });
   let leftWall = Bodies.rectangle(-wallThickness / 2 + 4, height / 2, wallThickness, height * 3, { isStatic: true, friction: 0.5, restitution: 0.4 });
   let rightWall = Bodies.rectangle(width + wallThickness / 2 - 4, height / 2, wallThickness, height * 3, { isStatic: true, friction: 0.5, restitution: 0.4 });
-  let ceiling = Bodies.rectangle(width / 2, -wallThickness / 2 - 300, width * 2, wallThickness, { isStatic: true });
+  let ceiling = Bodies.rectangle(width / 2, -wallThickness / 2 + 4, width * 2, wallThickness, { isStatic: true, friction: 0.5, restitution: 0.4 });
 
   Composite.add(engine.world, [ground, leftWall, rightWall, ceiling]);
 
@@ -308,7 +308,7 @@ function initGravityPhysicsBucket() {
       setTimeout(() => {
         // Random horizontal drop position
         const spawnX = Math.random() * (width - 180) + 90;
-        const spawnY = -60 - index * 20;
+        const spawnY = 40 + index * 10;
 
         // Chamfered rounded rectangle body for realistic physics rolling & tumbling
         const body = Bodies.rectangle(spawnX, spawnY, iconSize, iconSize, {
@@ -401,7 +401,7 @@ function initGravityPhysicsBucket() {
   dropObserver.observe(container);
 
   // Device Orientation (Gyroscope Gravity for Mobile Phones!)
-  if (window.DeviceOrientationEvent) {
+  if ('ontouchstart' in window && window.DeviceOrientationEvent) {
     window.addEventListener('deviceorientation', (event) => {
       const gamma = event.gamma; // Left-to-right tilt [-90 to 90]
       const beta = event.beta;   // Front-to-back tilt [-180 to 180]
@@ -409,7 +409,7 @@ function initGravityPhysicsBucket() {
       if (gamma !== null && beta !== null) {
         // Dynamically update physics gravity vector based on phone orientation
         const gx = Math.max(-2, Math.min(2, gamma / 15));
-        const gy = Math.max(-2, Math.min(2, (beta - 30) / 15));
+        const gy = Math.max(0.4, Math.min(2, (beta - 10) / 15));
 
         engine.gravity.x = gx;
         engine.gravity.y = gy;
