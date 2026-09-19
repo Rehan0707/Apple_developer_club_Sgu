@@ -283,7 +283,7 @@ function initGravityPhysicsBucket() {
 
   Composite.add(engine.world, [ground, leftWall, rightWall, ceiling]);
 
-  // App icons to spawn in the physics bucket
+  // App icons to spawn in the physics bucket across full width
   const iconData = [
     { type: 'img', src: '/images/app-icon-showcase.png', alt: 'Nature App' },
     { type: 'badge', emoji: '🍎', label: 'Swift', bg: 'linear-gradient(135deg, #ff5e3a, #ff2a68)' },
@@ -292,23 +292,23 @@ function initGravityPhysicsBucket() {
     { type: 'badge', emoji: '🪪', label: 'SGU Pass', bg: 'linear-gradient(135deg, #0071e3, #42a5f5)' },
     { type: 'badge', emoji: '⚡', label: 'Playroom', bg: 'linear-gradient(135deg, #11998e, #38ef7d)' },
     { type: 'badge', emoji: '🧭', label: 'ARKit', bg: 'linear-gradient(135deg, #fc4a1a, #f7b731)' },
-    { type: 'badge', emoji: '💡', label: 'App Idea', bg: 'linear-gradient(135deg, #f093fb, #f5576c)' }
+    { type: 'badge', emoji: '💡', label: 'App Idea', bg: 'linear-gradient(135deg, #f093fb, #f5576c)' },
+    { type: 'badge', emoji: '🥽', label: 'visionOS', bg: 'linear-gradient(135deg, #5b86e5, #36d1dc)' },
+    { type: 'badge', emoji: '🧠', label: 'Core ML', bg: 'linear-gradient(135deg, #fa709a, #fee140)' },
+    { type: 'badge', emoji: '🚀', label: 'TestFlight', bg: 'linear-gradient(135deg, #2af598, #009efd)' },
+    { type: 'badge', emoji: '📐', label: 'Metal', bg: 'linear-gradient(135deg, #ff0844, #ffb199)' }
   ];
 
   const bodyElements = [];
   const iconSize = 76;
 
-  // Drop icons in from top opening
-  let hasDropped = false;
-  function dropIcons() {
-    if (hasDropped) return;
-    hasDropped = true;
-
+  // Function to spawn icons falling down from above
+  function spawnFallingBatch() {
     iconData.forEach((item, index) => {
       setTimeout(() => {
-        // Random horizontal drop position
-        const spawnX = Math.random() * (width - 180) + 90;
-        const spawnY = 40 + index * 10;
+        // Random horizontal drop position spread dynamically across full container width
+        const spawnX = Math.random() * Math.max(100, width - 160) + 80;
+        const spawnY = -60 - index * 20;
 
         // Chamfered rounded rectangle body for realistic physics rolling & tumbling
         const body = Bodies.rectangle(spawnX, spawnY, iconSize, iconSize, {
@@ -349,13 +349,38 @@ function initGravityPhysicsBucket() {
         Composite.add(engine.world, body);
 
         // Apply slight initial angular velocity & downward force
-        Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.2);
-        Body.setVelocity(body, { x: (Math.random() - 0.5) * 4, y: Math.random() * 2 });
+        Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.25);
+        Body.setVelocity(body, { x: (Math.random() - 0.5) * 5, y: Math.random() * 3 + 2 });
 
         bodyElements.push({ body, el });
-      }, index * 120);
+      }, index * 90);
     });
   }
+
+  // Drop icons in on initial scroll
+  let hasDropped = false;
+  function dropIcons() {
+    if (hasDropped) return;
+    hasDropped = true;
+    spawnFallingBatch();
+  }
+
+  // Trigger falling icons when user clicks twice (double click / double tap)
+  const bucketWrapper = container.closest('.gravity-bucket-wrapper') || container;
+  bucketWrapper.addEventListener('dblclick', () => {
+    spawnFallingBatch();
+  });
+
+  // Handle double-tap gesture on mobile screens
+  let lastTapTime = 0;
+  bucketWrapper.addEventListener('touchstart', (e) => {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTapTime;
+    if (tapLength < 300 && tapLength > 0) {
+      spawnFallingBatch();
+    }
+    lastTapTime = currentTime;
+  }, { passive: true });
 
   // Mouse & Touch Drag Interaction Physics Constraint
   const mouse = Mouse.create(container);
@@ -367,11 +392,39 @@ function initGravityPhysicsBucket() {
     }
   });
 
-  // Prevent wheel scroll locking
+  // Remove Matter.js default scroll-blocking wheel & touch listeners
   if (mouseConstraint.mouse.element) {
-    mouseConstraint.mouse.element.removeEventListener('mousewheel', mouseConstraint.mouse.mousewheel);
-    mouseConstraint.mouse.element.removeEventListener('DOMMouseScroll', mouseConstraint.mouse.mousewheel);
+    const el = mouseConstraint.mouse.element;
+    el.removeEventListener('mousewheel', mouseConstraint.mouse.mousewheel);
+    el.removeEventListener('DOMMouseScroll', mouseConstraint.mouse.mousewheel);
+    el.removeEventListener('wheel', mouseConstraint.mouse.mousewheel);
+    el.removeEventListener('touchstart', mouseConstraint.mouse.touchstart);
+    el.removeEventListener('touchmove', mouseConstraint.mouse.touchmove);
+    el.removeEventListener('touchend', mouseConstraint.mouse.touchend);
   }
+
+  // Non-blocking touch & scroll delegation to preserve native page scrolling
+  container.addEventListener('touchstart', (e) => {
+    const isIconTouch = e.target.closest('.physics-icon-item');
+    if (isIconTouch && mouseConstraint.mouse.touchstart) {
+      mouseConstraint.mouse.touchstart(e);
+    }
+  }, { passive: true });
+
+  container.addEventListener('touchmove', (e) => {
+    if (mouseConstraint.body) {
+      if (e.cancelable) e.preventDefault();
+      if (mouseConstraint.mouse.touchmove) {
+        mouseConstraint.mouse.touchmove(e);
+      }
+    }
+  }, { passive: false });
+
+  container.addEventListener('touchend', (e) => {
+    if (mouseConstraint.mouse.touchend) {
+      mouseConstraint.mouse.touchend(e);
+    }
+  }, { passive: true });
 
   Composite.add(engine.world, mouseConstraint);
 
@@ -417,13 +470,25 @@ function initGravityPhysicsBucket() {
     }, true);
   }
 
-  // Handle Container Resize
+  // Dynamic Container Resize Handler
   window.addEventListener('resize', () => {
     width = container.clientWidth;
     height = container.clientHeight;
 
+    // Reposition boundaries to adapt to dynamic window / container dimensions
     Body.setPosition(ground, { x: width / 2, y: height + wallThickness / 2 - 4 });
     Body.setPosition(rightWall, { x: width + wallThickness / 2 - 4, y: height / 2 });
+    Body.setPosition(leftWall, { x: -wallThickness / 2 + 4, y: height / 2 });
+    Body.setPosition(ceiling, { x: width / 2, y: -wallThickness / 2 - 300 });
+
+    // Keep icons gracefully within boundaries when window width contracts
+    bodyElements.forEach(({ body }) => {
+      const clampedX = Math.max(iconSize / 2 + 10, Math.min(width - iconSize / 2 - 10, body.position.x));
+      const clampedY = Math.max(iconSize / 2 + 10, Math.min(height - iconSize / 2 - 10, body.position.y));
+      if (clampedX !== body.position.x || clampedY !== body.position.y) {
+        Body.setPosition(body, { x: clampedX, y: clampedY });
+      }
+    });
   });
 }
 
