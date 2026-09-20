@@ -19,8 +19,16 @@
 }
 
 html {
-  scroll-behavior: smooth;
   scroll-padding-top: 100px;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
 }
 
 body {
@@ -171,19 +179,24 @@ button:focus-visible {
 nav {
   display: flex;
   align-items: center;
-  gap: 30px;
-  font-size: 12px;
+  gap: 28px;
+  font-size: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", sans-serif;
+  letter-spacing: -0.015em;
+  -webkit-font-smoothing: antialiased;
 }
 
 nav a:not(.button) {
-  color: #424245;
-  transition: color 0.15s ease;
+  color: #38383a;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  transition: color 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 nav a:hover,
 nav a[aria-current] {
   color: #000000;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .nav-dropdown-item {
@@ -195,26 +208,30 @@ nav a[aria-current] {
 .nav-dropdown-trigger {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  color: #424245;
+  gap: 6px;
+  color: #38383a;
   cursor: pointer;
-  font-size: 12px;
-  transition: color 0.15s ease;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  transition: color 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   text-decoration: none;
   background: transparent;
   border: none;
   padding: 0;
-  font-family: inherit;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", sans-serif;
 }
 
 .nav-dropdown-trigger:hover,
 .nav-dropdown-item.is-active .nav-dropdown-trigger {
   color: #000000;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .nav-chevron {
-  transition: transform 0.25s ease, color 0.25s ease;
+  width: 12px;
+  height: 12px;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
   color: #86868b;
 }
 
@@ -391,23 +408,51 @@ nav a[aria-current] {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 13px 25px;
-  border-radius: 30px;
+  padding: 13px 26px;
+  border-radius: 980px;
   background: #0071e3;
   color: #ffffff;
   font-size: 17px;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", sans-serif;
+  letter-spacing: -0.015em;
   border: 0;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .button:hover {
   background: #0077ed;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+}
+
+.button:active {
+  transform: scale(0.97);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
 .button.small {
-  font-size: 12px;
-  padding: 8px 16px;
+  font-size: 14.5px;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: 980px;
+  letter-spacing: -0.012em;
+  box-shadow: 0 2px 8px rgba(0, 113, 227, 0.28), 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.button.small:hover {
+  background: #0077ed;
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 4px 16px rgba(0, 113, 227, 0.38);
+}
+
+.button.small:active {
+  transform: scale(0.96);
+  box-shadow: 0 1px 2px rgba(0, 113, 227, 0.2);
 }
 
 .menu-toggle {
@@ -1199,9 +1244,10 @@ footer p {
   }
   nav .button.small {
     align-self: flex-start;
-    font-size: 14px;
-    margin-top: 10px;
-    padding: 10px 18px;
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 12px;
+    padding: 12px 24px;
     color: #ffffff !important;
   }
   .hero {

@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"background":"#f5f5f7","on-surface":"#1d1d1f","surface-container":"#f0f0f3","error":"#d70015","secondary-fixed":"#28cd41","surface-container-lowest":"#ffffff","surface":"#fbfbfd","on-secondary-fixed":"#00380e","primary":"#0071e3","outline":"#86868b","on-primary-fixed":"#001c39","surface-dim":"#ebebf0","inverse-primary":"#0071e3","on-tertiary":"#ffffff","on-primary":"#ffffff","tertiary":"#af52de","surface-container-low":"#ffffff","surface-container-high":"#e5e5ea","on-background":"#1d1d1f","on-error-container":"#8b0000","inverse-on-surface":"#fbfbfd","on-secondary-container":"#086622","tertiary-fixed":"#f3e8ff","primary-fixed":"#e8f2fd","on-primary-container":"#004085","on-secondary":"#ffffff","on-secondary-fixed-variant":"#0d7a2d","on-error":"#ffffff","primary-fixed-dim":"#0071e3","error-container":"#ffe5e5","secondary":"#34c759","tertiary-fixed-dim":"#af52de","surface-container-highest":"#d1d1d6","surface-tint":"#0071e3","on-primary-fixed-variant":"#005bb5","primary-container":"#0071e3","on-tertiary-container":"#4c1d95","on-surface-variant":"#6e6e73","surface-bright":"#ffffff","outline-variant":"#e5e5ea","surface-variant":"#f5f5f7","inverse-surface":"#1d1d1f","secondary-fixed-dim":"#34c759","on-tertiary-fixed":"#310048","on-tertiary-fixed-variant":"#7200a3","tertiary-container":"#f3e8ff","secondary-container":"#e6f8ee"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","2xl":"1rem","full":"9999px"},spacing:{"space-md":"1rem","gutter":"1.5rem","gutter-sm":"1rem","space-xl":"2rem","space-sm":"0.5rem","margin":"2rem","space-xs":"0.25rem","margin-sm":"1rem","space-lg":"1.25rem"},fontFamily:{"headline-xl-mobile":["Inter"],"body-lg":["Inter"],"body-md":["Inter"],"display-lg":["Inter"],"caption-sm":["Inter"],"headline-lg":["Inter"],"label-badge":["JetBrains Mono"],"title-md":["Inter"],"code-md":["JetBrains Mono"],"headline-xl":["Inter"]},fontSize:{"headline-xl-mobile":["28px",{"lineHeight":"34px","letterSpacing":"-0.02em","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","letterSpacing":"-0.005em","fontWeight":"400"}],"body-md":["14px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}],"display-lg":["44px",{"lineHeight":"52px","letterSpacing":"-0.03em","fontWeight":"700"}],"caption-sm":["12px",{"lineHeight":"16px","letterSpacing":"0.01em","fontWeight":"500"}],"headline-lg":["22px",{"lineHeight":"28px","letterSpacing":"-0.015em","fontWeight":"600"}],"label-badge":["11px",{"lineHeight":"14px","letterSpacing":"0.04em","fontWeight":"600"}],"title-md":["17px",{"lineHeight":"22px","letterSpacing":"-0.01em","fontWeight":"600"}],"code-md":["12px",{"lineHeight":"17px","letterSpacing":"-0.01em","fontWeight":"400"}],"headline-xl":["32px",{"lineHeight":"40px","letterSpacing":"-0.025em","fontWeight":"600"}]}}}}</script></head><body class="bg-background text-on-surface font-body-md text-body-md antialiased selection:bg-primary selection:text-white"><aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-lowest border-r border-outline-variant z-50 flex flex-col justify-between p-space-md"><div class="flex flex-col gap-space-lg"><div class="flex items-center gap-space-sm px-space-xs py-space-xs"><img alt="Apple Developer Club Emblem" class="h-9 w-9 rounded-lg object-contain shadow-sm" src="https://lh3.googleusercontent.com/aida/AEtjO1XIl2pJ7k0jHEiMda_uByLzZ47xkNrfPaNNP047HUKrv_i2Fg7wlpNgdA1bCS_zJoXrAUPokfZytzxx8Ic1HCt2y2Qg8EdXbRAewEl_7_AAeuPAZZYSAwpYO_ibLnzkaqewcbEX_1ZVufCD7u4heMQpqN0yPBhGh6cyIbTlq9nJ5bb3_k5dv_Gi_olO0lBCb5ij_RuggSQKjGhWHM81FAaBQ2pJyKjpxA70tnhJPayFwFui9sSVYs6npmg"/><div class="flex flex-col"><span class="font-title-md text-title-md text-on-surface leading-tight font-semibold">ADC Campus</span><span class="font-caption-sm text-caption-sm text-on-surface-variant font-medium">Chapter Portal</span></div></div><div class="flex flex-col gap-space-xs"><span class="px-space-sm font-label-badge text-label-badge text-outline tracking-wider uppercase">Navigation</span><nav class="flex flex-col gap-1" data-active-classes="bg-primary/10 text-primary font-semibold"><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-150" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[20px]">grid_view</span><span class="font-body-md text-body-md font-medium">Dashboard</span></a><a aria-current="page" class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg transition-all duration-150 bg-primary/10 text-primary font-semibold" data-path="events" href="#"><span class="material-symbols-outlined text-[20px] text-primary">calendar_month</span><span class="font-body-md text-body-md">Events</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-150" data-path="registrations" href="#"><span class="material-symbols-outlined text-[20px]">how_to_reg</span><span class="font-body-md text-body-md font-medium">Registrations</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-150" data-path="badges" href="#"><span class="material-symbols-outlined text-[20px]">verified</span><span class="font-body-md text-body-md font-medium">Badges</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-150" data-path="team" href="#"><span class="material-symbols-outlined text-[20px]">groups</span><span class="font-body-md text-body-md font-medium">Team</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all duration-150" data-path="resources" href="#"><span class="material-symbols-outlined text-[20px]">developer_mode_tv</span><span class="font-body-md text-body-md font-medium">Resources</span></a></nav></div></div><div class="p-space-sm rounded-xl bg-surface-container/70 border border-outline-variant flex flex-col gap-space-xs"><div class="flex items-center justify-between"><span class="font-label-badge text-label-badge text-secondary font-semibold flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>Xcode Cloud</span><span class="font-label-badge text-label-badge text-outline">v15.4</span></div><div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden"><div class="bg-secondary h-full w-4/5 rounded-full"></div></div><span class="font-caption-sm text-caption-sm text-on-surface-variant">Build targets synchronized</span></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/80 backdrop-blur-xl z-40 flex items-center justify-between px-space-lg border-b border-outline-variant"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs px-space-sm py-1 rounded-full bg-secondary-container text-on-secondary-container border border-secondary/20"><span class="w-2 h-2 rounded-full bg-secondary"></span><span class="font-label-badge text-label-badge font-semibold">Cupertino Core SDK</span></div><div class="hidden md:flex items-center gap-space-xs text-on-surface-variant font-code-md text-code-md bg-surface-container px-space-sm py-1 rounded-md border border-outline-variant/60"><span class="material-symbols-outlined text-[16px] text-outline">terminal</span><span>adc-cli status: operational</span></div></div><div class="flex items-center gap-space-md"><div class="flex items-center gap-0.5 bg-surface-container p-1 rounded-lg border border-outline-variant/60"><button class="px-space-sm py-1 rounded font-caption-sm text-caption-sm font-semibold bg-white text-on-surface shadow-sm transition-all">Portal Lead</button><button class="px-space-sm py-1 rounded font-caption-sm text-caption-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors">Member View</button></div><button class="flex items-center justify-center w-8 h-8 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high border border-outline-variant/50 transition-colors"><span class="material-symbols-outlined text-[18px]">notifications</span></button><div class="flex items-center gap-space-sm pl-space-xs border-l border-outline-variant"><div class="flex flex-col text-right hidden sm:flex"><span class="font-body-md text-body-md font-semibold text-on-surface leading-snug">Alex Chen</span><span class="font-caption-sm text-caption-sm text-primary font-medium">Club Co-Lead</span></div><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary/20 shadow-sm" src="https://lh3.googleusercontent.com/aida/AEtjO1U9DjIG6D2JHKmYO0vJz4WLCVJpokrToe03XgNPfDA4DkUzhwk2E-vDSRJUzYS1YX0-ZnZjNBbO9rUsFv_Ss0PFjz0EecP8IpQHR7e6KBgN1otrF42lpHo-vaCwCxzczT6SPzdpiDaPu5G_8gNcEtzX3Tvtsf6L3UqXSifwJXEnlGPQEODVPl8IhsQnEMeZlpmEqdu8R8cdqZwYURv-oO6fI7WnoCkDcjie-RyPoEHpF-on5T8l_COYI5I"/></div></div></header><main class="w-full pt-16 bg-background min-h-screen"><div class="flex flex-col w-full">
+<!-- Action Bar & Command Ribbon -->
+<div class="relative w-full p-space-lg lg:p-margin flex flex-col gap-space-xl">
+<div class="flex flex-col xl:flex-row xl:items-center justify-between gap-space-lg">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-sm">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-badge text-label-badge font-semibold border border-secondary/20">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-ping"></span>
+            LIVE SESSION RUNNING
+          </span>
+<span class="font-code-md text-code-md text-on-surface-variant">Hall 4B • Cupertino Campus Node</span>
+</div>
+<div class="flex items-baseline gap-space-md flex-wrap">
+<h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tight font-bold">WWDC24 Keynote &amp; Spatial Labs</h1>
+<span class="font-label-badge text-label-badge text-outline uppercase tracking-wider px-space-xs py-0.5 bg-surface-container border border-outline-variant rounded">ID: EVT-9924-WWDC</span>
+</div>
+</div>
+<!-- Quick Action CTAs -->
+<div class="flex items-center gap-space-sm flex-wrap">
+<button class="flex items-center gap-space-xs h-10 px-space-md bg-white hover:bg-surface-container text-on-surface rounded-lg font-title-md text-body-md transition-all border border-outline-variant shadow-sm active:scale-95" id="exportBtn">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">file_download</span>
+<span class="font-medium">Export CSV</span>
+</button>
+<button class="flex items-center gap-space-xs h-10 px-space-md bg-white hover:bg-surface-container text-on-surface rounded-lg font-title-md text-body-md transition-all border border-outline-variant shadow-sm active:scale-95" id="createEventModalBtn">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">add</span>
+<span class="font-medium">New Event</span>
+</button>
+<button class="flex items-center gap-space-xs h-10 px-space-lg bg-primary hover:bg-[#0062c4] text-white font-headline-lg text-body-md rounded-lg shadow-sm hover:shadow transition-all active:scale-95 group" id="triggerScannerFlash">
+<span class="material-symbols-outlined text-[20px] group-hover:rotate-12 transition-transform">qr_code_scanner</span>
+<span class="font-semibold">Live Camera Check-In</span>
+</button>
+</div>
+</div>
+<!-- Live Telemetry KPI Deck -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<!-- Checked In Counter -->
+<div class="relative bg-white rounded-xl p-space-lg flex flex-col justify-between border border-outline-variant shadow-sm overflow-hidden">
+<div class="flex items-center justify-between">
+<span class="font-caption-sm text-caption-sm text-on-surface-variant uppercase tracking-wider font-semibold">Attendance Rate</span>
+<span class="material-symbols-outlined text-secondary text-[20px]">how_to_reg</span>
+</div>
+<div class="flex items-baseline gap-space-sm my-space-sm">
+<span class="font-display-lg text-display-lg text-on-surface font-bold leading-none" id="checkedInCount">142</span>
+<span class="font-headline-lg text-headline-lg text-outline font-semibold">/ 160</span>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full transition-all duration-700" id="checkinBar" style="width: 88.7%;"></div>
+</div>
+<div class="flex justify-between font-label-badge text-label-badge">
+<span class="text-secondary font-bold">88.7% Confirmed</span>
+<span class="text-on-surface-variant">Target: 95%</span>
+</div>
+</div>
+</div>
+<!-- Capacity Gauge -->
+<div class="relative bg-white rounded-xl p-space-lg flex flex-col justify-between border border-outline-variant shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-caption-sm text-caption-sm text-on-surface-variant uppercase tracking-wider font-semibold">Venue Capacity</span>
+<span class="material-symbols-outlined text-primary text-[20px]">domain</span>
+</div>
+<div class="flex items-baseline gap-space-xs my-space-sm">
+<span class="font-display-lg text-display-lg text-on-surface font-bold leading-none">18</span>
+<span class="font-title-md text-title-md text-primary font-semibold">Walk-ins Left</span>
+</div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-caption-sm text-caption-sm">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span>Fire Marshall Cap: 180 seats max</span>
+</div>
+</div>
+<!-- Real-time Scan Velocity -->
+<div class="relative bg-white rounded-xl p-space-lg flex flex-col justify-between border border-outline-variant shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-caption-sm text-caption-sm text-on-surface-variant uppercase tracking-wider font-semibold">Pace &amp; Peak</span>
+<span class="material-symbols-outlined text-tertiary text-[20px]">bolt</span>
+</div>
+<div class="flex items-baseline gap-space-xs my-space-sm">
+<span class="font-display-lg text-display-lg text-tertiary font-bold leading-none">4.2</span>
+<span class="font-title-md text-title-md text-on-surface-variant font-medium">scans/min</span>
+</div>
+<!-- Sparkline SVG -->
+<div class="flex items-center justify-between">
+<svg class="w-28 h-6 text-tertiary" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 100 24">
+<path d="M0,18 L15,16 L30,20 L45,12 L60,14 L75,4 L90,8 L100,2" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="font-label-badge text-label-badge text-outline">Peak: 12:15 PM</span>
+</div>
+</div>
+<!-- Leader Terminal Pulse -->
+<div class="relative bg-white rounded-xl p-space-lg flex flex-col justify-between border border-outline-variant shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-caption-sm text-caption-sm text-on-surface-variant uppercase tracking-wider font-semibold">Staff Gate Nodes</span>
+<span class="material-symbols-outlined text-outline text-[20px]">hub</span>
+</div>
+<div class="flex items-center -space-x-2 my-space-sm">
+<div class="w-9 h-9 rounded-full bg-primary/10 border-2 border-white flex items-center justify-center font-caption-sm text-caption-sm font-bold text-primary shadow-sm">AC</div>
+<div class="w-9 h-9 rounded-full bg-secondary-container border-2 border-white flex items-center justify-center font-caption-sm text-caption-sm font-bold text-secondary shadow-sm">ML</div>
+<div class="w-9 h-9 rounded-full bg-tertiary-container border-2 border-white flex items-center justify-center font-caption-sm text-caption-sm font-bold text-tertiary shadow-sm">JR</div>
+<div class="w-9 h-9 rounded-full bg-surface-container border-2 border-white flex items-center justify-center font-caption-sm text-caption-sm font-bold text-on-surface shadow-sm">SK</div>
+</div>
+<div class="flex items-center justify-between font-caption-sm text-caption-sm">
+<span class="text-secondary font-medium">4 Terminals Active</span>
+<span class="font-label-badge text-label-badge text-outline">Mesh Latency 14ms</span>
+</div>
+</div>
+</div>
+<!-- Live Event Detail & Check-in Panel (Split Pane) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- Left Pane: Live Camera QR Scanner & Manual Fast Search (5 Cols) -->
+<div class="lg:col-span-5 flex flex-col gap-space-md">
+<!-- Interactive Scanner Box -->
+<div class="bg-white rounded-2xl p-space-lg flex flex-col gap-space-md border border-outline-variant shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">videocam</span>
+<h2 class="font-title-md text-title-md text-on-surface font-semibold">Optical Check-in Rig</h2>
+</div>
+<div class="flex items-center gap-space-xs">
+<select class="bg-surface-container text-on-surface font-caption-sm text-caption-sm px-space-sm py-1.5 rounded-lg border border-outline-variant outline-none focus:ring-2 focus:ring-primary/40" id="cameraSelector">
+<option>FaceTime HD Camera (Ultra-Wide)</option>
+<option>Continuity Camera (iPhone 15 Pro)</option>
+<option>USB Desk Scanner (Port 02)</option>
+</select>
+</div>
+</div>
+<!-- Video Viewport Simulator -->
+<div class="relative w-full aspect-video bg-[#0d0d15] rounded-xl overflow-hidden flex flex-col items-center justify-center shadow-inner group">
+<!-- Simulated Camera Feed Background -->
+<div class="absolute inset-0 bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-700" data-alt="Dark high-tech university lecture hall stage with blue glow screens and developer workstations in soft blur background, cinematic high contrast." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAaI-Ct-BxzGNzkIKjoh6AdAgxPxk6YpYRuuwmBUELhzk8f9A98xvCKt2_0RdTiKVwkDTFf5OzcCNB-QXiqZAeqM-BrcSVi4KqiBcsBeZzijWAml--0-QuZHwChto8zjfsbk978MozMjdwhxgCr6CXjbPmbY1ltIfLdRMaIMMTGHZKrkVNcSBAd-BnuTeX8xoI7lGOeAfSbauv3YJNVwegksR-d1FrkE6SNAaHnewkexu6ssZAe7lAAHw')"></div>
+<!-- Dark Overlay Vignette -->
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/60"></div>
+<!-- Optical Targeting Reticle -->
+<div class="relative z-10 w-44 h-44 rounded-xl flex items-center justify-center">
+<!-- Corner brackets -->
+<span class="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-primary"></span>
+<span class="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-primary"></span>
+<span class="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-primary"></span>
+<span class="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-primary"></span>
+<!-- Scanning laser bar -->
+<div class="w-full h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_12px_rgba(0,113,227,0.9)] animate-bounce" id="laserScan"></div>
+<div class="absolute -bottom-8 font-label-badge text-label-badge text-white bg-black/70 px-2 py-0.5 rounded backdrop-blur-md">
+                ALIGN PASS QR CODE
+              </div>
+</div>
+<!-- Flash Toast on Successful Scan -->
+<div class="absolute inset-x-space-md bottom-space-md z-20 transform translate-y-2 opacity-0 pointer-events-none transition-all duration-300 bg-secondary-container text-on-secondary-container p-space-sm rounded-lg flex items-center justify-between border border-secondary/30 shadow-lg" id="scanConfirmation">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="material-symbols-outlined text-[20px] text-secondary">check_circle</span>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-caption-sm font-bold truncate text-on-surface" id="scannedNameToast">Scanned: Maya Lin</span>
+<span class="font-caption-sm text-label-badge text-on-surface-variant truncate">ID #8849 • Seat B-12 • Just now</span>
+</div>
+</div>
+<span class="font-label-badge text-label-badge px-2 py-0.5 bg-secondary text-white rounded font-bold">VERIFIED</span>
+</div>
+</div>
+<!-- Quick Manual Entry Bar -->
+<div class="flex flex-col gap-space-xs">
+<label class="font-caption-sm text-caption-sm text-on-surface-variant flex items-center justify-between" for="manualInput">
+<span class="font-medium">Manual Entry Bypass</span>
+<span class="font-code-md text-code-md text-outline">Press [Enter] to submit</span>
+</label>
+<div class="flex items-center gap-space-xs">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-outline">search</span>
+<input class="w-full h-10 pl-9 pr-space-md bg-white border border-outline-variant text-on-surface font-body-md text-body-md rounded-lg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-outline" id="manualInput" placeholder="Enter Student ID (e.g. #8849) or @edu mail..." type="text"/>
+</div>
+<button class="h-10 px-space-md bg-surface-container hover:bg-surface-container-high text-on-surface font-semibold text-caption-sm rounded-lg border border-outline-variant transition-all flex items-center gap-1 active:scale-95" id="manualSubmitBtn">
+<span>Verify</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Quick Hardware Diagnostics -->
+<div class="p-space-sm bg-surface-container rounded-lg flex items-center justify-between text-on-surface-variant font-caption-sm text-caption-sm border border-outline-variant/60">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-medium text-on-surface">Scanner Engine 3.1: Active</span>
+</div>
+<span class="font-code-md text-code-md text-outline">Exposure: Auto (-0.3 EV)</span>
+</div>
+</div>
+<!-- Venue Audio / Mic / Keynote Sync Card -->
+<div class="bg-white rounded-2xl p-space-lg flex items-center justify-between border border-outline-variant shadow-sm">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-xl bg-tertiary-container text-tertiary flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px]">cast</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-body-md font-semibold text-on-surface">Stage Keynote Sync</span>
+<span class="font-caption-sm text-caption-sm text-on-surface-variant">Live streaming to Spatial Studio 1 &amp; 3</span>
+</div>
+</div>
+<button class="px-space-sm py-1.5 bg-surface-container hover:bg-surface-container-high text-on-surface text-caption-sm font-semibold rounded-lg border border-outline-variant transition-colors">
+            Stream Control
+          </button>
+</div>
+</div>
+<!-- Right Pane: Real-time Registrant List with Rapid Attendance Toggle (7 Cols) -->
+<div class="lg:col-span-7 bg-white rounded-2xl p-space-lg flex flex-col gap-space-md border border-outline-variant shadow-sm">
+<!-- Header & Segmented Filter Bar -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-sm">
+<h2 class="font-title-md text-title-md text-on-surface font-semibold">Attendee Roster</h2>
+<span class="px-2.5 py-0.5 rounded-full bg-primary/10 font-label-badge text-label-badge text-primary font-semibold" id="rosterCountPill">160 Registered</span>
+</div>
+<!-- Search filter input inside list -->
+<div class="relative w-full sm:w-56">
+<span class="material-symbols-outlined absolute left-2.5 top-2 text-[16px] text-outline">tune</span>
+<input class="w-full h-8 pl-8 pr-space-xs bg-white border border-outline-variant text-on-surface font-caption-sm text-caption-sm rounded-lg outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-outline" id="listFilterSearch" placeholder="Filter names..." type="text"/>
+</div>
+</div>
+<!-- HIG Segmented Control Filter Tabs -->
+<div class="flex items-center gap-1 p-1 bg-surface-container rounded-xl overflow-x-auto border border-outline-variant/60">
+<button class="filter-tab flex-1 py-1.5 px-space-sm rounded-lg font-caption-sm text-caption-sm font-semibold bg-white text-on-surface transition-all shadow-sm whitespace-nowrap" data-filter="all">All (160)</button>
+<button class="filter-tab flex-1 py-1.5 px-space-sm rounded-lg font-caption-sm text-caption-sm font-medium text-on-surface-variant hover:text-on-surface transition-all whitespace-nowrap" data-filter="checked">Checked In (142)</button>
+<button class="filter-tab flex-1 py-1.5 px-space-sm rounded-lg font-caption-sm text-caption-sm font-medium text-on-surface-variant hover:text-on-surface transition-all whitespace-nowrap" data-filter="awaiting">Awaiting (18)</button>
+<button class="filter-tab flex-1 py-1.5 px-space-sm rounded-lg font-caption-sm text-caption-sm font-medium text-on-surface-variant hover:text-on-surface transition-all whitespace-nowrap" data-filter="walkin">Walk-ins (4)</button>
+<button class="filter-tab flex-1 py-1.5 px-space-sm rounded-lg font-caption-sm text-caption-sm font-medium text-on-surface-variant hover:text-on-surface transition-all whitespace-nowrap" data-filter="vip">VIP / Speakers (6)</button>
+</div>
+<!-- Student Attendance Interactive Card Roster -->
+<div class="flex flex-col gap-space-xs max-h-[500px] overflow-y-auto pr-space-xs divide-y divide-outline-variant/40" id="attendeeContainer">
+<!-- Attendee Row 1 (VIP Speaker - Checked In) -->
+<div class="attendee-row flex items-center justify-between p-space-sm rounded-xl hover:bg-surface-container/60 transition-all pt-2" data-category="vip" data-id="1092" data-name="Dr. Aris Thorne" data-status="checked">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="relative">
+<img class="w-10 h-10 rounded-full object-cover shadow-sm ring-1 ring-outline-variant" data-alt="Headshot portrait of a senior distinguished Apple computer science professor with spectacles and dark minimal turtleneck, professional soft studio lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0Z0DrovC0I_Ehhgw7pUfcJ0VfMDxluXXOaT-cAYUPNuyVHxu6NqJRc6zVtzVkXBme2h8EbZSYF_JD0EYCSZjDCyHNPFme1bc0U9I_gMg1Bq9nOuKnjczs4iviIGZ0BUaaN3Kr8qLfM2P57n4B-yVaFZ6q9PcSNb1_X4BflhMEz7p5G6vxIaa8saFNT0zjcIYKaKnZFjSJeqUdiMl8pdQy8mGmzZPJbG7O7TdL1K7JCuiEYW51t4Fr3w"/>
+<span class="absolute -bottom-1 -right-1 w-4 h-4 bg-tertiary text-white rounded-full flex items-center justify-center text-[10px] font-bold">★</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="font-body-md text-body-md font-semibold text-on-surface truncate">Dr. Aris Thorne</span>
+<span class="font-label-badge text-label-badge px-2 py-0.5 bg-tertiary-container text-tertiary font-semibold rounded">VIP Keynote</span>
+</div>
+<div class="flex items-center gap-space-xs font-caption-sm text-caption-sm text-on-surface-variant">
+<span>Track: CoreML &amp; Accelerate</span>
+<span>•</span>
+<span class="font-code-md text-code-md text-outline">Seat A-01</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<span class="status-indicator px-space-sm py-1 rounded-full font-label-badge text-label-badge bg-secondary-container text-on-secondary-container flex items-center gap-1 font-semibold border border-secondary/20">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span>11:42 AM</span>
+</span>
+<button class="toggle-btn w-9 h-9 rounded-lg bg-surface-container hover:bg-secondary hover:text-white text-on-surface border border-outline-variant transition-colors flex items-center justify-center active:scale-90" title="Toggle Check-In">
+<span class="material-symbols-outlined text-[18px]">done_all</span>
+</button>
+</div>
+</div>
+<!-- Attendee Row 2 (Checked In) -->
+<div class="attendee-row flex items-center justify-between p-space-sm rounded-xl hover:bg-surface-container/60 transition-all pt-2" data-category="checked" data-id="8849" data-name="Maya Lin" data-status="checked">
+<div class="flex items-center gap-space-sm min-w-0">
+<img class="w-10 h-10 rounded-full object-cover shadow-sm ring-1 ring-outline-variant" data-alt="Portrait of a young Asian female software engineer smiling warmly in modern tech hoodie, ambient studio lighting with dark purple tone." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTuhb59Xe-TOukaSP9_OAUSPFmDeNTDskAP0lIchAXkXXq-DHZfa88XKbXYjRvq5JrFnG0wDc-xIAZ9EAe9zbugH1PBcUNXdmyFh9OsBw6lTVlorl4f0_uyo7TdOBHOPbjRGjBylriT2slf2wGhTzyTgFV1PQA1GsR8X3GpJyzw0ScRygZU1Uwvj2MIIl5U7Qyy1W8R2tlWJZq4uVoUxlI0St2EM8MLkOdDvLRxFTWV-5b9iwVtnKa_A"/>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="font-body-md text-body-md font-semibold text-on-surface truncate">Maya Lin</span>
+<span class="font-label-badge text-label-badge text-outline">#8849</span>
+</div>
+<div class="flex items-center gap-space-xs font-caption-sm text-caption-sm text-on-surface-variant">
+<span class="px-1.5 py-0.2 rounded bg-primary-fixed text-primary font-medium text-[11px]">VisionOS Spatial UI</span>
+<span>•</span>
+<span class="font-code-md text-code-md text-outline">Seat B-12</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<span class="status-indicator px-space-sm py-1 rounded-full font-label-badge text-label-badge bg-secondary-container text-on-secondary-container flex items-center gap-1 font-semibold border border-secondary/20">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span>12:04 PM</span>
+</span>
+<button class="toggle-btn w-9 h-9 rounded-lg bg-surface-container hover:bg-secondary hover:text-white text-on-surface border border-outline-variant transition-colors flex items-center justify-center active:scale-90" title="Toggle Check-In">
+<span class="material-symbols-outlined text-[18px]">check</span>
+</button>
+</div>
+</div>
+<!-- Attendee Row 3 (Awaiting Check-in) -->
+<div class="attendee-row flex items-center justify-between p-space-sm rounded-xl hover:bg-surface-container/60 transition-all pt-2" data-category="awaiting" data-id="4412" data-name="Julian Vance" data-status="awaiting">
+<div class="flex items-center gap-space-sm min-w-0">
+<img class="w-10 h-10 rounded-full object-cover shadow-sm ring-1 ring-outline-variant" data-alt="Portrait of a young male computer engineering student with curly dark hair looking focused, clean Apple campus ambient backdrop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4fRfGNHYSM-9S-LFsPkAQt_PthcAxdpEwCx1ManORNw_pHgcI1t9Hlu4zCtcN7r3PYT3p611OqC7ehJT-BYviM9nup9oQk3Fs8cT33QUaSyqUMvyVGNVm6GAbfKvOp_QPG2ZYbitoduX3Vt3KNfezmeptvI6Yk5oNWKIwuE_aEahllANhQrB5fWVqGEJHssUh83VRIpUN4jMS3sLu1OSVJrr4ULNTmVepZQqM0_ctGMKbJ4cbkIoC4w"/>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="font-body-md text-body-md font-semibold text-on-surface truncate">Julian Vance</span>
+<span class="font-label-badge text-label-badge text-outline">#4412</span>
+</div>
+<div class="flex items-center gap-space-xs font-caption-sm text-caption-sm text-on-surface-variant">
+<span class="px-1.5 py-0.2 rounded bg-tertiary-fixed text-tertiary font-medium text-[11px]">Swift 6 Concurrency</span>
+<span>•</span>
+<span class="font-code-md text-code-md text-outline">Seat C-04</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<span class="status-indicator px-space-sm py-1 rounded-full font-label-badge text-label-badge bg-surface-container text-on-surface-variant flex items-center gap-1 border border-outline-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+<span>Awaiting Arrival</span>
+</span>
+<button class="toggle-btn w-9 h-9 rounded-lg bg-surface-container hover:bg-primary hover:text-white text-on-surface border border-outline-variant transition-colors flex items-center justify-center active:scale-90" title="Quick Check-In">
+<span class="material-symbols-outlined text-[18px]">how_to_reg</span>
+</button>
+</div>
+</div>
+<!-- Attendee Row 4 (Walk-in Checked In) -->
+<div class="attendee-row flex items-center justify-between p-space-sm rounded-xl hover:bg-surface-container/60 transition-all pt-2" data-category="walkin" data-id="9021" data-name="Siddharth Rao" data-status="checked">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-10 h-10 rounded-full bg-primary/10 text-primary border border-primary/20 flex items-center justify-center font-bold text-body-md shadow-sm">
+                SR
+              </div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="font-body-md text-body-md font-semibold text-on-surface truncate">Siddharth Rao</span>
+<span class="font-label-badge text-label-badge px-2 py-0.2 bg-primary/10 text-primary font-semibold rounded">Walk-in</span>
+</div>
+<div class="flex items-center gap-space-xs font-caption-sm text-caption-sm text-on-surface-variant">
+<span>Track: iOS App Architecture</span>
+<span>•</span>
+<span class="font-code-md text-code-md text-outline">Seat W-03</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<span class="status-indicator px-space-sm py-1 rounded-full font-label-badge text-label-badge bg-secondary-container text-on-secondary-container flex items-center gap-1 font-semibold border border-secondary/20">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span>12:11 PM</span>
+</span>
+<button class="toggle-btn w-9 h-9 rounded-lg bg-surface-container hover:bg-secondary hover:text-white text-on-surface border border-outline-variant transition-colors flex items-center justify-center active:scale-90" title="Toggle Check-In">
+<span class="material-symbols-outlined text-[18px]">check</span>
+</button>
+</div>
+</div>
+<!-- Attendee Row 5 (Awaiting) -->
+<div class="attendee-row flex items-center justify-between p-space-sm rounded-xl hover:bg-surface-container/60 transition-all pt-2" data-category="awaiting" data-id="7719" data-name="Elena Rostova" data-status="awaiting">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-10 h-10 rounded-full bg-tertiary/10 text-tertiary border border-tertiary/20 flex items-center justify-center font-bold text-body-md shadow-sm">
+                ER
+              </div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="font-body-md text-body-md font-semibold text-on-surface truncate">Elena Rostova</span>
+<span class="font-label-badge text-label-badge text-outline">#7719</span>
+</div>
+<div class="flex items-center gap-space-xs font-caption-sm text-caption-sm text-on-surface-variant">
+<span>Track: Metal Shaders 3D</span>
+<span>•</span>
+<span class="font-code-md text-code-md text-outline">Seat D-19</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<span class="status-indicator px-space-sm py-1 rounded-full font-label-badge text-label-badge bg-surface-container text-on-surface-variant flex items-center gap-1 border border-outline-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+<span>Awaiting Arrival</span>
+</span>
+<button class="toggle-btn w-9 h-9 rounded-lg bg-surface-container hover:bg-primary hover:text-white text-on-surface border border-outline-variant transition-colors flex items-center justify-center active:scale-90" title="Quick Check-In">
+<span class="material-symbols-outlined text-[18px]">how_to_reg</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Realtime Roster Quick Footer -->
+<div class="p-space-sm bg-surface-container/70 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-space-xs text-on-surface-variant font-caption-sm text-caption-sm border border-outline-variant/60">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[16px] text-secondary">sync</span>
+<span>CloudKit Database stream synced 4s ago</span>
+</div>
+<button class="font-caption-sm text-caption-sm text-primary hover:underline flex items-center gap-1 font-semibold" id="addWalkinModalBtn">
+<span class="material-symbols-outlined text-[16px]">person_add</span>
+<span>Fast Register Walk-In Student</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bottom Section: All Club Events Registry & Lifecycle Operations -->
+<div class="bg-white rounded-2xl p-space-lg flex flex-col gap-space-lg border border-outline-variant shadow-sm">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md">
+<div class="flex flex-col gap-0.5">
+<h2 class="font-headline-lg text-headline-lg text-on-surface font-semibold">Club Event Schedule &amp; Lifecycle</h2>
+<span class="font-caption-sm text-caption-sm text-on-surface-variant">Active academic term 2024-2025 • Silicon Valley Chapter Hub</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<div class="flex items-center gap-1 bg-surface-container p-1 rounded-lg border border-outline-variant/60">
+<button class="px-space-sm py-1 rounded font-caption-sm text-caption-sm font-semibold bg-white text-on-surface shadow-sm">All Terms</button>
+<button class="px-space-sm py-1 rounded font-caption-sm text-caption-sm font-medium text-on-surface-variant hover:text-on-surface">Fall 24</button>
+<button class="px-space-sm py-1 rounded font-caption-sm text-caption-sm font-medium text-on-surface-variant hover:text-on-surface">Spring 25</button>
+</div>
+</div>
+</div>
+<!-- Events Operations Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="font-caption-sm text-caption-sm text-on-surface-variant uppercase tracking-wider border-b border-outline-variant font-semibold">
+<th class="pb-space-sm">EVENT NAME &amp; FOCUS</th>
+<th class="pb-space-sm">STATUS</th>
+<th class="pb-space-sm">DATE &amp; VENUE</th>
+<th class="pb-space-sm">RSVP BREAKDOWN</th>
+<th class="pb-space-sm">CAPACITY</th>
+<th class="pb-space-sm text-right">MANAGE</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md divide-y divide-outline-variant/60">
+<!-- Event 1 (Current Live) -->
+<tr class="hover:bg-surface-container/50 transition-colors group">
+<td class="py-space-md pr-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></div>
+<div class="flex flex-col">
+<span class="font-title-md text-body-md font-semibold text-on-surface group-hover:text-primary transition-colors">WWDC24 Keynote &amp; Spatial Labs</span>
+<span class="font-caption-sm text-caption-sm text-on-surface-variant">Core Session • VisionOS Demo Stations</span>
+</div>
+</div>
+</td>
+<td class="py-space-md pr-space-md">
+<span class="px-2.5 py-1 rounded-full font-label-badge text-label-badge bg-secondary-container text-on-secondary-container font-bold border border-secondary/20">
+                  LIVE NOW
+                </span>
+</td>
+<td class="py-space-md pr-space-md">
+<div class="flex flex-col font-caption-sm text-caption-sm">
+<span class="text-on-surface font-semibold">Today • 12:00 PM PST</span>
+<span class="text-on-surface-variant">Hall 4B Engineering Center</span>
+</div>
+</td>
+<td class="py-space-md pr-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="font-code-md text-code-md font-semibold text-on-surface">142 Checked In</span>
+<span class="font-caption-sm text-caption-sm text-outline">(160 RSVP)</span>
+</div>
+</td>
+<td class="py-space-md pr-space-md">
+<div class="w-32 flex flex-col gap-1">
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 88.7%;"></div>
+</div>
+<span class="font-label-badge text-label-badge text-outline">89% full</span>
+</div>
+</td>
+<td class="py-space-md text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="px-space-sm py-1 bg-primary text-white rounded font-caption-sm text-caption-sm font-semibold hover:bg-primary/90 transition-colors shadow-sm">Console</button>
+<button class="p-1 text-on-surface-variant hover:text-on-surface rounded hover:bg-surface-container transition-colors" title="Manage Attendees">
+<span class="material-symbols-outlined text-[18px]">group</span>
+</button>
+<button class="p-1 text-on-surface-variant hover:text-on-surface rounded hover:bg-surface-container transition-colors" title="Duplicate Event">
+<span class="material-symbols-outlined text-[18px]">content_copy</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Event 2 (Upcoming) -->
+<tr class="hover:bg-surface-container/50 transition-colors group">
+<td class="py-space-md pr-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-2.5 h-2.5 rounded-full bg-primary"></div>
+<div class="flex flex-col">
+<span class="font-title-md text-body-md font-semibold text-on-surface group-hover:text-primary transition-colors">Swift Student Challenge Sprint 2025</span>
+<span class="font-caption-sm text-caption-sm text-on-surface-variant">48-Hour Hackathon • Mentorship Track</span>
+</div>
+</div>
+</td>
+<td class="py-space-md pr-space-md">
+<span class="px-2.5 py-1 rounded-full font-label-badge text-label-badge bg-primary/10 text-primary font-bold border border-primary/20">
+                  UPCOMING
+                </span>
+</td>
+<td class="py-space-md pr-space-md">
+<div class="flex flex-col font-caption-sm text-caption-sm">
+<span class="text-on-surface font-semibold">Nov 15 • 9:00 AM PST</span>
+<span class="text-on-surface-variant">Innovation Hive Labs</span>
+</div>
+</td>
+<td class="py-space-md pr-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="font-code-md text-code-md font-semibold text-on-surface">210 Registered</span>
+<span class="font-caption-sm text-caption-sm text-outline">(Waitlist 45)</span>
+</div>
+</td>
+<td class="py-space-md pr-space-md">
+<div class="w-32 flex flex-col gap-1">
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-error h-full rounded-full" style="width: 100%;"></div>
+</div>
+<span class="font-label-badge text-label-badge text-error font-semibold">Overbooked (105%)</span>
+</div>
+</td>
+<td class="py-space-md text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="px-space-sm py-1 bg-surface-container hover:bg-surface-container-high text-on-surface rounded font-caption-sm text-caption-sm font-medium border border-outline-variant transition-colors">Edit</button>
+<button class="p-1 text-on-surface-variant hover:text-on-surface rounded hover:bg-surface-container transition-colors" title="Manage Attendees">
+<span class="material-symbols-outlined text-[18px]">group</span>
+</button>
+<button class="p-1 text-on-surface-variant hover:text-on-surface rounded hover:bg-surface-container transition-colors" title="Duplicate Event">
+<span class="material-symbols-outlined text-[18px]">content_copy</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Event 3 (Completed) -->
+<tr class="hover:bg-surface-container/50 transition-colors group">
+<td class="py-space-md pr-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-2.5 h-2.5 rounded-full bg-outline"></div>
+<div class="flex flex-col">
+<span class="font-title-md text-body-md font-semibold text-on-surface group-hover:text-primary transition-colors">Metal 3 Shader Workshop &amp; Game Porting</span>
+<span class="font-caption-sm text-caption-sm text-outline">Hands-on lab with Apple GPU Architects</span>
+</div>
+</div>
+</td>
+<td class="py-space-md pr-space-md">
+<span class="px-2.5 py-1 rounded-full font-label-badge text-label-badge bg-surface-container text-on-surface-variant font-bold border border-outline-variant">
+                  COMPLETED
+                </span>
+</td>
+<td class="py-space-md pr-space-md">
+<div class="flex flex-col font-caption-sm text-caption-sm">
+<span class="text-on-surface font-semibold">Oct 28 • Concluded</span>
+<span class="text-outline">Mac Studio Lab 202</span>
+</div>
+</td>
+<td class="py-space-md pr-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="font-code-md text-code-md font-semibold text-on-surface">94 Checked In</span>
+<span class="font-caption-sm text-caption-sm text-outline">(98% Show Rate)</span>
+</div>
+</td>
+<td class="py-space-md pr-space-md">
+<div class="w-32 flex flex-col gap-1">
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-outline h-full rounded-full" style="width: 100%;"></div>
+</div>
+<span class="font-label-badge text-label-badge text-outline">Archived</span>
+</div>
+</td>
+<td class="py-space-md text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="px-space-sm py-1 bg-surface-container hover:bg-surface-container-high text-on-surface rounded font-caption-sm text-caption-sm font-medium border border-outline-variant transition-colors">Summary</button>
+<button class="p-1 text-on-surface-variant hover:text-on-surface rounded hover:bg-surface-container transition-colors" title="Export Ledger">
+<span class="material-symbols-outlined text-[18px]">archive</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Interactive JavaScript for venue check-in operations -->
+<script>
+    (function() {
+      let checkedInCount = 142;
+      const totalRegistered = 160;
+
+      const checkedInCounterEl = document.getElementById('checkedInCount');
+      const checkinBarEl = document.getElementById('checkinBar');
+      const scanConfirmation = document.getElementById('scanConfirmation');
+      const scannedNameToast = document.getElementById('scannedNameToast');
+      const triggerScannerBtn = document.getElementById('triggerScannerFlash');
+      const manualInput = document.getElementById('manualInput');
+      const manualSubmitBtn = document.getElementById('manualSubmitBtn');
+      const filterTabs = document.querySelectorAll('.filter-tab');
+      const rosterRows = document.querySelectorAll('.attendee-row');
+      const listFilterSearch = document.getElementById('listFilterSearch');
+      const exportBtn = document.getElementById('exportBtn');
+
+      function updateStats() {
+        if(checkedInCounterEl) checkedInCounterEl.innerText = checkedInCount;
+        if(checkinBarEl) {
+          const pct = ((checkedInCount / totalRegistered) * 100).toFixed(1);
+          checkinBarEl.style.width = pct + '%';
+        }
+      }
+
+      function flashSuccess(name, id) {
+        if(!scanConfirmation) return;
+        scannedNameToast.innerText = 'Scanned: ' + name;
+        scanConfirmation.classList.remove('translate-y-2', 'opacity-0', 'pointer-events-none');
+        scanConfirmation.classList.add('translate-y-0', 'opacity-100');
+
+        setTimeout(() => {
+          scanConfirmation.classList.remove('translate-y-0', 'opacity-100');
+          scanConfirmation.classList.add('translate-y-2', 'opacity-0', 'pointer-events-none');
+        }, 3200);
+      }
+
+      // Simulate scanner hit
+      if(triggerScannerBtn) {
+        triggerScannerBtn.addEventListener('click', () => {
+          flashSuccess('Marcus Aurelius • #3021', '3021');
+          checkedInCount++;
+          updateStats();
+        });
+      }
+
+      // Manual ID input action
+      function handleManualSubmit() {
+        const val = manualInput.value.trim();
+        if(!val) return;
+        flashSuccess(val + ' (Bypass Code)', 'Manual');
+        manualInput.value = '';
+        checkedInCount++;
+        updateStats();
+      }
+
+      if(manualSubmitBtn) {
+        manualSubmitBtn.addEventListener('click', handleManualSubmit);
+      }
+      if(manualInput) {
+        manualInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') handleManualSubmit();
+        });
+      }
+
+      // Toggle Attendee Check-in Status on click
+      document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const row = e.target.closest('.attendee-row');
+          if(!row) return;
+          const statusSpan = row.querySelector('.status-indicator');
+          const isChecked = row.dataset.status === 'checked';
+
+          if(isChecked) {
+            row.dataset.status = 'awaiting';
+            statusSpan.className = 'status-indicator px-space-sm py-1 rounded-full font-label-badge text-label-badge bg-surface-container text-on-surface-variant flex items-center gap-1 border border-outline-variant';
+            statusSpan.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-outline"></span><span>Awaiting Arrival</span>';
+            btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">how_to_reg</span>';
+            checkedInCount = Math.max(0, checkedInCount - 1);
+          } else {
+            row.dataset.status = 'checked';
+            statusSpan.className = 'status-indicator px-space-sm py-1 rounded-full font-label-badge text-label-badge bg-secondary-container text-on-secondary-container flex items-center gap-1 font-semibold border border-secondary/20';
+            statusSpan.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span><span>Just Now</span>';
+            btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">done_all</span>';
+            checkedInCount++;
+            flashSuccess(row.dataset.name, row.dataset.id);
+          }
+          updateStats();
+        });
+      });
+
+      // Filter Tabs Handler
+      filterTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          filterTabs.forEach(t => {
+            t.classList.remove('bg-white', 'text-on-surface', 'font-semibold', 'shadow-sm');
+            t.classList.add('text-on-surface-variant', 'font-medium');
+          });
+          tab.classList.add('bg-white', 'text-on-surface', 'font-semibold', 'shadow-sm');
+          tab.classList.remove('text-on-surface-variant', 'font-medium');
+
+          const filterVal = tab.dataset.filter;
+          rosterRows.forEach(row => {
+            if(filterVal === 'all') {
+              row.style.display = 'flex';
+            } else if(filterVal === 'checked') {
+              row.style.display = (row.dataset.status === 'checked') ? 'flex' : 'none';
+            } else if(filterVal === 'awaiting') {
+              row.style.display = (row.dataset.status === 'awaiting') ? 'flex' : 'none';
+            } else if(filterVal === 'walkin') {
+              row.style.display = (row.dataset.category === 'walkin') ? 'flex' : 'none';
+            } else if(filterVal === 'vip') {
+              row.style.display = (row.dataset.category === 'vip') ? 'flex' : 'none';
+            }
+          });
+        });
+      });
+
+      // Search Filter
+      if(listFilterSearch) {
+        listFilterSearch.addEventListener('input', (e) => {
+          const query = e.target.value.toLowerCase();
+          rosterRows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(query) ? 'flex' : 'none';
+          });
+        });
+      }
+
+      // Export CSV Feedback
+      if(exportBtn) {
+        exportBtn.addEventListener('click', () => {
+          const original = exportBtn.innerHTML;
+          exportBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] text-secondary">check</span><span class="font-medium">Generated!</span>';
+          setTimeout(() => { exportBtn.innerHTML = original; }, 2000);
+        });
+      }
+    })();
+  </script>
+</div></main></div></body></html>
