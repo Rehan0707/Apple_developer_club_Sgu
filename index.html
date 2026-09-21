@@ -19,7 +19,7 @@
       <nav id="navigation" aria-label="Main navigation">
         <a href="/#about">The Club</a>
         <a href="/events/">Upcoming Events</a>
-        <a href="/#resources">Resources</a>
+        <a href="/resources/">Resources</a>
         <a href="/#faq">FAQ</a>
         <div class="nav-dropdown-item" id="nav-contact-item">
           <a href="#contact" class="nav-dropdown-trigger" id="contact-menu-btn" aria-haspopup="true" aria-expanded="false">
@@ -84,133 +84,6 @@
     <section class="hero" id="overview" aria-labelledby="hero-title">
       <h1 id="hero-title">Apple Developer Club<span class="hero-sgu">SGU</span></h1>
       <p class="hero-copy">A place for curious minds to explore, create, and grow.<br class="desktop-break" /> Discover Swift, think through design, and turn your ideas<br class="desktop-break" /> into something you can share with the world.</p>
-      <!-- Animated Integration Card (Hero Showcase) -->
-      <div class="hero-integration-card" aria-label="Seamless Integrations Showcase">
-        <div class="integration-visual-wrap">
-          <div class="integration-dots-bg"></div>
-          <div class="integration-gradient-overlay"></div>
-
-          <!-- SVG Connecting Curves & Moving Light Beams -->
-          <svg class="integration-svg-canvas" viewBox="0 0 564 410" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="beam-grad-1" gradientUnits="userSpaceOnUse" x1="110" y1="90" x2="270" y2="205">
-                <stop offset="0%" stop-color="#ff2d55" stop-opacity="0"/>
-                <stop offset="50%" stop-color="#0071e3" stop-opacity="0.9"/>
-                <stop offset="100%" stop-color="#0071e3" stop-opacity="0"/>
-              </linearGradient>
-              <linearGradient id="beam-grad-2" gradientUnits="userSpaceOnUse" x1="294" y1="205" x2="360" y2="70">
-                <stop offset="0%" stop-color="#0071e3" stop-opacity="0"/>
-                <stop offset="50%" stop-color="#d97706" stop-opacity="0.9"/>
-                <stop offset="100%" stop-color="#d97706" stop-opacity="0"/>
-              </linearGradient>
-              <linearGradient id="beam-grad-3" gradientUnits="userSpaceOnUse" x1="160" y1="205" x2="250" y2="205">
-                <stop offset="0%" stop-color="#1d1d1f" stop-opacity="0"/>
-                <stop offset="50%" stop-color="#0071e3" stop-opacity="0.9"/>
-                <stop offset="100%" stop-color="#0071e3" stop-opacity="0"/>
-              </linearGradient>
-              <linearGradient id="beam-grad-4" gradientUnits="userSpaceOnUse" x1="314" y1="205" x2="480" y2="205">
-                <stop offset="0%" stop-color="#0071e3" stop-opacity="0"/>
-                <stop offset="50%" stop-color="#00d8ff" stop-opacity="0.9"/>
-                <stop offset="100%" stop-color="#00d8ff" stop-opacity="0"/>
-              </linearGradient>
-              <linearGradient id="beam-grad-5" gradientUnits="userSpaceOnUse" x1="282" y1="205" x2="282" y2="360">
-                <stop offset="0%" stop-color="#0071e3" stop-opacity="0"/>
-                <stop offset="50%" stop-color="#ff6b3d" stop-opacity="0.9"/>
-                <stop offset="100%" stop-color="#ff2d55" stop-opacity="0"/>
-              </linearGradient>
-              <linearGradient id="beam-grad-6" gradientUnits="userSpaceOnUse" x1="314" y1="215" x2="460" y2="340">
-                <stop offset="0%" stop-color="#0071e3" stop-opacity="0"/>
-                <stop offset="50%" stop-color="#00a2ff" stop-opacity="0.9"/>
-                <stop offset="100%" stop-color="#00a2ff" stop-opacity="0"/>
-              </linearGradient>
-            </defs>
-
-            <!-- Path 1: Top-Left (Figma) -->
-            <path d="M 270 205 V 105 Q 270 90 255 90 H 110" stroke="rgba(0,0,0,0.09)" stroke-width="1.5" stroke-dasharray="4 4" fill="none" />
-            <path d="M 270 205 V 105 Q 270 90 255 90 H 110" stroke="url(#beam-grad-1)" stroke-width="2.5" stroke-dasharray="40 160" fill="none" class="integration-animated-beam delay-1" />
-
-            <!-- Path 2: Top-Right (Claude / AI) -->
-            <path d="M 294 205 V 85 Q 294 70 309 70 H 360" stroke="rgba(0,0,0,0.09)" stroke-width="1.5" stroke-dasharray="4 4" fill="none" />
-            <path d="M 294 205 V 85 Q 294 70 309 70 H 360" stroke="url(#beam-grad-2)" stroke-width="2.5" stroke-dasharray="40 160" fill="none" class="integration-animated-beam delay-2" />
-
-            <!-- Path 3: Mid-Left (Shadcn / Design) -->
-            <path d="M 250 205 H 160" stroke="rgba(0,0,0,0.09)" stroke-width="1.5" stroke-dasharray="4 4" fill="none" />
-            <path d="M 250 205 H 160" stroke="url(#beam-grad-3)" stroke-width="2.5" stroke-dasharray="40 160" fill="none" class="integration-animated-beam delay-3" />
-
-            <!-- Path 4: Mid-Right (React / Web) -->
-            <path d="M 314 205 H 480" stroke="rgba(0,0,0,0.09)" stroke-width="1.5" stroke-dasharray="4 4" fill="none" />
-            <path d="M 314 205 H 480" stroke="url(#beam-grad-4)" stroke-width="2.5" stroke-dasharray="40 160" fill="none" class="integration-animated-beam delay-4" />
-
-            <!-- Path 5: Bottom-Center (Swift Platform) -->
-            <path d="M 282 205 V 360" stroke="rgba(0,0,0,0.09)" stroke-width="1.5" stroke-dasharray="4 4" fill="none" />
-            <path d="M 282 205 V 360" stroke="url(#beam-grad-5)" stroke-width="2.5" stroke-dasharray="40 160" fill="none" class="integration-animated-beam delay-5" />
-
-            <!-- Path 6: Bottom-Right (SwiftUI Framework) -->
-            <path d="M 314 215 V 325 Q 314 340 329 340 H 460" stroke="rgba(0,0,0,0.09)" stroke-width="1.5" stroke-dasharray="4 4" fill="none" />
-            <path d="M 314 215 V 325 Q 314 340 329 340 H 460" stroke="url(#beam-grad-6)" stroke-width="2.5" stroke-dasharray="40 160" fill="none" class="integration-animated-beam delay-6" />
-          </svg>
-
-          <!-- Center Apple Developer Club Badge with Pulse Aura -->
-          <div class="integration-center-hub" title="Apple Developer Club SGU Hub">
-            <div class="integration-center-inner">
-              <img src="/images/club-lockup.png" alt="Apple Developer Club SGU" class="integration-center-logo-img" />
-            </div>
-            <div class="integration-center-pulse"></div>
-          </div>
-
-          <!-- Peripheral Node 1: Figma (Top-Left) -->
-          <div class="integration-node" style="left: 19.5%; top: 21.95%;" title="Figma Design">
-            <img src="/images/icon-figma.png" alt="Figma" class="integration-node-img" />
-            <span class="integration-node-label">Figma</span>
-          </div>
-
-          <!-- Peripheral Node 2: Claude AI (Top-Right) -->
-          <div class="integration-node" style="left: 63.83%; top: 17.07%;" title="Claude & Apple Intelligence">
-            <svg viewBox="0 0 28 28" fill="none" aria-hidden="true">
-              <path d="M5.488 18.62L11.004 15.54L11.088 15.26L11.004 15.12H10.724L9.8 15.064L6.664 14.98L3.92 14.84L1.26 14.7L0.588 14.56L0 13.72L0.056 13.3L0.616 12.936L1.428 12.992L3.192 13.132L5.852 13.3L7.784 13.412L10.64 13.748H11.088L11.144 13.552L11.004 13.44L10.892 13.328L8.12 11.48L5.152 9.52L3.584 8.372L2.744 7.812L2.324 7.252L2.156 6.076L2.912 5.236L3.948 5.32L4.2 5.376L5.236 6.188L7.476 7.896L10.36 10.08L10.78 10.416L10.948 10.304L10.976 10.22L10.78 9.912L9.24 7L7.56 4.088L6.804 2.884L6.608 2.156C6.524 1.876 6.496 1.596 6.496 1.316L7.336 0.14L7.84 0L9.016 0.168L9.464 0.56L10.192 2.24L11.34 4.844L13.16 8.372L13.72 9.436L14 10.388L14.084 10.668H14.28V10.528L14.42 8.512L14.7 6.076L14.98 2.94L15.064 2.044L15.512 0.98L16.352 0.42L17.08 0.728L17.64 1.54L17.556 2.044L17.248 4.2L16.52 7.588L16.1 9.884H16.352L16.632 9.576L17.78 8.064L19.712 5.656L20.552 4.676L21.56 3.64L22.204 3.136H23.408L24.276 4.452L23.884 5.824L22.652 7.392L21.616 8.708L20.132 10.696L19.236 12.292L19.32 12.404H19.516L22.876 11.676L24.668 11.368L26.796 11.004L27.776 11.452L27.888 11.9L27.496 12.852L25.2 13.412L22.512 13.972L18.508 14.896L18.452 14.924L18.508 15.008L20.3 15.176L21.084 15.232H22.988L26.516 15.512L27.44 16.072L27.972 16.828L27.888 17.388L26.46 18.116L24.556 17.668L20.076 16.604L18.564 16.24H18.34V16.352L19.628 17.612L21.952 19.712L24.92 22.428L25.06 23.1L24.696 23.66L24.304 23.604L21.728 21.644L20.72 20.804L18.48 18.9H18.34V19.096L18.844 19.852L21.588 23.968L21.728 25.228L21.532 25.62L20.804 25.9L20.048 25.732L18.424 23.492L16.744 20.972L15.428 18.676L15.288 18.788L14.476 27.244L14.112 27.664L13.272 28L12.572 27.44L12.18 26.6L12.572 24.864L13.02 22.624L13.384 20.832L13.72 18.62L13.916 17.892V17.836H13.72L12.04 20.16L9.52 23.604L7.504 25.732L7.028 25.928L6.188 25.508L6.272 24.724L6.72 24.08L9.52 20.496L11.2 18.284L12.32 16.996L12.292 16.856H12.208L4.816 21.672L3.5 21.84L2.94 21.28L2.996 20.44L3.276 20.16L5.516 18.62H5.488Z" fill="#D97706"/>
-            </svg>
-            <span class="integration-node-label">Claude AI</span>
-          </div>
-
-          <!-- Peripheral Node 3: Shadcn UI (Mid-Left) -->
-          <div class="integration-node" style="left: 28.37%; top: 50%;" title="shadcn/ui Design System">
-            <svg viewBox="0 0 26 26" fill="none" aria-hidden="true">
-              <path d="M22.5551 13.4553L13.4551 22.5553L22.5551 13.4553ZM20.7351 3.44531L3.44507 20.7353L20.7351 3.44531Z" fill="#1d1d1f"/>
-              <path d="M22.5551 13.4553L13.4551 22.5553M20.7351 3.44531L3.44507 20.7353" stroke="#1d1d1f" stroke-width="3" stroke-linecap="round"/>
-            </svg>
-            <span class="integration-node-label">shadcn/ui</span>
-          </div>
-
-          <!-- Peripheral Node 4: React (Mid-Right) -->
-          <div class="integration-node" style="left: 85.11%; top: 50%;" title="React & Swift Platform">
-            <svg viewBox="0 0 28 28" fill="none" aria-hidden="true">
-              <path d="M25.3376 13.9997C25.3376 12.3326 23.7754 10.8719 21.2927 9.9164C21.3266 9.7064 21.3826 9.48473 21.4094 9.28056C21.6626 6.87956 21.0909 5.14706 19.8006 4.40156C18.3597 3.56856 16.3204 4.18456 14.2577 5.84706C12.1916 4.1869 10.1499 3.5709 8.71257 4.40156C7.42107 5.14706 6.8459 6.87956 7.10373 9.28056C7.12473 9.48473 7.1819 9.7064 7.21457 9.9164C4.73307 10.8719 3.1709 12.3326 3.1709 13.9997C3.1709 15.6669 4.73307 17.1276 7.21457 18.0831C7.1819 18.2931 7.12473 18.5147 7.10373 18.7189C6.8494 21.1199 7.42107 22.8524 8.71257 23.5979C9.15123 23.8464 9.6494 23.9736 10.1534 23.9666C11.6826 23.826 13.1231 23.1865 14.2531 22.1466C15.3833 23.1867 16.8243 23.8263 18.3539 23.9666C18.8588 23.9737 19.3564 23.8465 19.7959 23.5979C21.0862 22.8524 21.6626 21.1199 21.4047 18.7189C21.3826 18.5147 21.3266 18.2931 21.2881 18.0831C23.7754 17.1276 25.3376 15.6669 25.3376 13.9997Z" fill="#00D8FF"/>
-            </svg>
-            <span class="integration-node-label">React</span>
-          </div>
-
-          <!-- Peripheral Node 5: Swift (Bottom-Center) -->
-          <div class="integration-node" style="left: 50%; top: 87.8%;" title="Swift Programming Language">
-            <img src="/images/icon-swift.png" alt="Swift" class="integration-node-img" />
-            <span class="integration-node-label">Swift</span>
-          </div>
-
-          <!-- Peripheral Node 6: SwiftUI (Bottom-Right) -->
-          <div class="integration-node" style="left: 81.56%; top: 82.93%;" title="SwiftUI Framework">
-            <img src="/images/icon-swiftui.png" alt="SwiftUI" class="integration-node-img" />
-            <span class="integration-node-label">SwiftUI</span>
-          </div>
-        </div>
-
-        <!-- Card Bottom Content -->
-        <div class="integration-card-content">
-          <div class="integration-card-text">
-            <h3>Seamless Integrations</h3>
-            <p>Connect your favorite developer tools and keep your workflows unified across Apple platforms.</p>
-          </div>
-          <a href="/join/" class="integration-card-btn">Learn more</a>
-        </div>
-      </div>
       <div class="hero-actions"><a class="button" href="/join/">Join the Club</a><a class="text-link" href="#about">Meet the club <span aria-hidden="true">›</span></a></div>
     </section>
     <figure class="community-photo"><img src="/images/club-community.jpg" alt="Apple Developer Club SGU members gathered together on campus" width="1024" height="616" fetchpriority="high" /></figure>    <section class="apple-events-section" id="about">
@@ -305,7 +178,7 @@
         </div>
       </div>
     </section>
-    <section class="apple-stories-section" id="resources" aria-labelledby="stories-title">
+    <section class="apple-stories-section" id="success-stories" aria-labelledby="stories-title">
       <div class="container">
         <div class="stories-header">
           <div class="stories-title-group">
@@ -391,13 +264,44 @@
         </div>
       </div>
 
-      <!-- 2D Physics Gravity Box for Rolling App Icons (Full Width Dynamic) -->
+      <!-- Interactive build shelf -->
       <div class="gravity-bucket-wrapper">
         <div class="gravity-bucket-header container">
-          <h2>This is what we Built</h2>
+          <p class="eyebrow">INTERACTIVE WORKBENCH</p>
+          <h2>This is what we built.</h2>
+          <p class="gravity-bucket-intro">Tap an icon to open a small piece of the club’s build process.</p>
         </div>
-        <div class="gravity-bucket-box" id="gravity-bucket-box" aria-label="Interactive Gravity Physics Bucket with rolling app icons">
-          <div class="physics-world-canvas" id="physics-world-canvas"></div>
+        <div class="gravity-bucket-box app-lab" id="gravity-bucket-box" aria-label="Interactive club build workbench">
+          <div class="app-lab-toolbar">
+            <div class="app-lab-lights" aria-hidden="true"><span></span><span></span><span></span></div>
+            <span class="app-lab-title">Club Workbench</span>
+            <span class="app-lab-state"><i aria-hidden="true"></i> Live preview</span>
+          </div>
+          <div class="app-lab-content">
+            <div class="app-lab-copy">
+              <span class="app-lab-kicker">SGU / BUILD LOG</span>
+              <h3>Curiosity, made tangible.</h3>
+              <p>Explore the ideas, tools, and sessions that shape what we make together.</p>
+            </div>
+            <div class="app-lab-stage" id="app-lab-stage" aria-live="polite">
+              <div class="app-lab-placeholder" id="app-lab-placeholder">
+                <span class="app-lab-placeholder-icon" aria-hidden="true">⌘</span>
+                <span>Choose a build to explore</span>
+              </div>
+              <article class="app-lab-window" id="app-lab-window" hidden>
+                <div class="app-window-heading"><span class="app-window-icon" id="app-window-icon" aria-hidden="true">⌘</span><div><strong id="app-window-title">Build</strong><span id="app-window-meta">Club project</span></div><button type="button" class="app-window-close" id="app-window-close" aria-label="Close build preview">×</button></div>
+                <p id="app-window-copy"></p>
+                <div class="app-window-progress"><span id="app-window-progress-bar"></span></div>
+                <div class="app-window-footer"><span id="app-window-progress-label">In progress</span><span>SGU Club</span></div>
+              </article>
+            </div>
+          </div>
+          <div class="app-lab-dock" role="toolbar" aria-label="Open a club build">
+            <button type="button" class="app-icon app-icon-blue" data-app-icon="⌘" data-app-title="Xcode sessions" data-app-meta="WORKSHOP / SWIFTUI" data-app-copy="A calm place to start: open a project, sketch an idea, and turn the first line of Swift into something you can touch." data-app-progress="74"><span aria-hidden="true">⌘</span><small>Xcode</small></button>
+            <button type="button" class="app-icon app-icon-purple" data-app-icon="✦" data-app-title="Design lab" data-app-meta="LAB / HUMAN INTERFACE" data-app-copy="Good interfaces start with attention. We study the details that make an app feel simple, clear, and unmistakably yours." data-app-progress="58"><span aria-hidden="true">✦</span><small>Design</small></button>
+            <button type="button" class="app-icon app-icon-green" data-app-icon="↗" data-app-title="Build sessions" data-app-meta="SESSION / PROTOTYPE" data-app-copy="Bring a rough idea. Leave with a working shape, a sharper question, and a room full of people who want to help." data-app-progress="86"><span aria-hidden="true">↗</span><small>Build</small></button>
+            <button type="button" class="app-icon app-icon-orange" data-app-icon="◎" data-app-title="Club resources" data-app-meta="LIBRARY / LEARN" data-app-copy="The resource library collects the official Apple videos, docs, and play spaces we return to while learning." data-app-progress="42"><span aria-hidden="true">◎</span><small>Library</small></button>
+          </div>
         </div>
       </div>
     </section>
@@ -411,7 +315,8 @@
         <div class="faq-list">
           <details>
             <summary>Do I need to know how to code?</summary>
-            <p>You can start exploring with no prior experience. The beginner resources on this page are a good first step. Ask the club about the right starting point for you.</p>
+            <p>You can start exploring with no prior experience. The beginner resources in our library are a good first step. Ask the club about the right starting point for you.</p>
+            <a class="text-link" href="/resources/">Browse the resource library ›</a>
           </details>
           <details>
             <summary>Do I need a Mac to get started?</summary>
@@ -478,8 +383,8 @@
       </div>
 
       <div class="modal-header">
-        <h2 id="modal-title" class="modal-title">We’re excited to<br />see you at the event.</h2>
-        <p class="modal-subtitle">Fill out your details to reserve your spot.</p>
+        <h2 id="modal-title" class="modal-title">Reserve your place.</h2>
+        <p class="modal-subtitle">Share a few details, then confirm with Apple sign-in.</p>
       </div>
 
       <form id="event-registration-form" class="modal-form" novalidate>
@@ -536,10 +441,11 @@
         </div>
 
         <div id="form-error-msg" class="form-error-msg" hidden role="alert">Please fill out all required fields with a valid email.</div>
+        <p id="registration-auth-hint" class="registration-auth-hint" hidden>Continue on the <a href="/join/?next=/events/">Join the Club page</a>, sign in with Apple, then come back to reserve your spot.</p>
 
         <div class="form-actions-left">
           <button type="submit" class="button modal-pill-submit">
-            <span>Sign in</span>
+            <span>Reserve my spot</span>
           </button>
         </div>
 
@@ -553,9 +459,9 @@
         <div class="success-icon-badge">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
         </div>
-        <h3 class="success-heading">Registration Confirmed</h3>
+        <h3 class="success-heading">You’re on the list.</h3>
         <p class="success-text">We’ve reserved your spot for <strong id="success-event-name">Getting started with Xcode</strong>.</p>
-        <p class="success-sub">A confirmation has been sent to <span id="success-email">your email</span>. Keep an eye on your inbox for session links and details.</p>
+        <p class="success-sub">Your Apple sign-in keeps this registration connected to your club profile. Your event pass will appear in the member dashboard.</p>
         <button type="button" class="button secondary-btn modal-done-btn" data-close-modal>Done</button>
       </div>
     </div>

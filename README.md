@@ -23,7 +23,8 @@ The production build is served on http://127.0.0.1:3001. No external deployment 
 
 ## Pages and content
 
-- `/`: centered club introduction, Join button, demo workspace image, club mission, event previews, learning resources, and FAQ.
+- `/`: centered club introduction, Join button, club mission, event previews, and FAQ.
+- `/resources/`: a focused library linking to the official Apple Developer video channel, documentation, Human Interface Guidelines, and Swift Playgrounds.
 - `/events/`: two clearly labeled layout previews. The user confirmed these are examples, not scheduled events; no dates or registration claims are published.
 - `/join/`: Apple authentication availability and club contact link.
 - `public/images/`: the two original user-supplied logos, copied without image modifications.

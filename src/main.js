@@ -119,10 +119,11 @@ const observer = new IntersectionObserver((entries) => {
     }
   });
 }, { rootMargin: '-15% 0px -55% 0px' });
-['about', 'resources', 'faq'].forEach(id => document.getElementById(id) && observer.observe(document.getElementById(id)));
+['about', 'faq'].forEach(id => document.getElementById(id) && observer.observe(document.getElementById(id)));
 
 if (location.pathname.startsWith('/events')) navigation.querySelector('a[href="/events/"]').setAttribute('aria-current', 'page');
 if (location.pathname.startsWith('/join')) navigation.querySelector('a[href="/join/"]').setAttribute('aria-current', 'page');
+if (location.pathname.startsWith('/resources')) navigation.querySelector('a[href="/resources/"]').setAttribute('aria-current', 'page');
 const authStatus = document.getElementById('auth-status');
 if (authStatus) {
   const messages = { error: 'Sign-in could not be completed. Please try again.', cancelled: 'Sign-in was cancelled. You can try again whenever you’re ready.' };
@@ -157,8 +158,12 @@ if (eventModal) {
   const modalSuccess = document.getElementById('modal-success');
   const eventSelect = document.getElementById('reg-event');
   const errorMsg = document.getElementById('form-error-msg');
+  const authHint = document.getElementById('registration-auth-hint');
   const successEventName = document.getElementById('success-event-name');
   const successEmail = document.getElementById('success-email');
+  const submitButton = modalForm?.querySelector('button[type="submit"]');
+  const submitLabel = submitButton?.querySelector('span');
+  const modalBox = eventModal.querySelector('.modal-box');
   let activeTriggerBtn = null;
 
   function openEventModal(eventName) {
@@ -169,6 +174,7 @@ if (eventModal) {
     modalForm.hidden = false;
     modalSuccess.hidden = true;
     if (errorMsg) errorMsg.hidden = true;
+    if (authHint) authHint.hidden = true;
 
     if (typeof eventModal.showModal === 'function') {
       try { eventModal.showModal(); } catch { eventModal.setAttribute('open', ''); }
@@ -176,7 +182,10 @@ if (eventModal) {
       eventModal.setAttribute('open', '');
     }
     document.body.style.overflow = 'hidden';
-    setTimeout(() => document.getElementById('reg-name')?.focus(), 50);
+    requestAnimationFrame(() => {
+      if (modalBox) modalBox.scrollTop = 0;
+      document.getElementById('reg-name')?.focus();
+    });
   }
 
   function closeEventModal() {
@@ -216,9 +225,10 @@ if (eventModal) {
     }
   });
 
-  modalForm?.addEventListener('submit', (e) => {
+  modalForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (errorMsg) errorMsg.hidden = true;
+    if (authHint) authHint.hidden = true;
 
     const name = document.getElementById('reg-name')?.value.trim();
     const email = document.getElementById('reg-email')?.value.trim();
@@ -229,20 +239,48 @@ if (eventModal) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!name || !email || !emailRegex.test(email) || !branch || !year || !selectedEvent) {
       if (errorMsg) errorMsg.hidden = false;
+      document.querySelector('.form-input:invalid')?.focus();
       return;
     }
 
-    if (successEventName) successEventName.textContent = selectedEvent;
-    if (successEmail) successEmail.textContent = email;
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.setAttribute('aria-busy', 'true');
+    }
+    if (submitLabel) submitLabel.textContent = 'Checking Apple sign-in…';
 
-    modalForm.hidden = true;
-    modalSuccess.hidden = false;
-    modalForm.reset();
+    try {
+      const response = await fetch('/api/auth/status');
+      const status = response.ok ? await response.json() : { authenticated: false, available: false };
+      if (!status.authenticated) {
+        if (errorMsg) {
+          errorMsg.textContent = status.available ? 'Sign in with Apple first, then return here to reserve your spot.' : 'Apple sign-in is being connected. Your form is ready, but registration is not open yet.';
+          errorMsg.hidden = false;
+        }
+        if (authHint) authHint.hidden = false;
+        return;
+      }
+
+      if (successEventName) successEventName.textContent = eventSelect?.selectedOptions?.[0]?.textContent || selectedEvent;
+      if (successEmail) successEmail.textContent = email;
+      modalForm.hidden = true;
+      modalSuccess.hidden = false;
+      if (modalBox) modalBox.scrollTop = 0;
+      modalForm.reset();
+    } catch {
+      if (errorMsg) {
+        errorMsg.textContent = 'We could not check your Apple sign-in. Please try again.';
+        errorMsg.hidden = false;
+      }
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.removeAttribute('aria-busy');
+      }
+      if (submitLabel) submitLabel.textContent = 'Reserve my spot';
+    }
   });
 }
-
-// Stories Carousel Scroll Control
-import Matter from 'matter-js';
 
 // Stories Carousel Scroll Control
 const storiesTrack = document.getElementById('stories-track');
@@ -258,241 +296,31 @@ if (storiesTrack && storiesPrevBtn && storiesNextBtn) {
   });
 }
 
-// Matter.js 2D Gravity Physics Engine & Rolling Icons Bucket Box
-function initGravityPhysicsBucket() {
+// Interactive build workbench
+function initAppWorkbench() {
   const container = document.getElementById('gravity-bucket-box');
-  const worldCanvas = document.getElementById('physics-world-canvas');
-  if (!container || !worldCanvas) return;
-
-  const { Engine, Runner, Bodies, Composite, Body, Mouse, MouseConstraint, Events } = Matter;
-
-  // Create Matter.js physics engine with gravity vector
-  const engine = Engine.create({
-    gravity: { x: 0, y: 1.2, scale: 0.001 }
-  });
-
-  let width = container.clientWidth;
-  let height = container.clientHeight;
-
-  // Boundaries (Floor, Left Wall, Right Wall, Ceiling)
-  const wallThickness = 120;
-  let ground = Bodies.rectangle(width / 2, height + wallThickness / 2 - 4, width * 2, wallThickness, { isStatic: true, friction: 0.5, restitution: 0.4 });
-  let leftWall = Bodies.rectangle(-wallThickness / 2 + 4, height / 2, wallThickness, height * 3, { isStatic: true, friction: 0.5, restitution: 0.4 });
-  let rightWall = Bodies.rectangle(width + wallThickness / 2 - 4, height / 2, wallThickness, height * 3, { isStatic: true, friction: 0.5, restitution: 0.4 });
-  let ceiling = Bodies.rectangle(width / 2, -wallThickness / 2 + 4, width * 2, wallThickness, { isStatic: true, friction: 0.5, restitution: 0.4 });
-
-  Composite.add(engine.world, [ground, leftWall, rightWall, ceiling]);
-
-  // App icons to spawn in the physics bucket across full width
-  const iconData = [
-    { type: 'img', src: '/images/app-icon-showcase.png', alt: 'Nature App' },
-    { type: 'badge', emoji: '🍎', label: 'Swift', bg: 'linear-gradient(135deg, #ff5e3a, #ff2a68)' },
-    { type: 'badge', emoji: '🛠️', label: 'Xcode', bg: 'linear-gradient(135deg, #1d72b8, #00c6ff)' },
-    { type: 'badge', emoji: '🎨', label: 'HIG Lab', bg: 'linear-gradient(135deg, #8e44ad, #f39c12)' },
-    { type: 'badge', emoji: '🪪', label: 'SGU Pass', bg: 'linear-gradient(135deg, #0071e3, #42a5f5)' },
-    { type: 'badge', emoji: '⚡', label: 'Playroom', bg: 'linear-gradient(135deg, #11998e, #38ef7d)' },
-    { type: 'badge', emoji: '🧭', label: 'ARKit', bg: 'linear-gradient(135deg, #fc4a1a, #f7b731)' },
-    { type: 'badge', emoji: '💡', label: 'App Idea', bg: 'linear-gradient(135deg, #f093fb, #f5576c)' },
-    { type: 'badge', emoji: '🥽', label: 'visionOS', bg: 'linear-gradient(135deg, #5b86e5, #36d1dc)' },
-    { type: 'badge', emoji: '🧠', label: 'Core ML', bg: 'linear-gradient(135deg, #fa709a, #fee140)' },
-    { type: 'badge', emoji: '🚀', label: 'TestFlight', bg: 'linear-gradient(135deg, #2af598, #009efd)' },
-    { type: 'badge', emoji: '📐', label: 'Metal', bg: 'linear-gradient(135deg, #ff0844, #ffb199)' }
-  ];
-
-  const bodyElements = [];
-  const iconSize = 76;
-
-  // Function to spawn icons falling down from above
-  function spawnFallingBatch() {
-    iconData.forEach((item, index) => {
-      setTimeout(() => {
-        // Random horizontal drop position spread dynamically across full container width
-        const spawnX = Math.random() * Math.max(100, width - 160) + 80;
-        const spawnY = -60 - index * 20;
-
-        // Chamfered rounded rectangle body for realistic physics rolling & tumbling
-        const body = Bodies.rectangle(spawnX, spawnY, iconSize, iconSize, {
-          chamfer: { radius: 18 },
-          restitution: 0.6,  // Realistic bounce
-          friction: 0.2,     // Rolling friction
-          density: 0.002,
-          angle: (Math.random() - 0.5) * 0.6
-        });
-
-        // DOM element corresponding to the physics body
-        const el = document.createElement('div');
-        el.className = 'physics-icon-item';
-        el.style.width = `${iconSize}px`;
-        el.style.height = `${iconSize}px`;
-
-        if (item.type === 'img') {
-          const img = document.createElement('img');
-          img.src = item.src;
-          img.alt = item.alt;
-          img.className = 'physics-icon-img';
-          el.appendChild(img);
-        } else {
-          el.style.background = item.bg;
-          el.style.color = '#ffffff';
-          const badge = document.createElement('span');
-          badge.className = 'physics-icon-badge';
-          badge.textContent = item.emoji;
-          const label = document.createElement('span');
-          label.className = 'physics-icon-label';
-          label.textContent = item.label;
-          label.style.color = '#ffffff';
-          el.appendChild(badge);
-          el.appendChild(label);
-        }
-
-        worldCanvas.appendChild(el);
-        Composite.add(engine.world, body);
-
-        // Apply slight initial angular velocity & downward force
-        Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.25);
-        Body.setVelocity(body, { x: (Math.random() - 0.5) * 5, y: Math.random() * 3 + 2 });
-
-        bodyElements.push({ body, el });
-      }, index * 90);
-    });
-  }
-
-  // Drop icons in on initial scroll
-  let hasDropped = false;
-  function dropIcons() {
-    if (hasDropped) return;
-    hasDropped = true;
-    spawnFallingBatch();
-  }
-
-  // Trigger falling icons when user clicks twice (double click / double tap)
-  const bucketWrapper = container.closest('.gravity-bucket-wrapper') || container;
-  bucketWrapper.addEventListener('dblclick', () => {
-    spawnFallingBatch();
-  });
-
-  // Handle double-tap gesture on mobile screens
-  let lastTapTime = 0;
-  bucketWrapper.addEventListener('touchstart', (e) => {
-    const currentTime = new Date().getTime();
-    const tapLength = currentTime - lastTapTime;
-    if (tapLength < 300 && tapLength > 0) {
-      spawnFallingBatch();
-    }
-    lastTapTime = currentTime;
-  }, { passive: true });
-
-  // Mouse & Touch Drag Interaction Physics Constraint
-  const mouse = Mouse.create(container);
-  const mouseConstraint = MouseConstraint.create(engine, {
-    mouse: mouse,
-    constraint: {
-      stiffness: 0.2,
-      render: { visible: false }
-    }
-  });
-
-  // Remove Matter.js default scroll-blocking wheel & touch listeners
-  if (mouseConstraint.mouse.element) {
-    const el = mouseConstraint.mouse.element;
-    el.removeEventListener('mousewheel', mouseConstraint.mouse.mousewheel);
-    el.removeEventListener('DOMMouseScroll', mouseConstraint.mouse.mousewheel);
-    el.removeEventListener('wheel', mouseConstraint.mouse.mousewheel);
-    el.removeEventListener('touchstart', mouseConstraint.mouse.touchstart);
-    el.removeEventListener('touchmove', mouseConstraint.mouse.touchmove);
-    el.removeEventListener('touchend', mouseConstraint.mouse.touchend);
-  }
-
-  // Non-blocking touch & scroll delegation to preserve native page scrolling
-  container.addEventListener('touchstart', (e) => {
-    const isIconTouch = e.target.closest('.physics-icon-item');
-    if (isIconTouch && mouseConstraint.mouse.touchstart) {
-      mouseConstraint.mouse.touchstart(e);
-    }
-  }, { passive: true });
-
-  container.addEventListener('touchmove', (e) => {
-    if (mouseConstraint.body) {
-      if (e.cancelable) e.preventDefault();
-      if (mouseConstraint.mouse.touchmove) {
-        mouseConstraint.mouse.touchmove(e);
-      }
-    }
-  }, { passive: false });
-
-  container.addEventListener('touchend', (e) => {
-    if (mouseConstraint.mouse.touchend) {
-      mouseConstraint.mouse.touchend(e);
-    }
-  }, { passive: true });
-
-  Composite.add(engine.world, mouseConstraint);
-
-  // Sync DOM elements with Matter body positions on each frame (60 FPS)
-  Events.on(engine, 'afterUpdate', () => {
-    bodyElements.forEach(({ body, el }) => {
-      const x = body.position.x - iconSize / 2;
-      const y = body.position.y - iconSize / 2;
-      const angle = body.angle;
-      el.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${angle}rad)`;
-    });
-  });
-
-  // Run runner & engine
-  const runner = Runner.create();
-  Runner.run(runner, engine);
-
-  // Intersection Observer to drop icons when user scrolls to section
-  const dropObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        dropIcons();
-      }
-    });
-  }, { threshold: 0.2 });
-
-  dropObserver.observe(container);
-
-  // Device Orientation (Gyroscope Gravity for Mobile Phones!)
-  if ('ontouchstart' in window && window.DeviceOrientationEvent) {
-    window.addEventListener('deviceorientation', (event) => {
-      const gamma = event.gamma; // Left-to-right tilt [-90 to 90]
-      const beta = event.beta;   // Front-to-back tilt [-180 to 180]
-
-      if (gamma !== null && beta !== null) {
-        // Dynamically update physics gravity vector based on phone orientation
-        const gx = Math.max(-2, Math.min(2, gamma / 15));
-        const gy = Math.max(0.4, Math.min(2, (beta - 10) / 15));
-
-        engine.gravity.x = gx;
-        engine.gravity.y = gy;
-      }
-    }, true);
-  }
-
-  // Dynamic Container Resize Handler
-  window.addEventListener('resize', () => {
-    width = container.clientWidth;
-    height = container.clientHeight;
-
-    // Reposition boundaries to adapt to dynamic window / container dimensions
-    Body.setPosition(ground, { x: width / 2, y: height + wallThickness / 2 - 4 });
-    Body.setPosition(rightWall, { x: width + wallThickness / 2 - 4, y: height / 2 });
-    Body.setPosition(leftWall, { x: -wallThickness / 2 + 4, y: height / 2 });
-    Body.setPosition(ceiling, { x: width / 2, y: -wallThickness / 2 - 300 });
-
-    // Keep icons gracefully within boundaries when window width contracts
-    bodyElements.forEach(({ body }) => {
-      const clampedX = Math.max(iconSize / 2 + 10, Math.min(width - iconSize / 2 - 10, body.position.x));
-      const clampedY = Math.max(iconSize / 2 + 10, Math.min(height - iconSize / 2 - 10, body.position.y));
-      if (clampedX !== body.position.x || clampedY !== body.position.y) {
-        Body.setPosition(body, { x: clampedX, y: clampedY });
-      }
-    });
-  });
+  if (!container) return;
+  const placeholder = document.getElementById('app-lab-placeholder');
+  const windowCard = document.getElementById('app-lab-window');
+  const closeButton = document.getElementById('app-window-close');
+  const icons = [...container.querySelectorAll('[data-app-icon]')];
+  const fields = { icon: document.getElementById('app-window-icon'), title: document.getElementById('app-window-title'), meta: document.getElementById('app-window-meta'), copy: document.getElementById('app-window-copy'), progress: document.getElementById('app-window-progress-bar'), progressLabel: document.getElementById('app-window-progress-label') };
+  const closeWindow = () => { windowCard.hidden = true; placeholder.hidden = false; icons.forEach(icon => icon.classList.remove('is-selected')); };
+  icons.forEach(icon => icon.addEventListener('click', () => {
+    fields.icon.textContent = icon.dataset.appIcon;
+    fields.title.textContent = icon.dataset.appTitle;
+    fields.meta.textContent = icon.dataset.appMeta;
+    fields.copy.textContent = icon.dataset.appCopy;
+    fields.progress.style.width = `${icon.dataset.appProgress}%`;
+    fields.progressLabel.textContent = `${icon.dataset.appProgress}% shaped so far`;
+    placeholder.hidden = true;
+    windowCard.hidden = false;
+    icons.forEach(item => item.classList.toggle('is-selected', item === icon));
+  }));
+  closeButton?.addEventListener('click', closeWindow);
 }
 
-initGravityPhysicsBucket();
+initAppWorkbench();
 
 // ── Join Transition Loader ────────────────────────────────────────────
 const joinOverlay = document.getElementById('join-loader-overlay');
