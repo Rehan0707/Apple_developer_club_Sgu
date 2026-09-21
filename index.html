@@ -270,39 +270,10 @@
         <div class="gravity-bucket-header container">
           <p class="eyebrow">INTERACTIVE WORKBENCH</p>
           <h2>This is what we built.</h2>
-          <p class="gravity-bucket-intro">Tap an icon to open a small piece of the club’s build process.</p>
+          <p class="gravity-bucket-intro">Watch the ideas, tools, and sessions fall into place.</p>
         </div>
-        <div class="gravity-bucket-box app-lab" id="gravity-bucket-box" aria-label="Interactive club build workbench">
-          <div class="app-lab-toolbar">
-            <div class="app-lab-lights" aria-hidden="true"><span></span><span></span><span></span></div>
-            <span class="app-lab-title">Club Workbench</span>
-            <span class="app-lab-state"><i aria-hidden="true"></i> Live preview</span>
-          </div>
-          <div class="app-lab-content">
-            <div class="app-lab-copy">
-              <span class="app-lab-kicker">SGU / BUILD LOG</span>
-              <h3>Curiosity, made tangible.</h3>
-              <p>Explore the ideas, tools, and sessions that shape what we make together.</p>
-            </div>
-            <div class="app-lab-stage" id="app-lab-stage" aria-live="polite">
-              <div class="app-lab-placeholder" id="app-lab-placeholder">
-                <span class="app-lab-placeholder-icon" aria-hidden="true">⌘</span>
-                <span>Choose a build to explore</span>
-              </div>
-              <article class="app-lab-window" id="app-lab-window" hidden>
-                <div class="app-window-heading"><span class="app-window-icon" id="app-window-icon" aria-hidden="true">⌘</span><div><strong id="app-window-title">Build</strong><span id="app-window-meta">Club project</span></div><button type="button" class="app-window-close" id="app-window-close" aria-label="Close build preview">×</button></div>
-                <p id="app-window-copy"></p>
-                <div class="app-window-progress"><span id="app-window-progress-bar"></span></div>
-                <div class="app-window-footer"><span id="app-window-progress-label">In progress</span><span>SGU Club</span></div>
-              </article>
-            </div>
-          </div>
-          <div class="app-lab-dock" role="toolbar" aria-label="Open a club build">
-            <button type="button" class="app-icon app-icon-blue" data-app-icon="⌘" data-app-title="Xcode sessions" data-app-meta="WORKSHOP / SWIFTUI" data-app-copy="A calm place to start: open a project, sketch an idea, and turn the first line of Swift into something you can touch." data-app-progress="74"><span aria-hidden="true">⌘</span><small>Xcode</small></button>
-            <button type="button" class="app-icon app-icon-purple" data-app-icon="✦" data-app-title="Design lab" data-app-meta="LAB / HUMAN INTERFACE" data-app-copy="Good interfaces start with attention. We study the details that make an app feel simple, clear, and unmistakably yours." data-app-progress="58"><span aria-hidden="true">✦</span><small>Design</small></button>
-            <button type="button" class="app-icon app-icon-green" data-app-icon="↗" data-app-title="Build sessions" data-app-meta="SESSION / PROTOTYPE" data-app-copy="Bring a rough idea. Leave with a working shape, a sharper question, and a room full of people who want to help." data-app-progress="86"><span aria-hidden="true">↗</span><small>Build</small></button>
-            <button type="button" class="app-icon app-icon-orange" data-app-icon="◎" data-app-title="Club resources" data-app-meta="LIBRARY / LEARN" data-app-copy="The resource library collects the official Apple videos, docs, and play spaces we return to while learning." data-app-progress="42"><span aria-hidden="true">◎</span><small>Library</small></button>
-          </div>
+        <div class="gravity-bucket-box" id="gravity-bucket-box" aria-label="Interactive build area with falling app icons">
+          <div class="physics-world-canvas" id="physics-world-canvas" aria-hidden="true"></div>
         </div>
       </div>
     </section>

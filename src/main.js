@@ -1,5 +1,6 @@
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
+import Matter from 'matter-js';
 
 // ── Ultra-smooth Linear Scrolling (Apple-grade fluid physics) ──
 const lenis = new Lenis({
@@ -343,31 +344,109 @@ if (storiesTrack && storiesPrevBtn && storiesNextBtn) {
   });
 }
 
-// Interactive build workbench
-function initAppWorkbench() {
+// Matter.js falling build icons
+function initGravityPhysicsBucket() {
   const container = document.getElementById('gravity-bucket-box');
-  if (!container) return;
-  const placeholder = document.getElementById('app-lab-placeholder');
-  const windowCard = document.getElementById('app-lab-window');
-  const closeButton = document.getElementById('app-window-close');
-  const icons = [...container.querySelectorAll('[data-app-icon]')];
-  const fields = { icon: document.getElementById('app-window-icon'), title: document.getElementById('app-window-title'), meta: document.getElementById('app-window-meta'), copy: document.getElementById('app-window-copy'), progress: document.getElementById('app-window-progress-bar'), progressLabel: document.getElementById('app-window-progress-label') };
-  const closeWindow = () => { windowCard.hidden = true; placeholder.hidden = false; icons.forEach(icon => icon.classList.remove('is-selected')); };
-  icons.forEach(icon => icon.addEventListener('click', () => {
-    fields.icon.textContent = icon.dataset.appIcon;
-    fields.title.textContent = icon.dataset.appTitle;
-    fields.meta.textContent = icon.dataset.appMeta;
-    fields.copy.textContent = icon.dataset.appCopy;
-    fields.progress.style.width = `${icon.dataset.appProgress}%`;
-    fields.progressLabel.textContent = `${icon.dataset.appProgress}% shaped so far`;
-    placeholder.hidden = true;
-    windowCard.hidden = false;
-    icons.forEach(item => item.classList.toggle('is-selected', item === icon));
-  }));
-  closeButton?.addEventListener('click', closeWindow);
+  const worldCanvas = document.getElementById('physics-world-canvas');
+  if (!container || !worldCanvas) return;
+
+  const { Engine, Runner, Bodies, Body, Composite, Events } = Matter;
+  const engine = Engine.create({ gravity: { x: 0, y: 1.15, scale: 0.001 } });
+  const bodyElements = [];
+  const iconSize = 76;
+  const wallThickness = 120;
+  let width = container.clientWidth;
+  let height = container.clientHeight;
+
+  const ground = Bodies.rectangle(width / 2, height + wallThickness / 2 - 4, width * 2, wallThickness, { isStatic: true, friction: 0.5, restitution: 0.4 });
+  const leftWall = Bodies.rectangle(-wallThickness / 2 + 4, height / 2, wallThickness, height * 3, { isStatic: true, friction: 0.5, restitution: 0.4 });
+  const rightWall = Bodies.rectangle(width + wallThickness / 2 - 4, height / 2, wallThickness, height * 3, { isStatic: true, friction: 0.5, restitution: 0.4 });
+  Composite.add(engine.world, [ground, leftWall, rightWall]);
+
+  const iconData = [
+    { type: 'img', src: '/images/app-icon-showcase.png', alt: 'Nature App' },
+    { emoji: '🍎', label: 'Swift', bg: 'linear-gradient(135deg, #ff5e3a, #ff2a68)' },
+    { emoji: '🛠️', label: 'Xcode', bg: 'linear-gradient(135deg, #1d72b8, #00c6ff)' },
+    { emoji: '🎨', label: 'HIG Lab', bg: 'linear-gradient(135deg, #8e44ad, #f39c12)' },
+    { emoji: '🪪', label: 'SGU Pass', bg: 'linear-gradient(135deg, #0071e3, #42a5f5)' },
+    { emoji: '⚡', label: 'Playroom', bg: 'linear-gradient(135deg, #11998e, #38ef7d)' },
+    { emoji: '🧭', label: 'ARKit', bg: 'linear-gradient(135deg, #fc4a1a, #f7b731)' },
+    { emoji: '💡', label: 'App Idea', bg: 'linear-gradient(135deg, #f093fb, #f5576c)' },
+    { emoji: '🥽', label: 'visionOS', bg: 'linear-gradient(135deg, #5b86e5, #36d1dc)' },
+    { emoji: '🧠', label: 'Core ML', bg: 'linear-gradient(135deg, #fa709a, #fee140)' },
+    { emoji: '🚀', label: 'TestFlight', bg: 'linear-gradient(135deg, #2af598, #009efd)' },
+    { emoji: '📐', label: 'Metal', bg: 'linear-gradient(135deg, #ff0844, #ffb199)' },
+  ];
+
+  function spawnFallingBatch() {
+    iconData.forEach((item, index) => {
+      setTimeout(() => {
+        const spawnX = Math.random() * Math.max(100, width - 160) + 80;
+        const body = Bodies.rectangle(spawnX, -70 - index * 18, iconSize, iconSize, {
+          chamfer: { radius: 18 },
+          restitution: 0.6,
+          friction: 0.2,
+          density: 0.002,
+          angle: (Math.random() - 0.5) * 0.6,
+        });
+        const element = document.createElement('div');
+        element.className = 'physics-icon-item';
+
+        if (item.type === 'img') {
+          const image = document.createElement('img');
+          image.src = item.src;
+          image.alt = item.alt;
+          image.className = 'physics-icon-img';
+          element.appendChild(image);
+        } else {
+          element.style.background = item.bg;
+          const badge = document.createElement('span');
+          badge.className = 'physics-icon-badge';
+          badge.textContent = item.emoji;
+          const label = document.createElement('span');
+          label.className = 'physics-icon-label';
+          label.textContent = item.label;
+          element.append(badge, label);
+        }
+
+        worldCanvas.appendChild(element);
+        Composite.add(engine.world, body);
+        Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.25);
+        Body.setVelocity(body, { x: (Math.random() - 0.5) * 5, y: Math.random() * 3 + 2 });
+        bodyElements.push({ body, element });
+      }, index * 90);
+    });
+  }
+
+  Events.on(engine, 'afterUpdate', () => {
+    bodyElements.forEach(({ body, element }) => {
+      element.style.transform = `translate3d(${body.position.x - iconSize / 2}px, ${body.position.y - iconSize / 2}px, 0) rotate(${body.angle}rad)`;
+    });
+  });
+
+  const runner = Runner.create();
+  Runner.run(runner, engine);
+
+  let hasDropped = false;
+  const dropIcons = () => {
+    if (hasDropped) return;
+    hasDropped = true;
+    spawnFallingBatch();
+  };
+  const observer = new IntersectionObserver((entries) => entries.forEach(entry => entry.isIntersecting && dropIcons()), { threshold: 0.2 });
+  observer.observe(container);
+  container.addEventListener('dblclick', spawnFallingBatch);
+
+  window.addEventListener('resize', () => {
+    width = container.clientWidth;
+    height = container.clientHeight;
+    Body.setPosition(ground, { x: width / 2, y: height + wallThickness / 2 - 4 });
+    Body.setPosition(rightWall, { x: width + wallThickness / 2 - 4, y: height / 2 });
+    Body.setPosition(leftWall, { x: -wallThickness / 2 + 4, y: height / 2 });
+  });
 }
 
-initAppWorkbench();
+initGravityPhysicsBucket();
 
 // ── Join Transition Loader ────────────────────────────────────────────
 const joinOverlay = document.getElementById('join-loader-overlay');
