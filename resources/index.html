@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="description" content="Resources - Apple Developer Club SGU" />
+  <title>Resources — Apple Developer Club SGU</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/src/style.css" />
+  <style>
+    .page-header {
+      padding: 120px 20px 60px;
+      text-align: center;
+      background: #f5f5f7;
+    }
+    .page-title {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -1.2px;
+      color: #1d1d1f;
+      margin: 0 0 16px;
+    }
+    .page-desc {
+      font-size: 21px;
+      line-height: 1.4;
+      color: #86868b;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .resources-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      padding: 80px 20px;
+      max-width: 1060px;
+      margin: 0 auto;
+    }
+    
+    .resource-card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-align: left;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #e5e5ea;
+    }
+    .resource-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+    }
+    
+    .resource-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 24px;
+      color: #0071e3;
+    }
+    
+    .resource-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1d1d1f;
+      margin: 0 0 12px;
+      letter-spacing: -0.5px;
+    }
+    
+    .resource-desc {
+      font-size: 17px;
+      line-height: 1.5;
+      color: #6e6e73;
+      margin: 0 0 24px;
+      flex: 1;
+    }
+    
+    .resource-link {
+      color: #0071e3;
+      font-weight: 500;
+      font-size: 17px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .resource-link svg {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.2s;
+    }
+    .resource-card:hover .resource-link svg {
+      transform: translateX(4px);
+    }
+  </style>
+</head>
+<body>
+  <!-- Include header via JS or template, simulating for now -->
+  <header class="site-header" id="site-header">
+    <div class="nav-inner local-inner">
+      <a class="brand" href="/"><img src="/images/club-lockup.png" alt="Apple Developer Club SGU" class="brand-logo" width="180" height="60" /></a>
+      <nav id="navigation">
+        <a href="/">The Club</a>
+        <a href="/events/">Events</a>
+        <a href="/resources/" aria-current="page">Resources</a>
+        <a href="/team/">Team</a>
+        <a class="button small" href="/join/">Sign In</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <header class="page-header">
+      <h1 class="page-title">Resources</h1>
+      <p class="page-desc">Everything you need to build incredible apps for Apple platforms.</p>
+    </header>
+
+    <div class="resources-grid" id="resources-container">
+      <!-- Generated via JS -->
+    </div>
+  </main>
+
+  <script>
+    const resources = [
+      {
+        title: "Human Interface Guidelines",
+        desc: "In-depth information and UI resources for designing great apps that integrate seamlessly with Apple platforms.",
+        url: "https://developer.apple.com/design/human-interface-guidelines/",
+        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>'
+      },
+      {
+        title: "SwiftUI Documentation",
+        desc: "Declare the user interface and behavior for your app on every platform.",
+        url: "https://developer.apple.com/documentation/swiftui/",
+        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>'
+      },
+      {
+        title: "WWDC Videos",
+        desc: "Watch the latest sessions from the Apple Worldwide Developers Conference to learn about new technologies.",
+        url: "https://developer.apple.com/videos/",
+        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>'
+      }
+    ];
+
+    const container = document.getElementById('resources-container');
+    resources.forEach(res => {
+      const card = document.createElement('a');
+      card.className = 'resource-card';
+      card.href = res.url;
+      card.target = '_blank';
+      card.rel = 'noopener noreferrer';
+      card.innerHTML = `
+        <div class="resource-icon">${res.icon}</div>
+        <h2 class="resource-title">${res.title}</h2>
+        <p class="resource-desc">${res.desc}</p>
+        <div class="resource-link">View resource <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+      `;
+      container.appendChild(card);
+    });
+  </script>
+</body>
+</html>

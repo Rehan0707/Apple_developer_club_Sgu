@@ -1,3 +1,50 @@
+import Lenis from 'lenis';
+import 'lenis/dist/lenis.css';
+
+// ── Ultra-smooth Linear Scrolling (Apple-grade fluid physics) ──
+const lenis = new Lenis({
+  lerp: 0.09, // Linear interpolation damping for silky smooth scroll
+  wheelMultiplier: 0.95,
+  touchMultiplier: 1.5,
+  smoothWheel: true,
+  infinite: false,
+});
+
+function raf(time) {
+  lenis.raf(time);
+  requestAnimationFrame(raf);
+}
+requestAnimationFrame(raf);
+
+window.lenis = lenis;
+
+// Linear smooth scrolling for in-page anchor links
+document.querySelectorAll('a[href*="#"]').forEach(anchor => {
+  anchor.addEventListener('click', (e) => {
+    const href = anchor.getAttribute('href');
+    if (!href || href === '#' || href === '/#') return;
+    if (anchor.id === 'contact-menu-btn' || anchor.closest('#nav-contact-item')) return;
+    
+    try {
+      const url = new URL(href, window.location.href);
+      if (url.pathname === window.location.pathname && url.hash && url.hash.length > 1) {
+        const target = document.querySelector(url.hash);
+        if (target) {
+          e.preventDefault();
+          lenis.scrollTo(target, {
+            offset: -85,
+            duration: 1.1,
+            easing: (t) => t, // Linear easing
+          });
+          history.pushState(null, '', url.hash);
+        }
+      }
+    } catch {
+      // Fallback
+    }
+  });
+});
+
 const menuButton = document.querySelector('.menu-toggle');
 const navigation = document.querySelector('#navigation');
 function closeMenu() {

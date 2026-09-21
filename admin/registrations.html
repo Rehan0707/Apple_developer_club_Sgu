@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrations - Admin</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            background: "#f5f5f7",
+            "on-surface": "#1d1d1f",
+            "surface-container": "#f0f0f3",
+            "surface-container-lowest": "#ffffff",
+            primary: "#0071e3",
+            "outline-variant": "#e5e5ea",
+            "on-surface-variant": "#6e6e73"
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-background text-on-surface antialiased font-sans">
+  <aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-lowest border-r border-outline-variant z-50 flex flex-col justify-between p-4">
+    <div class="flex flex-col gap-6">
+      <a href="/" class="flex items-center justify-center py-2 px-1 transition-opacity hover:opacity-80">
+        <img alt="Apple Developer Club SGU" class="w-full object-contain" src="/images/club-lockup-sgu-text-bak.png"/>
+      </a>
+      <div class="flex flex-col gap-1">
+        <span class="px-2 font-semibold text-[11px] text-[#86868b] tracking-wider uppercase mb-1">Navigation</span>
+        <nav class="flex flex-col gap-1"><a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-medium" href="/admin/index.html">
+        <span class="material-symbols-outlined text-[20px]">calendar_month</span>
+        <span class="text-sm">Events</span>
+      </a><a aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors bg-primary/10 text-primary font-semibold" href="/admin/registrations.html">
+        <span class="material-symbols-outlined text-[20px]">how_to_reg</span>
+        <span class="text-sm">Registrations</span>
+      </a><a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-medium" href="/admin/badges.html">
+        <span class="material-symbols-outlined text-[20px]">verified</span>
+        <span class="text-sm">Badges</span>
+      </a><a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-medium" href="/admin/resources.html">
+        <span class="material-symbols-outlined text-[20px]">developer_mode_tv</span>
+        <span class="text-sm">Resources</span>
+      </a></nav>
+      </div>
+    </div>
+  </aside>
+  <div class="pl-64">
+    <header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/80 backdrop-blur-xl z-40 flex items-center justify-end px-6 border-b border-outline-variant">
+      <div class="flex items-center gap-4">
+        <span class="text-sm font-semibold text-on-surface">Alex Chen</span>
+      </div>
+    </header>
+    <main class="w-full pt-24 px-8 max-w-5xl mx-auto">
+      <h1 class="text-3xl font-bold mb-2">Registrations</h1>
+      <p class="text-on-surface-variant mb-8">View students registered for upcoming events.</p>
+      
+      <div class="bg-white rounded-xl border border-outline-variant shadow-sm overflow-hidden p-8 text-center text-on-surface-variant">
+        No registrations found yet.
+      </div>
+    </main>
+  </div>
+</body>
+</html>

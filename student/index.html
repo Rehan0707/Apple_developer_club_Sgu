@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Dashboard - Apple Developer Club SGU</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            background: "#f5f5f7",
+            "on-surface": "#1d1d1f",
+            "surface-container": "#f0f0f3",
+            "surface-container-lowest": "#ffffff",
+            primary: "#0071e3",
+            "outline-variant": "#e5e5ea",
+            "on-surface-variant": "#6e6e73"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @layer base { html, body { margin: 0; padding: 0; background: #f5f5f7; } }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased font-sans">
+
+  <!-- SIDEBAR -->
+  <aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-lowest border-r border-outline-variant z-50 flex flex-col justify-between p-4">
+    <div class="flex flex-col gap-6">
+      <a href="/" class="flex items-center justify-center py-2 px-1 transition-opacity hover:opacity-80">
+        <img alt="Apple Developer Club SGU" class="w-full object-contain" src="/images/club-lockup-sgu-text-bak.png"/>
+      </a>
+      <div class="flex flex-col gap-1">
+        <span class="px-2 text-xs text-outline-variant font-semibold tracking-wider uppercase mb-1" style="color:#86868b">Menu</span>
+        <nav class="flex flex-col gap-1">
+          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary font-semibold transition-colors w-full text-left">
+            <span class="material-symbols-outlined text-[20px]">grid_view</span>
+            <span class="text-sm">Dashboard</span>
+          </button>
+          <button onclick="switchTab('events')" id="nav-events" class="nav-btn flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors w-full text-left">
+            <span class="material-symbols-outlined text-[20px]">calendar_month</span>
+            <span class="text-sm">Events</span>
+          </button>
+          <button onclick="switchTab('badges')" id="nav-badges" class="nav-btn flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors w-full text-left">
+            <span class="material-symbols-outlined text-[20px]">verified</span>
+            <span class="text-sm">Badges</span>
+          </button>
+          <button onclick="switchTab('resources')" id="nav-resources" class="nav-btn flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors w-full text-left">
+            <span class="material-symbols-outlined text-[20px]">developer_mode_tv</span>
+            <span class="text-sm">Resources</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </aside>
+
+  <div class="pl-64">
+    <!-- HEADER -->
+    <header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/80 backdrop-blur-xl z-40 flex items-center justify-between px-6 border-b border-outline-variant">
+      <div><span class="font-bold text-lg text-on-surface" id="header-title">Student Portal</span></div>
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3 pl-2">
+          <div class="flex flex-col text-right hidden sm:flex">
+            <span class="text-sm font-semibold text-on-surface leading-snug">Alex Chen</span>
+            <span class="text-xs text-primary font-medium">Student Member</span>
+          </div>
+          <img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary/20 shadow-sm" src="https://lh3.googleusercontent.com/aida/AEtjO1U9DjIG6D2JHKmYO0vJz4WLCVJpokrToe03XgNPfDA4DkUzhwk2E-vDSRJUzYS1YX0-ZnZjNBbO9rUsFv_Ss0PFjz0EecP8IpQHR7e6KBgN1otrF42lpHo-vaCwCxzczT6SPzdpiDaPu5G_8gNcEtzX3Tvtsf6L3UqXSifwJXEnlGPQEODVPl8IhsQnEMeZlpmEqdu8R8cdqZwYURv-oO6fI7WnoCkDcjie-RyPoEHpF-on5T8l_COYI5I"/>
+        </div>
+      </div>
+    </header>
+
+    <main class="w-full pt-24 pb-20 px-8 max-w-5xl mx-auto">
+      
+      <!-- DASHBOARD TAB -->
+      <div id="tab-dashboard" class="tab-content active flex flex-col gap-10">
+        <div>
+          <h1 class="text-3xl font-bold mb-2">Welcome Back, Alex!</h1>
+          <p class="text-on-surface-variant">Here is a quick overview of your club activity.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Next Event Widget -->
+          <div class="bg-white rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col gap-4">
+            <div class="flex items-center gap-2 text-primary font-semibold">
+              <span class="material-symbols-outlined text-[20px]">event</span>
+              <h3>Next Event</h3>
+            </div>
+            <div id="dash-next-event">
+              <p class="text-on-surface-variant text-sm">Loading...</p>
+            </div>
+            <button onclick="switchTab('events')" class="mt-auto px-4 py-2 border border-outline-variant rounded-lg text-sm font-medium hover:bg-surface-container transition-colors w-fit">View All Events</button>
+          </div>
+
+          <!-- Latest Badge Widget -->
+          <div class="bg-white rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col gap-4">
+            <div class="flex items-center gap-2 text-primary font-semibold">
+              <span class="material-symbols-outlined text-[20px]">award_star</span>
+              <h3>Latest Badge</h3>
+            </div>
+            <div id="dash-latest-badge" class="flex flex-col items-center justify-center py-2">
+              <p class="text-on-surface-variant text-sm">Loading...</p>
+            </div>
+            <button onclick="switchTab('badges')" class="mt-auto px-4 py-2 border border-outline-variant rounded-lg text-sm font-medium hover:bg-surface-container transition-colors w-fit self-start">View Collection</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- EVENTS TAB -->
+      <div id="tab-events" class="tab-content flex flex-col gap-10">
+        <div>
+          <h1 class="text-3xl font-bold mb-2">Events</h1>
+          <p class="text-on-surface-variant">Register for workshops, sessions, and meetups.</p>
+        </div>
+        
+        <div class="flex flex-col gap-4">
+          <h2 class="text-lg font-semibold border-b border-outline-variant pb-2">My Registered Events</h2>
+          <div id="registered-events-list" class="flex flex-col gap-3">
+             <p class="text-on-surface-variant text-sm">Loading...</p>
+          </div>
+        </div>
+        
+        <div class="flex flex-col gap-4">
+          <h2 class="text-lg font-semibold border-b border-outline-variant pb-2">Upcoming Events</h2>
+          <div id="upcoming-events-list" class="flex flex-col gap-3">
+             <p class="text-on-surface-variant text-sm">Loading...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- BADGES TAB -->
+      <div id="tab-badges" class="tab-content flex flex-col gap-10">
+        <div>
+          <h1 class="text-3xl font-bold mb-2">My Badges</h1>
+          <p class="text-on-surface-variant">Showcase your skills and participation.</p>
+        </div>
+        
+        <div class="flex flex-col gap-4">
+          <h2 class="text-lg font-semibold border-b border-outline-variant pb-2">Owned Badges</h2>
+          <div id="owned-badges-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-12 p-8">
+             <p class="text-on-surface-variant text-sm">Loading...</p>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <h2 class="text-lg font-semibold border-b border-outline-variant pb-2">Locked Badges</h2>
+          <div id="locked-badges-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-12 p-8 opacity-60 grayscale">
+             <p class="text-on-surface-variant text-sm">Loading...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESOURCES TAB -->
+      <div id="tab-resources" class="tab-content flex flex-col gap-10">
+        <div>
+          <h1 class="text-3xl font-bold mb-2">Learning Resources</h1>
+          <p class="text-on-surface-variant">Curated materials to level up your skills.</p>
+        </div>
+        
+        <div id="resources-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+           <p class="text-on-surface-variant text-sm">Loading...</p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+
+    
+
+    let db = { events: [], resources: [], badges: [], students: [] };
+    const myStudentId = 'mock_student_1'; 
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      
+      document.querySelectorAll('.nav-btn').forEach(el => {
+        el.className = 'nav-btn flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors w-full text-left';
+      });
+      document.getElementById('nav-' + tabId).className = 'nav-btn flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary font-semibold transition-colors w-full text-left';
+    }
+
+    async function loadData() {
+      try {
+        const [badgesRes, resourcesRes, studentsRes, eventsRes] = await Promise.all([
+          fetch('/api/badges'),
+          fetch('/api/resources'),
+          fetch('/api/admin/students'),
+          fetch('/api/events')
+        ]);
+        
+        db.badges = await badgesRes.json();
+        db.resources = await resourcesRes.json();
+        db.students = await studentsRes.json();
+        db.events = await eventsRes.json();
+        
+        renderData();
+      } catch (e) {
+        console.error("Dashboard error:", e);
+      }
+    }
+
+    function renderData() {
+      const me = db.students.find(s => s.id === myStudentId) || { badges: [], events: [] };
+      const myBadgeIds = me.badges || [];
+      const myEventIds = me.events || []; // Assuming array of event IDs they RSVP'd to
+
+      // --- BADGES ---
+      const ownedBadges = db.badges.filter(b => myBadgeIds.includes(b.id));
+      const lockedBadges = db.badges.filter(b => !myBadgeIds.includes(b.id));
+      
+      
+      const renderBadgeCard = (b) => `
+        <div class="flex flex-col items-center text-center gap-2">
+          <div class="w-28 h-28">${getHexBadgeSVG(b)}</div>
+          <h3 class="font-bold text-sm leading-tight max-w-[120px]">${b.name}</h3>
+          <p class="text-xs text-on-surface-variant max-w-[120px]">${b.desc || ''}</p>
+        </div>`;
+
+
+      document.getElementById('owned-badges-grid').innerHTML = ownedBadges.length ? ownedBadges.map(renderBadgeCard).join('') : '<p class="text-on-surface-variant text-sm col-span-full">No badges earned yet.</p>';
+      document.getElementById('locked-badges-grid').innerHTML = lockedBadges.length ? lockedBadges.map(renderBadgeCard).join('') : '<p class="text-on-surface-variant text-sm col-span-full">You have earned all available badges!</p>';
+
+      // --- RESOURCES ---
+      document.getElementById('resources-list').innerHTML = db.resources.length ? db.resources.map(r => `
+        <a href="${r.url}" target="_blank" class="flex items-center justify-between p-4 bg-white rounded-xl border border-outline-variant hover:shadow-md transition-shadow">
+          <div class="flex flex-col">
+            <span class="font-semibold text-on-surface">${r.title}</span>
+            <span class="text-xs text-on-surface-variant bg-surface-container px-2 py-0.5 rounded w-fit mt-1">${r.category || 'General'}</span>
+          </div>
+          <span class="material-symbols-outlined text-primary">open_in_new</span>
+        </a>
+      `).join('') : '<p class="text-on-surface-variant text-sm col-span-full">No resources available.</p>';
+
+      // --- EVENTS ---
+      // For this prototype, we'll just show all events as upcoming since we don't have full RSVP API on the frontend yet
+      const allEventsHtml = db.events.length ? db.events.map(e => `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white rounded-xl border border-outline-variant hover:shadow-md transition-shadow gap-4">
+          <div class="flex flex-col">
+            <span class="font-bold text-on-surface">${e.title}</span>
+            <span class="text-sm text-on-surface-variant">${new Date(e.date).toLocaleDateString(undefined, {weekday: 'short', month: 'short', day: 'numeric'})} • ${e.location}</span>
+          </div>
+          <button class="px-4 py-2 bg-primary/10 text-primary font-semibold rounded-lg text-sm whitespace-nowrap">Register</button>
+        </div>
+      `).join('') : '<p class="text-on-surface-variant text-sm">No upcoming events.</p>';
+      
+      document.getElementById('upcoming-events-list').innerHTML = allEventsHtml;
+      document.getElementById('registered-events-list').innerHTML = '<p class="text-on-surface-variant text-sm italic">You are not registered for any events yet.</p>';
+
+      // --- DASHBOARD OVERVIEW ---
+      if (db.events.length > 0) {
+        const next = db.events[0];
+        document.getElementById('dash-next-event').innerHTML = `
+          <p class="font-bold text-lg">${next.title}</p>
+          <p class="text-on-surface-variant text-sm">${new Date(next.date).toLocaleDateString(undefined, {weekday: 'long', month: 'short', day: 'numeric'})}</p>
+        `;
+      } else {
+        document.getElementById('dash-next-event').innerHTML = '<p class="text-on-surface-variant text-sm">No events scheduled.</p>';
+      }
+
+      if (ownedBadges.length > 0) {
+        const b = ownedBadges[ownedBadges.length - 1]; // latest
+        document.getElementById('dash-latest-badge').innerHTML = `
+          <img src="${b.imageUrl}" alt="${b.name}" class="w-24 h-24 mb-3 object-contain drop-shadow-lg" />
+          <span class="font-bold text-sm">${b.name}</span>
+        `;
+      } else {
+        document.getElementById('dash-latest-badge').innerHTML = '<p class="text-on-surface-variant text-sm">No badges yet.</p>';
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', loadData);
+  </script>
+</body>
+</html>

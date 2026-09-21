@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="description" content="Admin Login - Apple Developer Club SGU" />
+  <title>Admin Login — Apple Developer Club SGU</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/src/style.css" />
+  <style>
+    .signin-page { min-height: 100dvh; display: flex; flex-direction: column; background: #f5f5f7; }
+    .signin-main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px 60px; }
+    .signin-wrap  { width: 100%; max-width: 440px; display: flex; flex-direction: column; align-items: center; }
+
+    .signin-card { background: #ffffff; border-radius: 28px; padding: 52px 48px 44px; width: 100%; box-shadow: 0 2px 6px rgba(0,0,0,.06), 0 12px 40px rgba(0,0,0,.09); text-align: center; position: relative; overflow: hidden; }
+    .signin-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg,#0071e3,#5e5ce6,#bf5af2,#ff375f,#ff9f0a); }
+    
+    .signin-heading { font-size: 28px; font-weight: 700; letter-spacing: -.6px; color: #1d1d1f; margin: 0 0 10px; line-height: 1.15; }
+    .signin-sub { font-size: 15px; line-height: 1.55; color: #6e6e73; margin: 0 auto 28px; max-width: 300px; display: block; }
+
+    .input-group { margin-bottom: 20px; text-align: left; }
+    .input-group label { display: block; font-size: 13px; font-weight: 600; color: #1d1d1f; margin-bottom: 8px; }
+    .input-group input { width: 100%; padding: 12px 16px; font-size: 16px; border: 1px solid rgba(0,0,0,0.15); border-radius: 12px; background: #f5f5f7; color: #1d1d1f; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    .input-group input:focus { border-color: #0071e3; box-shadow: 0 0 0 3px rgba(0,113,227,0.2); background: #ffffff; }
+
+    .submit-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; margin-top: 16px; padding: 15px 20px; background: #0071e3; color: #fff; border: none; border-radius: 14px; font-size: 17px; font-weight: 600; letter-spacing: -.2px; cursor: pointer; text-decoration: none; font-family: inherit; transition: background .18s, transform .15s, box-shadow .18s; box-shadow: 0 4px 16px rgba(0,113,227,.2); }
+    .submit-btn:hover { background: #0062c4; transform: translateY(-1px); box-shadow: 0 8px 28px rgba(0,113,227,.28); }
+    .submit-btn:active { transform: scale(.98); }
+
+    .error-message { color: #ff3b30; font-size: 14px; margin-top: 16px; display: none; }
+  </style>
+</head>
+<body class="signin-page">
+  <main id="main" class="signin-main">
+    <div class="signin-wrap">
+      <div class="signin-card">
+        <h1 class="signin-heading">Admin Portal</h1>
+        <span class="signin-sub">Sign in to access the club leader dashboard.</span>
+
+        <form id="admin-login-form">
+          <div class="input-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="e.g. soham@dev" required autocomplete="username">
+          </div>
+          <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+          </div>
+          <div class="error-message" id="error-msg">Incorrect username or password.</div>
+          <button type="submit" class="submit-btn">Sign In</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      const errorMsg = document.getElementById('error-msg');
+      
+      // Dummy check
+      if (user === 'soham@dev' && pass === '7777777') {
+        errorMsg.style.display = 'none';
+        await fetch('/api/auth/mock/admin', { method: 'POST' });
+        window.location.href = '/admin/index.html';
+      } else {
+        errorMsg.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
