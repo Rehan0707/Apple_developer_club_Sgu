@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="description" content="Team - Apple Developer Club SGU" />
+  <title>Team — Apple Developer Club SGU</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/src/style.css" />
+  <style>
+    .page-header {
+      padding: 120px 20px 60px;
+      text-align: center;
+      background: #f5f5f7;
+    }
+    .page-title {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -1.2px;
+      color: #1d1d1f;
+      margin: 0 0 16px;
+    }
+    .page-desc {
+      font-size: 21px;
+      line-height: 1.4;
+      color: #86868b;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 40px;
+      padding: 80px 20px;
+      max-width: 1060px;
+      margin: 0 auto;
+    }
+    
+    .team-member {
+      text-align: center;
+    }
+    
+    .member-photo {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 24px;
+      background: #e5e5ea;
+      display: inline-block;
+    }
+    
+    .member-name {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1d1d1f;
+      margin: 0 0 8px;
+      letter-spacing: -0.5px;
+    }
+    
+    .member-role {
+      font-size: 17px;
+      font-weight: 500;
+      color: #0071e3;
+      margin: 0 0 12px;
+    }
+    
+    .member-bio {
+      font-size: 15px;
+      line-height: 1.5;
+      color: #6e6e73;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header" id="site-header">
+    <div class="nav-inner local-inner">
+      <a class="brand" href="/"><img src="/images/club-lockup.png" alt="Apple Developer Club SGU" class="brand-logo" width="180" height="60" /></a>
+      <nav id="navigation">
+        <a href="/">The Club</a>
+        <a href="/events/">Events</a>
+        <a href="/resources/">Resources</a>
+        <a href="/team/" aria-current="page">Team</a>
+        <a class="button small" href="/join/">Sign In</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <header class="page-header">
+      <h1 class="page-title">Meet the Team</h1>
+      <p class="page-desc">The club leaders dedicated to bringing the best of Apple platforms to SGU.</p>
+    </header>
+
+    <div class="team-grid" id="team-container">
+      <!-- Generated via JS -->
+    </div>
+  </main>
+
+  <script>
+    const team = [
+      {
+        name: "Soham",
+        role: "Club Lead",
+        bio: "Passionate about building fluid interfaces and exploring the Apple ecosystem.",
+        photo: "https://ui-avatars.com/api/?name=Soham&background=0071e3&color=fff&size=200"
+      },
+      {
+        name: "Jane Doe",
+        role: "Technical Lead",
+        bio: "Swift enthusiast and iOS architecture expert.",
+        photo: "https://ui-avatars.com/api/?name=Jane+Doe&background=34c759&color=fff&size=200"
+      },
+      {
+        name: "John Smith",
+        role: "Design Lead",
+        bio: "Focused on human interface guidelines and intuitive experiences.",
+        photo: "https://ui-avatars.com/api/?name=John+Smith&background=af52de&color=fff&size=200"
+      }
+    ];
+
+    const container = document.getElementById('team-container');
+    team.forEach(member => {
+      const el = document.createElement('div');
+      el.className = 'team-member';
+      el.innerHTML = `
+        <img src="${member.photo}" alt="${member.name}" class="member-photo" loading="lazy" />
+        <h2 class="member-name">${member.name}</h2>
+        <div class="member-role">${member.role}</div>
+        <p class="member-bio">${member.bio}</p>
+      `;
+      container.appendChild(el);
+    });
+  </script>
+</body>
+</html>

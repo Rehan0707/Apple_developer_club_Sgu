@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_dashboard" name="shell-type"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "apple-bg": "#f5f5f7",
+            "apple-card": "#ffffff",
+            "apple-border": "#e5e5ea",
+            "apple-border-strong": "#d2d2d7",
+            "apple-text": "#1d1d1f",
+            "apple-text-secondary": "#6e6e73",
+            "apple-text-tertiary": "#86868b",
+            "apple-blue": "#0071e3",
+            "apple-blue-hover": "#0077ed",
+            "apple-blue-light": "#0071e312",
+            "apple-green": "#34c759",
+            "apple-green-light": "#34c75918",
+            "apple-purple": "#af52de",
+            "apple-purple-light": "#af52de18",
+            "apple-amber": "#ff9500",
+            "apple-amber-light": "#ff950018",
+            "apple-gray-fill": "#f5f5f7",
+            "apple-gray-hover": "#e8e8ed"
+          },
+          fontFamily: {
+            sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "SF Pro Text", "sans-serif"],
+            mono: ["JetBrains Mono", "SF Mono", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-apple-bg text-apple-text font-sans antialiased selection:bg-apple-blue selection:text-white">
+<!-- Sidebar (Clean Apple Light Mode) -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-white border-r border-apple-border z-50 flex flex-col justify-between p-4">
+<div class="flex flex-col gap-6">
+<!-- Chapter Logo / Brand -->
+<div class="flex items-center gap-3 px-1 py-1">
+<div class="w-9 h-9 rounded-xl overflow-hidden shrink-0 shadow-sm border border-apple-border/70 flex items-center justify-center bg-black">
+<img alt="ADC Logo" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1XIl2pJ7k0jHEiMda_uByLzZ47xkNrfPaNNP047HUKrv_i2Fg7wlpNgdA1bCS_zJoXrAUPokfZytzxx8Ic1HCt2y2Qg8EdXbRAewEl_7_AAeuPAZZYSAwpYO_ibLnzkaqewcbEX_1ZVufCD7u4heMQpqN0yPBhGh6cyIbTlq9nJ5bb3_k5dv_Gi_olO0lBCb5ij_RuggSQKjGhWHM81FAaBQ2pJyKjpxA70tnhJPayFwFui9sSVYs6npmg"/>
+</div>
+<div class="flex flex-col">
+<span class="font-semibold text-[15px] text-apple-text tracking-tight leading-tight">ADC Campus</span>
+<span class="text-[12px] text-apple-text-secondary font-medium">Chapter Portal</span>
+</div>
+</div>
+<!-- Navigation links -->
+<div class="flex flex-col gap-1">
+<span class="px-2.5 py-1 text-[11px] font-mono font-medium text-apple-text-tertiary uppercase tracking-wider">Navigation</span>
+<nav class="flex flex-col gap-1" data-active-classes="bg-apple-gray-fill text-apple-blue font-semibold border-l-2 border-apple-blue">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-apple-text-secondary hover:bg-apple-gray-fill hover:text-apple-text transition-all duration-150" data-path="dashboard" href="#">
+<span class="material-symbols-outlined text-[20px] text-apple-text-tertiary">grid_view</span>
+<span class="text-[14px] font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-apple-text-secondary hover:bg-apple-gray-fill hover:text-apple-text transition-all duration-150" data-path="events" href="#">
+<span class="material-symbols-outlined text-[20px] text-apple-text-tertiary">calendar_month</span>
+<span class="text-[14px] font-medium">Events</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-apple-text-secondary hover:bg-apple-gray-fill hover:text-apple-text transition-all duration-150" data-path="registrations" href="#">
+<span class="material-symbols-outlined text-[20px] text-apple-text-tertiary">how_to_reg</span>
+<span class="text-[14px] font-medium">Registrations</span>
+</a>
+<a aria-current="page" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-blue-50/70 text-apple-blue font-semibold transition-all duration-150 shadow-[inset_0_0_0_1px_rgba(0,113,227,0.12)]" data-path="badges" href="#">
+<span class="material-symbols-outlined text-[20px] text-apple-blue">verified</span>
+<span class="text-[14px] font-semibold text-apple-blue">Badges</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-apple-text-secondary hover:bg-apple-gray-fill hover:text-apple-text transition-all duration-150" data-path="team" href="#">
+<span class="material-symbols-outlined text-[20px] text-apple-text-tertiary">groups</span>
+<span class="text-[14px] font-medium">Team</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-apple-text-secondary hover:bg-apple-gray-fill hover:text-apple-text transition-all duration-150" data-path="resources" href="#">
+<span class="material-symbols-outlined text-[20px] text-apple-text-tertiary">developer_mode_tv</span>
+<span class="text-[14px] font-medium">Resources</span>
+</a>
+</nav>
+</div>
+</div>
+<!-- Xcode Cloud bottom badge -->
+<div class="p-3 rounded-xl bg-apple-gray-fill border border-apple-border flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-mono text-[11px] text-apple-green font-semibold flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-apple-green animate-pulse"></span>
+          Xcode Cloud
+        </span>
+<span class="font-mono text-[11px] text-apple-text-tertiary">v15.4</span>
+</div>
+<div class="w-full bg-apple-border h-1.5 rounded-full overflow-hidden">
+<div class="bg-apple-green h-full w-4/5 rounded-full"></div>
+</div>
+<span class="text-[11px] text-apple-text-secondary">Build targets synchronized</span>
+</div>
+</aside>
+<!-- Main Wrapper -->
+<div class="pl-64">
+<!-- Top Header (Frosted Cupertino Light Mode) -->
+<header class="fixed top-0 left-64 right-0 h-16 bg-white/80 backdrop-blur-xl z-40 flex items-center justify-between px-6 border-b border-apple-border">
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-apple-gray-fill border border-apple-border text-[12px] font-medium text-apple-text">
+<span class="w-2 h-2 rounded-full bg-apple-green"></span>
+<span>Cupertino Core SDK</span>
+</div>
+<div class="hidden md:flex items-center gap-1.5 font-mono text-[12px] text-apple-text-secondary bg-apple-gray-fill border border-apple-border px-2.5 py-1 rounded-md">
+<span class="material-symbols-outlined text-[15px] text-apple-text-tertiary">terminal</span>
+<span>adc-cli: operational</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<!-- Segmented Portal View Controller -->
+<div class="flex items-center bg-apple-gray-fill p-0.5 rounded-lg border border-apple-border">
+<button class="px-3 py-1 rounded-md text-[12px] font-semibold bg-white text-apple-text shadow-sm transition-all">Portal Lead</button>
+<button class="px-3 py-1 rounded-md text-[12px] font-medium text-apple-text-secondary hover:text-apple-text transition-colors">Member View</button>
+</div>
+<button class="flex items-center justify-center w-8 h-8 rounded-lg bg-apple-gray-fill border border-apple-border text-apple-text-secondary hover:text-apple-text hover:bg-apple-gray-hover transition-colors">
+<span class="material-symbols-outlined text-[18px]">notifications</span>
+</button>
+<div class="flex items-center gap-2.5 pl-1 border-l border-apple-border">
+<div class="flex flex-col text-right hidden sm:flex">
+<span class="text-[13px] font-semibold text-apple-text leading-tight">Alex Chen</span>
+<span class="text-[11px] text-apple-blue font-medium">Club Co-Lead</span>
+</div>
+<img alt="Alex Chen Profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-apple-blue/25 shadow-xs" src="https://lh3.googleusercontent.com/aida/AEtjO1U9DjIG6D2JHKmYO0vJz4WLCVJpokrToe03XgNPfDA4DkUzhwk2E-vDSRJUzYS1YX0-ZnZjNBbO9rUsFv_Ss0PFjz0EecP8IpQHR7e6KBgN1otrF42lpHo-vaCwCxzczT6SPzdpiDaPu5G_8gNcEtzX3Tvtsf6L3UqXSifwJXEnlGPQEODVPl8IhsQnEMeZlpmEqdu8R8cdqZwYURv-oO6fI7WnoCkDcjie-RyPoEHpF-on5T8l_COYI5I"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full pt-16 bg-apple-bg min-h-screen">
+<div class="flex flex-col w-full">
+<div class="flex flex-col gap-6 px-8 py-6 max-w-[1440px] mx-auto w-full">
+<!-- Studio Toolbar & Top KPI Stats -->
+<section class="flex flex-col gap-4">
+<div class="flex flex-wrap items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-apple-blue/20 text-apple-blue font-mono text-[12px] font-semibold">
+<span class="w-2 h-2 rounded-full bg-apple-blue animate-pulse"></span>
+                  ADC CREDENTIAL ENGINE v2.4
+                </div>
+<span class="text-apple-text-tertiary font-mono text-[12px]">● SHA256-Signed On-Device Passkeys</span>
+</div>
+<div class="flex items-center gap-2.5">
+<button class="flex items-center gap-1.5 px-3.5 h-[36px] rounded-lg bg-white border border-apple-border text-apple-text hover:bg-apple-gray-fill text-[13px] font-semibold transition-all shadow-xs" id="bulkCsvBtn">
+<span class="material-symbols-outlined text-[17px] text-apple-text-secondary">upload_file</span>
+<span>Bulk Award via CSV</span>
+</button>
+<button class="flex items-center gap-1.5 px-4 h-[36px] rounded-lg bg-apple-blue text-white text-[13px] font-semibold shadow-sm hover:bg-apple-blue-hover active:scale-[0.99] transition-all" id="createBadgeBtn">
+<span class="material-symbols-outlined text-[18px]">add_moderator</span>
+<span>+ Create Badge Template</span>
+</button>
+</div>
+</div>
+<!-- Metric Cards Grid (Apple White Cards) -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="flex flex-col p-4 rounded-xl bg-white border border-apple-border shadow-xs">
+<div class="flex items-center justify-between text-apple-text-tertiary font-mono text-[11px] uppercase tracking-wider">
+<span>Template Repository</span>
+<span class="material-symbols-outlined text-apple-blue text-[18px]">workspace_premium</span>
+</div>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="text-[32px] font-bold text-apple-text tracking-tight">24</span>
+<span class="text-[12px] text-apple-green font-semibold">+3 new this term</span>
+</div>
+<span class="text-[12px] text-apple-text-secondary mt-0.5">Distinct Badges Available</span>
+</div>
+<div class="flex flex-col p-4 rounded-xl bg-white border border-apple-border shadow-xs">
+<div class="flex items-center justify-between text-apple-text-tertiary font-mono text-[11px] uppercase tracking-wider">
+<span>Issued Credentials</span>
+<span class="material-symbols-outlined text-apple-green text-[18px]">military_tech</span>
+</div>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="text-[32px] font-bold text-apple-text tracking-tight">348</span>
+<span class="text-[12px] text-apple-green font-semibold">92.4% verification</span>
+</div>
+<span class="text-[12px] text-apple-text-secondary mt-0.5">Total Badges Awarded</span>
+</div>
+<div class="flex flex-col p-4 rounded-xl bg-white border border-apple-border shadow-xs">
+<div class="flex items-center justify-between text-apple-text-tertiary font-mono text-[11px] uppercase tracking-wider">
+<span>Pinnacle Honor</span>
+<span class="material-symbols-outlined text-apple-purple text-[18px]">bolt</span>
+</div>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="text-[20px] font-bold text-apple-text truncate">Swift Pioneer</span>
+<span class="text-[12px] text-apple-text-tertiary font-medium">Tier IV</span>
+</div>
+<span class="text-[12px] text-apple-text-secondary mt-0.5">68 Students Certified</span>
+</div>
+<div class="flex flex-col p-4 rounded-xl bg-white border border-apple-border shadow-xs">
+<div class="flex items-center justify-between text-apple-text-tertiary font-mono text-[11px] uppercase tracking-wider">
+<span>Wallet Compatibility</span>
+<span class="material-symbols-outlined text-apple-blue text-[18px]">wallet</span>
+</div>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="text-[32px] font-bold text-apple-text tracking-tight">98.2%</span>
+<span class="text-[12px] text-apple-blue font-semibold">PKPass sync</span>
+</div>
+<span class="text-[12px] text-apple-text-secondary mt-0.5">Apple Wallet passes minted</span>
+</div>
+</div>
+</section>
+<!-- Two-Column Studio Workspace -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+<!-- LEFT COLUMN: Member Directory (Apple White Card) -->
+<section class="xl:col-span-7 flex flex-col gap-4 bg-white p-5 rounded-2xl border border-apple-border shadow-xs relative">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-1">
+<div>
+<div class="flex items-center gap-2">
+<h2 class="text-[18px] font-semibold text-apple-text">Member Directory</h2>
+<span class="px-2 py-0.5 rounded-full bg-apple-gray-fill border border-apple-border font-mono text-[11px] font-semibold text-apple-text-secondary">142 Enrolled</span>
+</div>
+<p class="text-[13px] text-apple-text-secondary mt-0.5">Filter cohort members, inspect credential history, and issue verified club honors.</p>
+</div>
+<!-- Quick Search Input -->
+<div class="relative w-full md:w-64">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-apple-text-tertiary">search</span>
+<input class="w-full h-[36px] pl-9 pr-3 rounded-lg bg-apple-gray-fill border border-apple-border text-apple-text placeholder:text-apple-text-tertiary text-[13px] focus:outline-none focus:bg-white focus:border-apple-blue transition-all" id="directorySearch" placeholder="Filter by student, email..." type="text"/>
+</div>
+</div>
+<!-- Track Filter Chips -->
+<div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none" id="trackFilters">
+<button class="track-btn px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-apple-blue text-white shadow-xs whitespace-nowrap transition-all" data-track="all">All Tracks</button>
+<button class="track-btn px-3 py-1.5 rounded-lg text-[12px] font-medium bg-apple-gray-fill text-apple-text-secondary hover:text-apple-text hover:bg-apple-gray-hover whitespace-nowrap transition-all border border-apple-border" data-track="ios">iOS Dev</button>
+<button class="track-btn px-3 py-1.5 rounded-lg text-[12px] font-medium bg-apple-gray-fill text-apple-text-secondary hover:text-apple-text hover:bg-apple-gray-hover whitespace-nowrap transition-all border border-apple-border" data-track="vision">spatial computing / visionOS</button>
+<button class="track-btn px-3 py-1.5 rounded-lg text-[12px] font-medium bg-apple-gray-fill text-apple-text-secondary hover:text-apple-text hover:bg-apple-gray-hover whitespace-nowrap transition-all border border-apple-border" data-track="coreml">CoreML / AI</button>
+<button class="track-btn px-3 py-1.5 rounded-lg text-[12px] font-medium bg-apple-gray-fill text-apple-text-secondary hover:text-apple-text hover:bg-apple-gray-hover whitespace-nowrap transition-all border border-apple-border" data-track="metal">Metal / Graphics</button>
+</div>
+<!-- Directory Table -->
+<div class="overflow-x-auto rounded-xl border border-apple-border bg-white">
+<table class="w-full text-left border-collapse" id="membersTable">
+<thead>
+<tr class="bg-apple-gray-fill/80 border-b border-apple-border text-apple-text-secondary text-[11px] font-mono uppercase tracking-wider">
+<th class="py-3 px-4 font-semibold">Member</th>
+<th class="py-3 px-4 font-semibold">Primary Track</th>
+<th class="py-3 px-4 font-semibold">Earned</th>
+<th class="py-3 px-4 font-semibold">Attendance</th>
+<th class="py-3 px-4 font-semibold text-right">Award Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-apple-border text-[13px]" id="memberListBody">
+<!-- Member Row 1 (Jordan Lee) -->
+<tr class="hover:bg-apple-gray-fill/60 transition-colors group cursor-pointer" onclick="openAwardDrawer('Jordan Lee', 'jlee@university.edu', 'spatial computing / visionOS', 'https://lh3.googleusercontent.com/aida-public/AB6AXuAXDy3rznCJL5r04egsKyKQwK2aVe2LSYcEfuWunYOobekikepTULDI2EH17_h3Dbx4b3-WuLlGVjmR-ln8A3M4kYtWmeu5NfSWidnrTfoR1hdMnjH-9qy7PBiWQMKufAoDkp4tbZA8bt7eCLbPJvFfq7xZuQ5sADD8oOci-oRJsW9sogat2aTaB-z7tOrZPbVWebB_4SYY6ErNEkLp96b0XqDxEHoOMWih-jMkfIZyBzFVcKYcZpkR_Q')">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<div class="relative shrink-0">
+<img alt="Jordan Lee" class="w-9 h-9 rounded-full object-cover ring-2 ring-apple-blue/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXDy3rznCJL5r04egsKyKQwK2aVe2LSYcEfuWunYOobekikepTULDI2EH17_h3Dbx4b3-WuLlGVjmR-ln8A3M4kYtWmeu5NfSWidnrTfoR1hdMnjH-9qy7PBiWQMKufAoDkp4tbZA8bt7eCLbPJvFfq7xZuQ5sADD8oOci-oRJsW9sogat2aTaB-z7tOrZPbVWebB_4SYY6ErNEkLp96b0XqDxEHoOMWih-jMkfIZyBzFVcKYcZpkR_Q"/>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-apple-green ring-2 ring-white"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-apple-text group-hover:text-apple-blue transition-colors truncate">Jordan Lee</span>
+<span class="text-[12px] text-apple-text-secondary truncate">jlee@university.edu</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 border border-apple-blue/20 text-apple-blue font-mono text-[11px] font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-apple-blue"></span>visionOS
+                        </span>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center -space-x-1">
+<div class="w-6 h-6 rounded-md bg-blue-50 border border-apple-blue/20 flex items-center justify-center text-apple-blue shadow-xs" title="Swift Pioneer">
+<span class="material-symbols-outlined text-[14px]">bolt</span>
+</div>
+<div class="w-6 h-6 rounded-md bg-green-50 border border-apple-green/20 flex items-center justify-center text-apple-green shadow-xs" title="RealityKit Explorer">
+<span class="material-symbols-outlined text-[14px]">view_in_ar</span>
+</div>
+<div class="w-6 h-6 rounded-md bg-purple-50 border border-apple-purple/20 flex items-center justify-center text-apple-purple shadow-xs" title="Spatial Audio Master">
+<span class="material-symbols-outlined text-[14px]">spatial_audio</span>
+</div>
+<span class="w-6 h-6 rounded-md bg-apple-gray-fill border border-apple-border flex items-center justify-center font-mono text-[10px] text-apple-text-secondary font-semibold">+2</span>
+</div>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center gap-2">
+<div class="w-14 bg-apple-border h-1.5 rounded-full overflow-hidden">
+<div class="bg-apple-green h-full w-[96%] rounded-full"></div>
+</div>
+<span class="font-mono text-[11px] text-apple-text font-semibold">96%</span>
+</div>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-apple-border hover:bg-apple-blue hover:text-white hover:border-apple-blue text-apple-text text-[12px] font-semibold transition-all shadow-xs">
+<span class="material-symbols-outlined text-[15px]">military_tech</span>
+<span>+ Award</span>
+</button>
+</td>
+</tr>
+<!-- Member Row 2 -->
+<tr class="hover:bg-apple-gray-fill/60 transition-colors group cursor-pointer" onclick="openAwardDrawer('Elena Rostova', 'erostova@university.edu', 'CoreML / AI', 'https://lh3.googleusercontent.com/aida-public/AB6AXuArSwlaBAVhDttmddH1NPYSIb4nh7B7eK0SrAd84pDXCR-5AfPx8sqvZk93eLN0Z-bMWUMqyFVvjx7XwiW6w5k3sKSu1xDdgzorsoiqnGeFe2ue-95F6fInzbEyjOhYQAz_xzvRUBIBeUCW1BKyxm2v8BIkPLSHA2MkXJ52GWhL_vGR__QQFXRbxaMZxnyF1Cr2VK4o_3r6S3psjMrGgU1vvMUnF2GqzL4oTHl3pWy7f7gWP3KeW_e7-w')">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<img alt="Elena Rostova" class="w-9 h-9 rounded-full object-cover ring-1 ring-apple-border" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArSwlaBAVhDttmddH1NPYSIb4nh7B7eK0SrAd84pDXCR-5AfPx8sqvZk93eLN0Z-bMWUMqyFVvjx7XwiW6w5k3sKSu1xDdgzorsoiqnGeFe2ue-95F6fInzbEyjOhYQAz_xzvRUBIBeUCW1BKyxm2v8BIkPLSHA2MkXJ52GWhL_vGR__QQFXRbxaMZxnyF1Cr2VK4o_3r6S3psjMrGgU1vvMUnF2GqzL4oTHl3pWy7f7gWP3KeW_e7-w"/>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-apple-text group-hover:text-apple-blue transition-colors truncate">Elena Rostova</span>
+<span class="text-[12px] text-apple-text-secondary truncate">erostova@university.edu</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-50 border border-apple-purple/20 text-apple-purple font-mono text-[11px] font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-apple-purple"></span>CoreML / AI
+                        </span>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center -space-x-1">
+<div class="w-6 h-6 rounded-md bg-purple-50 border border-apple-purple/20 flex items-center justify-center text-apple-purple" title="CoreML Architect">
+<span class="material-symbols-outlined text-[14px]">psychology</span>
+</div>
+<div class="w-6 h-6 rounded-md bg-green-50 border border-apple-green/20 flex items-center justify-center text-apple-green" title="CreateML Speedrun">
+<span class="material-symbols-outlined text-[14px]">auto_graph</span>
+</div>
+<span class="w-6 h-6 rounded-md bg-apple-gray-fill border border-apple-border flex items-center justify-center font-mono text-[10px] text-apple-text-secondary font-semibold">+1</span>
+</div>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center gap-2">
+<div class="w-14 bg-apple-border h-1.5 rounded-full overflow-hidden">
+<div class="bg-apple-green h-full w-[88%] rounded-full"></div>
+</div>
+<span class="font-mono text-[11px] text-apple-text font-semibold">88%</span>
+</div>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-apple-border hover:bg-apple-blue hover:text-white hover:border-apple-blue text-apple-text text-[12px] font-semibold transition-all shadow-xs">
+<span class="material-symbols-outlined text-[15px]">military_tech</span>
+<span>+ Award</span>
+</button>
+</td>
+</tr>
+<!-- Member Row 3 -->
+<tr class="hover:bg-apple-gray-fill/60 transition-colors group cursor-pointer" onclick="openAwardDrawer('Marcus Vance', 'mvance@university.edu', 'Metal / Graphics', 'https://lh3.googleusercontent.com/aida-public/AB6AXuDBguW7jPcVXLm80HRPsiT7ns4Sd-J4SOAxayg2UUDwWYzvgEG0POHd5gUepJDigKSWyuNrT2q4NcY-YT6VXxnCaqmUd6YaNc_NSZ9yD163DJZ9l8Ct7ue2DPrxRlnYFcEpFJ1CZYj5JaQDLzUCtMc_IiYNQdufLbjIUKve235qGYcJnvkFnlxtAo00eVX_lSN3JNdzK6EKDl-MnaNEjQQv1EiDwbbl01FGmWeEZvy_rv3MZpgeGwhO3g')">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<img alt="Marcus Vance" class="w-9 h-9 rounded-full object-cover ring-1 ring-apple-border" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBguW7jPcVXLm80HRPsiT7ns4Sd-J4SOAxayg2UUDwWYzvgEG0POHd5gUepJDigKSWyuNrT2q4NcY-YT6VXxnCaqmUd6YaNc_NSZ9yD163DJZ9l8Ct7ue2DPrxRlnYFcEpFJ1CZYj5JaQDLzUCtMc_IiYNQdufLbjIUKve235qGYcJnvkFnlxtAo00eVX_lSN3JNdzK6EKDl-MnaNEjQQv1EiDwbbl01FGmWeEZvy_rv3MZpgeGwhO3g"/>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-apple-text group-hover:text-apple-blue transition-colors truncate">Marcus Vance</span>
+<span class="text-[12px] text-apple-text-secondary truncate">mvance@university.edu</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 border border-apple-amber/25 text-apple-amber font-mono text-[11px] font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-apple-amber"></span>Metal Graphics
+                        </span>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center -space-x-1">
+<div class="w-6 h-6 rounded-md bg-amber-50 border border-apple-amber/20 flex items-center justify-center text-apple-amber" title="Shader Artisan">
+<span class="material-symbols-outlined text-[14px]">brush</span>
+</div>
+<div class="w-6 h-6 rounded-md bg-blue-50 border border-apple-blue/20 flex items-center justify-center text-apple-blue" title="Swift Pioneer">
+<span class="material-symbols-outlined text-[14px]">bolt</span>
+</div>
+<div class="w-6 h-6 rounded-md bg-apple-gray-fill border border-apple-border flex items-center justify-center text-apple-text-tertiary" title="Compute Buff">
+<span class="material-symbols-outlined text-[14px]">memory</span>
+</div>
+<span class="w-6 h-6 rounded-md bg-apple-gray-fill border border-apple-border flex items-center justify-center font-mono text-[10px] text-apple-text-secondary font-semibold">+4</span>
+</div>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center gap-2">
+<div class="w-14 bg-apple-border h-1.5 rounded-full overflow-hidden">
+<div class="bg-apple-green h-full w-[100%] rounded-full"></div>
+</div>
+<span class="font-mono text-[11px] text-apple-text font-semibold">100%</span>
+</div>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-apple-border hover:bg-apple-blue hover:text-white hover:border-apple-blue text-apple-text text-[12px] font-semibold transition-all shadow-xs">
+<span class="material-symbols-outlined text-[15px]">military_tech</span>
+<span>+ Award</span>
+</button>
+</td>
+</tr>
+<!-- Member Row 4 -->
+<tr class="hover:bg-apple-gray-fill/60 transition-colors group cursor-pointer" onclick="openAwardDrawer('Aisha Khan', 'akhan@university.edu', 'iOS Dev', 'https://lh3.googleusercontent.com/aida-public/AB6AXuAm87edLArNQ7KqeehFbOg-jzzQV1Nd8dV7D-eztT6KTbU2i06YTb7XETy4POtfAxCkAp9R8_HDtiEgGp08U-R3ttUPXbZHpqQ-WJDZQZQYwwbidX60Z3fTugLh9w48-Sv8ZCDXDEnrcKgOt_D9ZceoXNXLu6ImZ4KoqNgTq6yuEyuKYzDyljB397CLcgvVopvS_GEB9VmEC6U0Obm8BHJkm16m3dJoKWHb0TtHs2AnFViatdomIwojuQ')">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<img alt="Aisha Khan" class="w-9 h-9 rounded-full object-cover ring-1 ring-apple-border" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAm87edLArNQ7KqeehFbOg-jzzQV1Nd8dV7D-eztT6KTbU2i06YTb7XETy4POtfAxCkAp9R8_HDtiEgGp08U-R3ttUPXbZHpqQ-WJDZQZQYwwbidX60Z3fTugLh9w48-Sv8ZCDXDEnrcKgOt_D9ZceoXNXLu6ImZ4KoqNgTq6yuEyuKYzDyljB397CLcgvVopvS_GEB9VmEC6U0Obm8BHJkm16m3dJoKWHb0TtHs2AnFViatdomIwojuQ"/>
+<div class="flex flex-col min-w-0">
+<span class="font-semibold text-apple-text group-hover:text-apple-blue transition-colors truncate">Aisha Khan</span>
+<span class="text-[12px] text-apple-text-secondary truncate">akhan@university.edu</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 border border-apple-blue/20 text-apple-blue font-mono text-[11px] font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-apple-blue"></span>iOS Dev
+                        </span>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center -space-x-1">
+<div class="w-6 h-6 rounded-md bg-blue-50 border border-apple-blue/20 flex items-center justify-center text-apple-blue" title="SwiftUI Specialist">
+<span class="material-symbols-outlined text-[14px]">widgets</span>
+</div>
+<div class="w-6 h-6 rounded-md bg-green-50 border border-apple-green/20 flex items-center justify-center text-apple-green" title="App Store Publisher">
+<span class="material-symbols-outlined text-[14px]">publish</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4">
+<div class="flex items-center gap-2">
+<div class="w-14 bg-apple-border h-1.5 rounded-full overflow-hidden">
+<div class="bg-apple-green h-full w-[91%] rounded-full"></div>
+</div>
+<span class="font-mono text-[11px] text-apple-text font-semibold">91%</span>
+</div>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-apple-border hover:bg-apple-blue hover:text-white hover:border-apple-blue text-apple-text text-[12px] font-semibold transition-all shadow-xs">
+<span class="material-symbols-outlined text-[15px]">military_tech</span>
+<span>+ Award</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Inline Table Footer -->
+<div class="flex items-center justify-between pt-1 text-[12px] text-apple-text-secondary">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-apple-green"></span>
+<span>All 4 verified students synced with Apple Developer Portal API</span>
+</div>
+<div class="flex items-center gap-1 font-mono text-[12px]">
+<button class="px-2.5 py-1 rounded border border-apple-border bg-white hover:bg-apple-gray-fill text-apple-text transition-colors">Prev</button>
+<span class="px-2 text-apple-text font-semibold">1 / 14</span>
+<button class="px-2.5 py-1 rounded border border-apple-border bg-white hover:bg-apple-gray-fill text-apple-text transition-colors">Next</button>
+</div>
+</div>
+</section>
+<!-- RIGHT COLUMN: Badge Showcase & Live Audit Stream -->
+<section class="xl:col-span-5 flex flex-col gap-6">
+<!-- Detailed Badge Preview Card: 'Visionary Coder' -->
+<div class="p-6 rounded-2xl bg-white border border-apple-border flex flex-col gap-4 shadow-xs relative overflow-hidden">
+<!-- Card Header -->
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded-full bg-blue-50 border border-apple-blue/20 font-mono text-[11px] text-apple-blue uppercase font-bold">Track Credential</span>
+<span class="text-[12px] text-apple-text-secondary font-medium">Tier II Specialization</span>
+</div>
+<h3 class="text-[22px] font-bold text-apple-text mt-1">Visionary Coder</h3>
+</div>
+<div class="flex items-center gap-1.5">
+<button class="w-8 h-8 rounded-lg bg-apple-gray-fill border border-apple-border hover:bg-apple-gray-hover flex items-center justify-center text-apple-text-secondary hover:text-apple-text transition-colors" title="Export Asset">
+<span class="material-symbols-outlined text-[17px]">ios_share</span>
+</button>
+<button class="w-8 h-8 rounded-lg bg-apple-gray-fill border border-apple-border hover:bg-apple-gray-hover flex items-center justify-center text-apple-text-secondary hover:text-apple-text transition-colors" title="Edit Template">
+<span class="material-symbols-outlined text-[17px]">tune</span>
+</button>
+</div>
+</div>
+<!-- Hexagonal Trophy Preview Stage (Refined for Cupertino Light) -->
+<div class="flex flex-col items-center justify-center py-6 bg-[#0f172a] rounded-xl border border-slate-800 relative overflow-hidden">
+<div class="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
+<div class="relative w-36 h-36 flex items-center justify-center z-10">
+<!-- Outer Hexagon SVG -->
+<svg class="w-full h-full drop-shadow-[0_0_20px_rgba(0,113,227,0.55)]" viewbox="0 0 100 100">
+<defs>
+<lineargradient id="applePacificGradient" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#2997ff"></stop>
+<stop offset="50%" stop-color="#0071e3"></stop>
+<stop offset="100%" stop-color="#5856d6"></stop>
+</lineargradient>
+</defs>
+<polygon fill="#1e293b" points="50 4, 90 26, 90 74, 50 96, 10 74, 10 26" stroke="url(#applePacificGradient)" stroke-width="4"></polygon>
+<polygon fill="#0f172a" points="50 12, 82 30, 82 70, 50 88, 18 70, 18 30" stroke="#38bdf8" stroke-opacity="0.4" stroke-width="1.5"></polygon>
+</svg>
+<!-- Central Emblem -->
+<div class="absolute inset-0 flex flex-col items-center justify-center gap-1 pointer-events-none">
+<span class="material-symbols-outlined text-sky-400 text-[38px] drop-shadow-[0_0_10px_rgba(56,189,248,0.8)]">visibility</span>
+<span class="font-mono text-[9px] font-bold text-sky-300 tracking-widest uppercase">visionOS</span>
+</div>
+</div>
+<!-- Hexagon Spec Metadata -->
+<div class="mt-3 flex items-center gap-3 text-[12px] text-slate-400 z-10 font-mono">
+<span class="flex items-center gap-1 text-slate-300">
+<span class="material-symbols-outlined text-[14px] text-emerald-400">group</span> 18 Recipients
+                    </span>
+<span>•</span>
+<span class="flex items-center gap-1 text-sky-300 font-semibold">
+<span class="material-symbols-outlined text-[14px] text-sky-400">verified_user</span> PassKit Active
+                    </span>
+</div>
+</div>
+<!-- Criteria Checklist -->
+<div class="flex flex-col gap-2">
+<span class="text-[11px] font-mono uppercase tracking-wider text-apple-text-tertiary font-semibold">Criteria Checklist (3 / 3 Required)</span>
+<div class="flex flex-col gap-2">
+<div class="flex items-start gap-2.5 p-2.5 rounded-xl bg-apple-gray-fill border border-apple-border">
+<span class="material-symbols-outlined text-apple-green text-[18px] shrink-0 mt-0.5">check_circle</span>
+<div class="flex flex-col min-w-0">
+<span class="text-[13px] text-apple-text font-semibold">Native RealityKit &amp; Spatial App Delivery</span>
+<span class="text-[12px] text-apple-text-secondary">Compiled against visionOS 2.0+ SDK with zero memory warnings.</span>
+</div>
+</div>
+<div class="flex items-start gap-2.5 p-2.5 rounded-xl bg-apple-gray-fill border border-apple-border">
+<span class="material-symbols-outlined text-apple-green text-[18px] shrink-0 mt-0.5">check_circle</span>
+<div class="flex flex-col min-w-0">
+<span class="text-[13px] text-apple-text font-semibold">Custom Spatial Audio Integration</span>
+<span class="text-[12px] text-apple-text-secondary">Utilized Phase or AudioToolbox 3D audio space anchor.</span>
+</div>
+</div>
+<div class="flex items-start gap-2.5 p-2.5 rounded-xl bg-apple-gray-fill border border-apple-border">
+<span class="material-symbols-outlined text-apple-green text-[18px] shrink-0 mt-0.5">check_circle</span>
+<div class="flex flex-col min-w-0">
+<span class="text-[13px] text-apple-text font-semibold">Campus Demo Presentation</span>
+<span class="text-[12px] text-apple-text-secondary">5-minute live testing station at monthly ADC Showcase.</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Trophy Gradient Preset Selector -->
+<div class="flex flex-col gap-2 pt-1 border-t border-apple-border">
+<span class="text-[11px] font-mono uppercase tracking-wider text-apple-text-tertiary font-semibold">Trophy Gradient Preset</span>
+<div class="flex items-center gap-2.5">
+<button class="w-7 h-7 rounded-full bg-gradient-to-tr from-[#0071e3] to-[#2997ff] ring-2 ring-apple-blue ring-offset-2 ring-offset-white shadow-xs" title="Pacific Blue"></button>
+<button class="w-7 h-7 rounded-full bg-gradient-to-tr from-[#5856d6] to-[#7d7aff] hover:scale-105 transition-transform" title="Cupertino Indigo"></button>
+<button class="w-7 h-7 rounded-full bg-gradient-to-tr from-[#34c759] to-[#30d158] hover:scale-105 transition-transform" title="Aurora Emerald"></button>
+<button class="w-7 h-7 rounded-full bg-gradient-to-tr from-[#ff9500] to-[#ffd60a] hover:scale-105 transition-transform" title="Neon Amber"></button>
+<button class="w-7 h-7 rounded-full bg-gradient-to-tr from-[#af52de] to-[#e9b3ff] hover:scale-105 transition-transform" title="Sunset Magenta"></button>
+</div>
+</div>
+</div>
+<!-- Live Audit Stream Ledger (Cupertino Light) -->
+<div class="p-5 rounded-2xl bg-white border border-apple-border flex flex-col gap-4 shadow-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-apple-blue text-[18px]">history</span>
+<h3 class="text-[15px] font-semibold text-apple-text">Recent Award Activity</h3>
+</div>
+<span class="font-mono text-[11px] font-semibold text-apple-text-tertiary uppercase">Live Audit Stream</span>
+</div>
+<div class="flex flex-col divide-y divide-apple-border" id="awardAuditStream">
+<!-- Audit Item 1 -->
+<div class="flex items-center justify-between py-2.5">
+<div class="flex items-center gap-3 min-w-0">
+<div class="relative w-8 h-8 shrink-0 flex items-center justify-center">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<polygon fill="#f0f7ff" points="50 3, 90 25, 90 75, 50 97, 10 75, 10 25" stroke="#0071e3" stroke-width="4"></polygon>
+</svg>
+<span class="material-symbols-outlined text-apple-blue text-[13px] absolute">visibility</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-[13px] font-semibold text-apple-text truncate">Liam Thorne <span class="font-normal text-apple-text-secondary text-[12px]">received</span> Visionary Coder</span>
+<span class="text-[11px] text-apple-text-tertiary flex items-center gap-1.5">
+<span>Awarded by Sarah T. (Lead)</span>
+<span>•</span>
+<span class="text-apple-green font-medium">Synced to Wallet</span>
+</span>
+</div>
+</div>
+<span class="font-mono text-[11px] text-apple-text-tertiary shrink-0">12m ago</span>
+</div>
+<!-- Audit Item 2 -->
+<div class="flex items-center justify-between py-2.5">
+<div class="flex items-center gap-3 min-w-0">
+<div class="relative w-8 h-8 shrink-0 flex items-center justify-center">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<polygon fill="#f0fdf4" points="50 3, 90 25, 90 75, 50 97, 10 75, 10 25" stroke="#34c759" stroke-width="4"></polygon>
+</svg>
+<span class="material-symbols-outlined text-apple-green text-[13px] absolute">widgets</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-[13px] font-semibold text-apple-text truncate">Chloe Miller <span class="font-normal text-apple-text-secondary text-[12px]">received</span> SwiftUI Architect</span>
+<span class="text-[11px] text-apple-text-tertiary">Awarded by Alex Chen (Co-Lead)</span>
+</div>
+</div>
+<span class="font-mono text-[11px] text-apple-text-tertiary shrink-0">2h ago</span>
+</div>
+<!-- Audit Item 3 -->
+<div class="flex items-center justify-between py-2.5">
+<div class="flex items-center gap-3 min-w-0">
+<div class="relative w-8 h-8 shrink-0 flex items-center justify-center">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<polygon fill="#fffbeb" points="50 3, 90 25, 90 75, 50 97, 10 75, 10 25" stroke="#ff9500" stroke-width="4"></polygon>
+</svg>
+<span class="material-symbols-outlined text-apple-amber text-[13px] absolute">emoji_events</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-[13px] font-semibold text-apple-text truncate">Karan Patel <span class="font-normal text-apple-text-secondary text-[12px]">received</span> Hackathon Winner</span>
+<span class="text-[11px] text-apple-text-tertiary">Awarded by Sarah T. (Lead)</span>
+</div>
+</div>
+<span class="font-mono text-[11px] text-apple-text-tertiary shrink-0">5h ago</span>
+</div>
+</div>
+<button class="w-full py-2 rounded-lg bg-apple-gray-fill border border-apple-border hover:bg-apple-gray-hover text-apple-text text-[12px] font-semibold transition-colors flex items-center justify-center gap-1 text-center mt-1">
+<span>View Complete Audit Ledger (348 records)</span>
+<span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+</button>
+</div>
+</section>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- AWARD BADGE MODAL (Cupertino Light Mode) -->
+<div class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 hidden" id="awardModalOverlay">
+<div class="w-full max-w-2xl bg-white rounded-2xl p-6 shadow-2xl border border-apple-border flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+<!-- Modal Header -->
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<img alt="Member Avatar" class="w-12 h-12 rounded-full object-cover ring-2 ring-apple-blue" id="modalMemberAvatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXDy3rznCJL5r04egsKyKQwK2aVe2LSYcEfuWunYOobekikepTULDI2EH17_h3Dbx4b3-WuLlGVjmR-ln8A3M4kYtWmeu5NfSWidnrTfoR1hdMnjH-9qy7PBiWQMKufAoDkp4tbZA8bt7eCLbPJvFfq7xZuQ5sADD8oOci-oRJsW9sogat2aTaB-z7tOrZPbVWebB_4SYY6ErNEkLp96b0XqDxEHoOMWih-jMkfIZyBzFVcKYcZpkR_Q"/>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="text-[18px] font-bold text-apple-text" id="modalMemberName">Jordan Lee</span>
+<span class="px-2 py-0.5 rounded-full bg-blue-50 border border-apple-blue/20 text-apple-blue font-mono text-[11px] font-semibold" id="modalMemberTrack">spatial computing</span>
+</div>
+<span class="text-[12px] text-apple-text-secondary" id="modalMemberEmail">jlee@university.edu</span>
+</div>
+</div>
+<button class="w-8 h-8 rounded-full bg-apple-gray-fill hover:bg-apple-gray-hover flex items-center justify-center text-apple-text-secondary hover:text-apple-text transition-colors" onclick="closeAwardDrawer()">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<div class="h-[1px] w-full bg-apple-border"></div>
+<!-- Modal Body -->
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<span class="text-[11px] font-mono uppercase tracking-wider text-apple-text-tertiary font-semibold">Select Hexagonal Credential to Grant</span>
+<span class="font-mono text-[11px] text-apple-green font-semibold">Tier 1 - 4 Standards</span>
+</div>
+<!-- Category 1: Foundational -->
+<div class="flex flex-col gap-1.5">
+<span class="font-mono text-[11px] text-apple-blue uppercase tracking-wider font-semibold">01. Foundational Core</span>
+<div class="grid grid-cols-2 gap-2.5">
+<div class="p-3 rounded-xl bg-apple-gray-fill hover:bg-white border border-apple-border hover:border-apple-blue transition-all cursor-pointer flex items-center gap-3 group">
+<div class="relative w-10 h-10 shrink-0 flex items-center justify-center">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<polygon fill="#ffffff" points="50 3, 90 25, 90 75, 50 97, 10 75, 10 25" stroke="#0071e3" stroke-width="4"></polygon>
+</svg>
+<span class="material-symbols-outlined text-apple-blue text-[18px] absolute">bolt</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-[13px] font-semibold text-apple-text group-hover:text-apple-blue truncate">Swift Pioneer</span>
+<span class="text-[11px] text-apple-text-secondary truncate">Language fundamentals</span>
+</div>
+</div>
+<div class="p-3 rounded-xl bg-apple-gray-fill hover:bg-white border border-apple-border hover:border-apple-green transition-all cursor-pointer flex items-center gap-3 group">
+<div class="relative w-10 h-10 shrink-0 flex items-center justify-center">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<polygon fill="#ffffff" points="50 3, 90 25, 90 75, 50 97, 10 75, 10 25" stroke="#34c759" stroke-width="4"></polygon>
+</svg>
+<span class="material-symbols-outlined text-apple-green text-[18px] absolute">widgets</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-[13px] font-semibold text-apple-text group-hover:text-apple-green truncate">SwiftUI Architect</span>
+<span class="text-[11px] text-apple-text-secondary truncate">Declarative UI layout</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Category 2: Workshop Excellence -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<span class="font-mono text-[11px] text-apple-purple uppercase tracking-wider font-semibold">02. Workshop &amp; Specialized Honors</span>
+<span class="text-[11px] text-apple-green font-semibold">Recommended for this member</span>
+</div>
+<div class="grid grid-cols-2 gap-2.5">
+<div class="p-3 rounded-xl bg-blue-50/60 border-2 border-apple-blue transition-all cursor-pointer flex items-center gap-3 group shadow-xs">
+<div class="relative w-10 h-10 shrink-0 flex items-center justify-center">
+<svg class="w-full h-full drop-shadow-sm" viewbox="0 0 100 100">
+<polygon fill="#ffffff" points="50 3, 90 25, 90 75, 50 97, 10 75, 10 25" stroke="#0071e3" stroke-width="4"></polygon>
+</svg>
+<span class="material-symbols-outlined text-apple-blue text-[18px] absolute">visibility</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1">
+<span class="text-[13px] font-bold text-apple-blue truncate">Visionary Coder</span>
+<span class="material-symbols-outlined text-apple-blue text-[14px]">check_circle</span>
+</div>
+<span class="text-[11px] text-apple-text-secondary truncate">Spatial Computing L2</span>
+</div>
+</div>
+<div class="p-3 rounded-xl bg-apple-gray-fill hover:bg-white border border-apple-border hover:border-apple-purple transition-all cursor-pointer flex items-center gap-3 group">
+<div class="relative w-10 h-10 shrink-0 flex items-center justify-center">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<polygon fill="#ffffff" points="50 3, 90 25, 90 75, 50 97, 10 75, 10 25" stroke="#af52de" stroke-width="4"></polygon>
+</svg>
+<span class="material-symbols-outlined text-apple-purple text-[18px] absolute">psychology</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-[13px] font-semibold text-apple-text group-hover:text-apple-purple truncate">CoreML Synthesizer</span>
+<span class="text-[11px] text-apple-text-secondary truncate">On-device transformer fine-tuning</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Citation Input -->
+<div class="flex flex-col gap-1.5 pt-1">
+<label class="text-[12px] font-semibold text-apple-text flex items-center justify-between">
+<span>Signer Citation / Verification Note</span>
+<span class="text-apple-text-tertiary font-mono text-[11px] font-normal">Optional</span>
+</label>
+<input class="h-[36px] px-3 rounded-lg bg-apple-gray-fill border border-apple-border text-apple-text text-[13px] focus:outline-none focus:bg-white focus:border-apple-blue transition-all" type="text" value="Successfully shipped spatial gesture-driven canvas on native visionOS 2.2"/>
+</div>
+</div>
+<!-- Modal Actions -->
+<div class="flex items-center justify-end gap-2.5 pt-2 border-t border-apple-border">
+<button class="px-4 h-[36px] rounded-lg bg-apple-gray-fill border border-apple-border hover:bg-apple-gray-hover text-apple-text text-[13px] font-semibold transition-colors" onclick="closeAwardDrawer()">
+          Cancel
+        </button>
+<button class="flex items-center gap-1.5 px-4 h-[36px] rounded-lg bg-apple-blue text-white text-[13px] font-semibold shadow-sm hover:bg-apple-blue-hover active:scale-[0.98] transition-all" onclick="confirmAwardBadge()">
+<span class="material-symbols-outlined text-[17px]">verified</span>
+<span>Issue Hexagonal Passkey</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Toast Notification (Cupertino Light) -->
+<div class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-3 px-4 py-3 rounded-xl bg-white border border-apple-border text-apple-text shadow-xl" id="awardToast">
+<span class="material-symbols-outlined text-apple-green text-[22px]">verified</span>
+<div class="flex flex-col">
+<span class="text-[13px] font-semibold" id="toastTitle">Badge Successfully Minted</span>
+<span class="text-[11px] text-apple-text-secondary" id="toastSubtitle">Signed passkey pushed to Apple Wallet.</span>
+</div>
+</div>
+<script>
+    // Track Filter interaction
+    const filterButtons = document.querySelectorAll('.track-btn');
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterButtons.forEach(b => {
+          b.className = 'track-btn px-3 py-1.5 rounded-lg text-[12px] font-medium bg-apple-gray-fill text-apple-text-secondary hover:text-apple-text hover:bg-apple-gray-hover whitespace-nowrap transition-all border border-apple-border';
+        });
+        btn.className = 'track-btn px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-apple-blue text-white shadow-xs whitespace-nowrap transition-all';
+      });
+    });
+
+    // Modal Controller
+    const modal = document.getElementById('awardModalOverlay');
+    const modalMemberName = document.getElementById('modalMemberName');
+    const modalMemberEmail = document.getElementById('modalMemberEmail');
+    const modalMemberTrack = document.getElementById('modalMemberTrack');
+    const modalMemberAvatar = document.getElementById('modalMemberAvatar');
+    const toast = document.getElementById('awardToast');
+
+    function openAwardDrawer(name, email, track, avatarUrl) {
+      modalMemberName.textContent = name;
+      modalMemberEmail.textContent = email;
+      modalMemberTrack.textContent = track;
+      if (avatarUrl && avatarUrl !== 'placeholder') {
+        modalMemberAvatar.src = avatarUrl;
+      }
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeAwardDrawer() {
+      modal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+
+    function showToast(title, subtitle) {
+      document.getElementById('toastTitle').textContent = title;
+      document.getElementById('toastSubtitle').textContent = subtitle;
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-24', 'opacity-0');
+      }, 4000);
+    }
+
+    function confirmAwardBadge() {
+      const student = modalMemberName.textContent;
+      closeAwardDrawer();
+      
+      const stream = document.getElementById('awardAuditStream');
+      const newEntry = document.createElement('div');
+      newEntry.className = 'flex items-center justify-between py-2.5 bg-blue-50/40 rounded-lg px-2 animate-pulse';
+      newEntry.innerHTML = `
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="relative w-8 h-8 shrink-0 flex items-center justify-center">
+            <svg viewBox="0 0 100 100" class="w-full h-full">
+              <polygon points="50 3, 90 25, 90 75, 50 97, 10 75, 10 25" fill="#f0f7ff" stroke="#0071e3" stroke-width="4"></polygon>
+            </svg>
+            <span class="material-symbols-outlined text-apple-blue text-[13px] absolute">visibility</span>
+          </div>
+          <div class="flex flex-col min-w-0">
+            <span class="text-[13px] font-semibold text-apple-text truncate">${student} <span class="font-normal text-apple-text-secondary text-[12px]">received</span> Visionary Coder</span>
+            <span class="text-[11px] text-apple-text-tertiary flex items-center gap-1.5">
+              <span>Awarded by Alex Chen (You)</span>
+              <span>•</span>
+              <span class="text-apple-green font-medium">Broadcasting now</span>
+            </span>
+          </div>
+        </div>
+        <span class="font-mono text-[11px] text-apple-green font-bold shrink-0">Just now</span>
+      `;
+      stream.prepend(newEntry);
+      setTimeout(() => newEntry.classList.remove('animate-pulse', 'bg-blue-50/40', 'px-2'), 1800);
+
+      showToast(`Awarded to ${student}`, 'Hexagonal passkey generated and delivered via ADC Portal.');
+    }
+
+    document.getElementById('bulkCsvBtn').addEventListener('click', () => {
+      showToast('Bulk Award Studio', 'Please upload .csv schema with university email and Badge ID columns.');
+    });
+
+    document.getElementById('createBadgeBtn').addEventListener('click', () => {
+      showToast('Badge Template Studio', 'Drafting new Tier-1 hexagonal credential specification.');
+    });
+  </script>
+</body></html>

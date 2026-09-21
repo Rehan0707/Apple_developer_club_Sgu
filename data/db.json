@@ -1,0 +1,41 @@
+{
+  "events": [],
+  "resources": [],
+  "badges": [
+    {
+      "id": "BDG-1",
+      "name": "September Challenge",
+      "imageUrl": "/images/badge_orange.jpg",
+      "desc": "Complete 10 activities"
+    },
+    {
+      "id": "BDG-4",
+      "name": "April Challenge",
+      "imageUrl": "/images/badge_green.jpg",
+      "desc": "Accessibility Expert"
+    },
+    {
+      "id": "BDG-5",
+      "name": "February Challenge",
+      "imageUrl": "/images/badge_blue.jpg",
+      "desc": "Core ML basics"
+    },
+    {
+      "id": "BDG-6",
+      "name": "November Challenge",
+      "imageUrl": "/images/badge_red.jpg",
+      "desc": "Swift Data architecture"
+    }
+  ],
+  "students": [
+    {
+      "id": "mock_student_1",
+      "name": "Alex Chen",
+      "email": "alex@sgu.ac.in",
+      "badges": [
+        "BDG-4",
+        "BDG-5"
+      ]
+    }
+  ]
+}
