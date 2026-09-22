@@ -4,161 +4,110 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#ffffff" />
-  <meta name="description" content="Resources - Apple Developer Club SGU" />
+  <meta name="description" content="Official learning resources for Apple Developer Club SGU: Apple Developer videos, documentation, design guidance, and Swift." />
   <title>Resources — Apple Developer Club SGU</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="stylesheet" href="/src/style.css" />
-  <style>
-    .page-header {
-      padding: 120px 20px 60px;
-      text-align: center;
-      background: #f5f5f7;
-    }
-    .page-title {
-      font-size: 48px;
-      font-weight: 700;
-      letter-spacing: -1.2px;
-      color: #1d1d1f;
-      margin: 0 0 16px;
-    }
-    .page-desc {
-      font-size: 21px;
-      line-height: 1.4;
-      color: #86868b;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    
-    .resources-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 30px;
-      padding: 80px 20px;
-      max-width: 1060px;
-      margin: 0 auto;
-    }
-    
-    .resource-card {
-      background: #ffffff;
-      border-radius: 20px;
-      padding: 40px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
-      transition: transform 0.2s, box-shadow 0.2s;
-      text-align: left;
-      text-decoration: none;
-      display: flex;
-      flex-direction: column;
-      border: 1px solid #e5e5ea;
-    }
-    .resource-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.1);
-    }
-    
-    .resource-icon {
-      width: 48px;
-      height: 48px;
-      margin-bottom: 24px;
-      color: #0071e3;
-    }
-    
-    .resource-title {
-      font-size: 24px;
-      font-weight: 600;
-      color: #1d1d1f;
-      margin: 0 0 12px;
-      letter-spacing: -0.5px;
-    }
-    
-    .resource-desc {
-      font-size: 17px;
-      line-height: 1.5;
-      color: #6e6e73;
-      margin: 0 0 24px;
-      flex: 1;
-    }
-    
-    .resource-link {
-      color: #0071e3;
-      font-weight: 500;
-      font-size: 17px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .resource-link svg {
-      width: 16px;
-      height: 16px;
-      transition: transform 0.2s;
-    }
-    .resource-card:hover .resource-link svg {
-      transform: translateX(4px);
-    }
-  </style>
 </head>
-<body>
-  <!-- Include header via JS or template, simulating for now -->
+<body class="resources-page">
+  <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header" id="site-header">
+    <div class="header-glow-wrap" aria-hidden="true"></div>
     <div class="nav-inner local-inner">
-      <a class="brand" href="/"><img src="/images/club-lockup.png" alt="Apple Developer Club SGU" class="brand-logo" width="180" height="60" /></a>
-      <nav id="navigation">
-        <a href="/">The Club</a>
-        <a href="/events/">Events</a>
+      <a class="brand" href="/" aria-label="Apple Developer Club SGU home"><img src="/images/club-lockup.png" alt="Apple Developer Club SGU" class="brand-logo" width="180" height="60" /></a>
+      <button class="menu-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="navigation"><span></span><span></span></button>
+      <nav id="navigation" aria-label="Main navigation">
+        <a href="/#about">The Club</a>
+        <a href="/events/">Upcoming Events</a>
         <a href="/resources/" aria-current="page">Resources</a>
-        <a href="/team/">Team</a>
-        <a class="button small" href="/join/">Sign In</a>
+        <a href="/#faq">FAQ</a>
+        <a href="/#connect">Contact</a>
+        <a class="button small" href="/join/">Join the Club</a>
       </nav>
     </div>
   </header>
 
   <main id="main">
-    <header class="page-header">
-      <h1 class="page-title">Resources</h1>
-      <p class="page-desc">Everything you need to build incredible apps for Apple platforms.</p>
-    </header>
+    <section class="resources-page-hero" aria-labelledby="resources-page-title">
+      <div class="container">
+        <p class="eyebrow">THE CLUB LIBRARY</p>
+        <h1 id="resources-page-title">Learn from the source.</h1>
+        <p class="resources-page-lead">A small, considered collection of official Apple resources for learning Swift, shaping better interfaces, and building apps that feel at home on Apple platforms.</p>
+      </div>
+    </section>
 
-    <div class="resources-grid" id="resources-container">
-      <!-- Generated via JS -->
-    </div>
+    <section class="resources-library" aria-labelledby="video-library-title">
+      <div class="container">
+        <a class="official-resource-card" href="https://www.youtube.com/@AppleDeveloper/videos" target="_blank" rel="noopener noreferrer" aria-label="Watch Apple Developer videos on YouTube">
+          <div class="official-resource-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.2 3.6-6.2 3.6Z"/></svg>
+          </div>
+          <div class="official-resource-copy">
+            <span class="official-resource-kicker">Official Apple Developer channel</span>
+            <h2 id="video-library-title">Build, watch, and keep going.</h2>
+            <p>Explore Apple’s developer videos, sessions, and platform updates in one place — from your first SwiftUI view to the ideas behind great apps.</p>
+            <span class="resource-action">Watch the video library <span aria-hidden="true">↗</span></span>
+          </div>
+          <span class="official-resource-arrow" aria-hidden="true">↗</span>
+        </a>
+
+        <div class="resource-library-heading">
+          <div>
+            <p class="eyebrow">MORE FROM APPLE</p>
+            <h2>Start where you are.</h2>
+          </div>
+          <p>Choose one path, follow your curiosity, and come back when you’re ready for the next one.</p>
+        </div>
+
+        <div class="resource-link-grid">
+          <a class="resource-link-card" href="https://developer.apple.com/documentation/" target="_blank" rel="noopener noreferrer">
+            <span class="resource-link-index">01</span>
+            <span class="resource-link-copy">
+              <span class="resource-link-kicker">Build</span>
+              <strong>Apple Developer Documentation</strong>
+              <span>Frameworks, APIs, tutorials, and practical starting points.</span>
+            </span>
+            <span class="resource-link-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a class="resource-link-card" href="https://developer.apple.com/design/human-interface-guidelines/" target="_blank" rel="noopener noreferrer">
+            <span class="resource-link-index">02</span>
+            <span class="resource-link-copy">
+              <span class="resource-link-kicker">Design</span>
+              <strong>Human Interface Guidelines</strong>
+              <span>Principles for making apps clear, familiar, and easy to use.</span>
+            </span>
+            <span class="resource-link-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a class="resource-link-card" href="https://www.apple.com/swift/playgrounds/" target="_blank" rel="noopener noreferrer">
+            <span class="resource-link-index">03</span>
+            <span class="resource-link-copy">
+              <span class="resource-link-kicker">Begin</span>
+              <strong>Swift Playgrounds</strong>
+              <span>A friendly way to start exploring code on iPad or Mac.</span>
+            </span>
+            <span class="resource-link-arrow" aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <script>
-    const resources = [
-      {
-        title: "Human Interface Guidelines",
-        desc: "In-depth information and UI resources for designing great apps that integrate seamlessly with Apple platforms.",
-        url: "https://developer.apple.com/design/human-interface-guidelines/",
-        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>'
-      },
-      {
-        title: "SwiftUI Documentation",
-        desc: "Declare the user interface and behavior for your app on every platform.",
-        url: "https://developer.apple.com/documentation/swiftui/",
-        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>'
-      },
-      {
-        title: "WWDC Videos",
-        desc: "Watch the latest sessions from the Apple Worldwide Developers Conference to learn about new technologies.",
-        url: "https://developer.apple.com/videos/",
-        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>'
-      }
-    ];
+  <footer>
+    <div class="container">
+      <div class="footer-top">
+        <a class="brand" href="/" aria-label="Apple Developer Club SGU home">
+          <img src="/images/club-lockup.png" alt="Apple Developer Club SGU" class="brand-logo" width="180" height="60" />
+        </a>
+        <a href="#main">Back to top <span aria-hidden="true">↑</span></a>
+      </div>
+      <p>A student club at SGU. This website does not represent Apple Inc. Apple, Swift, SwiftUI, and Xcode are trademarks of Apple Inc.</p>
+      <div class="footer-bottom">
+        <span>© <span id="year">2026</span> Apple Developer Club SGU.</span>
+        <span class="footer-curiosity">Made with curiosity.</span>
+      </div>
+    </div>
+  </footer>
 
-    const container = document.getElementById('resources-container');
-    resources.forEach(res => {
-      const card = document.createElement('a');
-      card.className = 'resource-card';
-      card.href = res.url;
-      card.target = '_blank';
-      card.rel = 'noopener noreferrer';
-      card.innerHTML = `
-        <div class="resource-icon">${res.icon}</div>
-        <h2 class="resource-title">${res.title}</h2>
-        <p class="resource-desc">${res.desc}</p>
-        <div class="resource-link">View resource <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-      `;
-      container.appendChild(card);
-    });
-  </script>
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>
