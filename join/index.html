@@ -63,7 +63,21 @@
     .step-num { width: 30px; height: 30px; border-radius: 50%; background: #1d1d1f; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
     .step-body h3 { font-size: 15px; font-weight: 600; color: #1d1d1f; margin: 0 0 3px; }
     .step-body p  { font-size: 13px; color: #6e6e73; margin: 0; line-height: 1.5; }
-    @media (max-width: 500px) { .signin-card { padding: 38px 26px 34px; border-radius: 22px; } .signin-heading { font-size: 24px; } }
+    @media (max-width: 500px) { .signin-card { padding: 38px 26px 34px; border-radius: 22px; } .signin-heading { font-size: 24px; } .member-login-form { flex-direction: column; } }
+    .btn-row { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 16px; }
+    .student-submit-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px 20px; background: #0071e3; color: #fff; border: none; border-radius: 14px; font-size: 16px; font-weight: 600; cursor: pointer; text-decoration: none; font-family: inherit; transition: background .18s, transform .15s, box-shadow .18s; box-shadow: 0 4px 14px rgba(0,113,227,.28); }
+    .student-submit-btn:hover { background: #0077ed; transform: translateY(-1px); }
+    .student-submit-btn:active { transform: scale(.98); }
+    .auth-tabs { display: flex; background: #e5e5ea; padding: 3px; border-radius: 12px; margin: 18px 0 16px; }
+    .auth-tab { flex: 1; padding: 9px 12px; border: none; background: transparent; font-size: 13.5px; font-weight: 600; color: #6e6e73; border-radius: 9px; cursor: pointer; transition: all .18s; font-family: inherit; }
+    .auth-tab.active { background: #fff; color: #1d1d1f; box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+    .auth-pane { display: none; }
+    .auth-pane.active { display: block; }
+    .auth-banner-notice { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: #fff5d9; border: 1px solid #f0d9a8; color: #795b17; font-size: 13px; text-align: left; line-height: 1.5; }
+    .dashboard-action-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; background: #0071e3; color: #fff; border-radius: 12px; font-size: 15px; font-weight: 600; text-decoration: none; transition: background .18s; }
+    .dashboard-action-btn:hover { background: #0077ed; }
+    .dashboard-action-btn.secondary { background: #e8e8ed; color: #1d1d1f; margin-left: 8px; }
+    .dashboard-action-btn.secondary:hover { background: #dcdce2; }
   </style>
 </head>
 <body class="signin-page">
@@ -151,29 +165,99 @@
           Apple Developer Club SGU
         </div>
 
-        <h1 class="signin-heading">Join the Club</h1>
-        <span class="signin-sub">Sign in with your Apple Account to verify your identity and take the first step.</span>
+        <div id="unauthenticated-wrap">
+          <h1 class="signin-heading" id="authMainTitle">Member Portal</h1>
+          <span class="signin-sub" id="authSubTitle">Sign in with your student email or join the club to open your dashboard.</span>
 
-        <button id="apple-signin" class="signin-apple-btn" aria-label="Sign In">
-          <svg viewBox="-2 -2 28 28" fill="currentColor"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>
-          Sign In
-        </button>
+          <div id="authNotice" class="auth-banner-notice" style="display:none;" role="status"></div>
 
-        <div id="signout-wrap" class="signed-in-wrap" hidden>
-          <div class="signed-in-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <p class="signed-in-heading">You're signed in.</p>
-          <p class="signed-in-text">Membership is confirmed separately by the club.<br/>Follow us on Instagram for the next step.</p>
-          <button id="signout" type="button">Sign out</button>
+          <div class="auth-tabs" role="tablist">
+            <button type="button" class="auth-tab active" id="tabSignIn" role="tab" aria-selected="true">Sign In</button>
+            <button type="button" class="auth-tab" id="tabRegister" role="tab" aria-selected="false">Join Club / Register</button>
+          </div>
+
+          <!-- Tab 1: Member Sign In -->
+          <div class="auth-pane active" id="paneSignIn">
+            <form id="member-signin-form" style="display:flex; flex-direction:column; gap:12px; text-align:left;">
+              <div>
+                <label for="signinEmailInput" style="display:block; font-size:12px; font-weight:600; color:#505056; margin-bottom:5px;">Student Email Address</label>
+                <input type="email" id="signinEmailInput" placeholder="student@sgu.ac.in" required maxlength="254" style="width:100%; padding:11px 14px; border:1px solid #d2d2d7; border-radius:11px; font-size:14px; outline:none; background:#fff; box-sizing:border-box;">
+              </div>
+              <p id="memberSignInError" style="margin:4px 0 0; color:#ff3b30; font-size:13px; display:none;"></p>
+              <button type="submit" id="studentSignInBtn" class="student-submit-btn" style="margin-top:6px;">
+                <span>Sign In to Member Dashboard</span>
+                <span aria-hidden="true">→</span>
+              </button>
+              <div style="font-size:13px; color:#6e6e73; text-align:center; margin-top:6px;">
+                New to the club? <a href="#" id="linkToRegister" style="color:#0071e3; font-weight:500;">Register as a new member</a>
+              </div>
+            </form>
+          </div>
+
+          <!-- Tab 2: New Member Registration -->
+          <div class="auth-pane" id="paneRegister">
+            <form id="member-login-form" class="member-registration-form" style="display:flex; flex-direction:column; gap:12px; text-align:left;">
+              <div>
+                <label for="studentNameInput" style="display:block; font-size:12px; font-weight:600; color:#505056; margin-bottom:5px;">Full Name *</label>
+                <input type="text" id="studentNameInput" placeholder="Your full name" required maxlength="100" style="width:100%; padding:11px 14px; border:1px solid #d2d2d7; border-radius:11px; font-size:14px; outline:none; background:#fff; box-sizing:border-box;">
+              </div>
+              <div>
+                <label for="studentEmailInput" style="display:block; font-size:12px; font-weight:600; color:#505056; margin-bottom:5px;">Student Email Address *</label>
+                <input type="email" id="studentEmailInput" placeholder="student@sgu.ac.in" required maxlength="254" style="width:100%; padding:11px 14px; border:1px solid #d2d2d7; border-radius:11px; font-size:14px; outline:none; background:#fff; box-sizing:border-box;">
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div>
+                  <label for="studentDeptInput" style="display:block; font-size:12px; font-weight:600; color:#505056; margin-bottom:5px;">Department</label>
+                  <input type="text" id="studentDeptInput" placeholder="e.g. CSE / IT / AI" maxlength="100" style="width:100%; padding:11px 14px; border:1px solid #d2d2d7; border-radius:11px; font-size:14px; outline:none; background:#fff; box-sizing:border-box;">
+                </div>
+                <div>
+                  <label for="studentYearInput" style="display:block; font-size:12px; font-weight:600; color:#505056; margin-bottom:5px;">Academic Year</label>
+                  <input type="text" id="studentYearInput" placeholder="e.g. 2nd Year" maxlength="40" style="width:100%; padding:11px 14px; border:1px solid #d2d2d7; border-radius:11px; font-size:14px; outline:none; background:#fff; box-sizing:border-box;">
+                </div>
+              </div>
+              <p id="memberLoginError" style="margin:4px 0 0; color:#ff3b30; font-size:13px; display:none;"></p>
+              <button type="submit" id="studentSubmitBtn" class="student-submit-btn" style="margin-top:6px;">
+                <span>Join Club & Open Dashboard</span>
+                <span aria-hidden="true">→</span>
+              </button>
+              <div style="font-size:13px; color:#6e6e73; text-align:center; margin-top:6px;">
+                Already a member? <a href="#" id="linkToSignIn" style="color:#0071e3; font-weight:500;">Sign in to your account</a>
+              </div>
+            </form>
+          </div>
+
+          <div class="signin-divider">or sign in with Apple</div>
+
+          <button id="apple-signin" class="signin-apple-btn" aria-label="Sign In with Apple">
+            <svg viewBox="-2 -2 28 28" fill="currentColor"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>
+            Sign in with Apple
+          </button>
         </div>
 
-        <div class="signin-divider">or</div>
+        <div id="signout-wrap" class="signed-in-wrap" style="display:none;">
+          <div class="signed-in-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <h2 class="signed-in-heading" id="signedInHeading">You're signed in.</h2>
+          <p class="signed-in-text" id="signedInDesc">Access your member dashboard, registrations, and earned badges.</p>
+          <div style="margin-bottom: 22px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+            <a href="/student/" class="dashboard-action-btn" id="primaryDashboardBtn">Open Member Dashboard ↗</a>
+            <a href="/admin/index.html" class="dashboard-action-btn secondary" id="adminPortalBtn" style="display:none;">Admin Portal ↗</a>
+          </div>
+          <div>
+            <button id="signout" type="button">Sign out</button>
+          </div>
+        </div>
+
+        <div class="signin-divider">or explore</div>
 
         <a class="signin-insta-btn" href="https://www.instagram.com/apple_developer_club_sgu/" target="_blank" rel="noopener noreferrer">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/></svg>
           Say hello on Instagram ↗
         </a>
 
-        <p class="signin-legal">Signing in verifies your Apple Account only. Club membership is confirmed separately. This site is not affiliated with Apple Inc.</p>
+        <p class="signin-legal">
+          Club membership is confirmed by Apple Developer Club SGU.<br>
+          <a href="/admin/login.html" style="color:#0071e3; text-decoration:underline;">Club Lead / Administrator login →</a>
+        </p>
       </div>
 
       <div class="signin-steps" aria-label="How to get involved">
@@ -229,10 +313,146 @@
 
   <script type="module" src="/src/main.js"></script>
   <script>
-    document.getElementById('apple-signin').addEventListener('click', async () => {
-      await fetch('/api/auth/mock/student', { method: 'POST' });
-      window.location.href = '/student/';
+    async function checkAuth() {
+      try {
+        const res = await fetch('/api/auth/status', { credentials: 'same-origin' });
+        const data = await res.json();
+        const unauthWrap = document.getElementById('unauthenticated-wrap');
+        const signoutWrap = document.getElementById('signout-wrap');
+        const authNotice = document.getElementById('authNotice');
+
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('auth') === 'unavailable' || !data.available) {
+          authNotice.textContent = 'Development Mode: Apple Account OAuth requires live HTTPS and Apple Developer credentials. You can sign in below with student credentials.';
+          authNotice.style.display = 'block';
+        }
+
+        if (data.authenticated) {
+          unauthWrap.style.display = 'none';
+          signoutWrap.style.display = 'block';
+
+          if (data.role === 'admin') {
+            document.getElementById('signedInHeading').textContent = 'Administrator Signed In';
+            document.getElementById('signedInDesc').textContent = 'You have full access to club management and the member dashboard.';
+            document.getElementById('primaryDashboardBtn').textContent = 'Open Member View ↗';
+            document.getElementById('adminPortalBtn').style.display = 'inline-flex';
+          } else {
+            document.getElementById('signedInHeading').textContent = 'You\'re Signed In';
+            document.getElementById('signedInDesc').textContent = 'Access your club profile, registered events, and earned badges.';
+            document.getElementById('primaryDashboardBtn').textContent = 'Open Member Dashboard ↗';
+            document.getElementById('adminPortalBtn').style.display = 'none';
+          }
+        } else {
+          unauthWrap.style.display = 'block';
+          signoutWrap.style.display = 'none';
+        }
+      } catch (e) {
+        console.error('Auth check error:', e);
+      }
+    }
+
+    // Tab switching logic
+    const tabSignIn = document.getElementById('tabSignIn');
+    const tabRegister = document.getElementById('tabRegister');
+    const paneSignIn = document.getElementById('paneSignIn');
+    const paneRegister = document.getElementById('paneRegister');
+
+    function switchTab(mode) {
+      if (mode === 'signin') {
+        tabSignIn.classList.add('active');
+        tabSignIn.setAttribute('aria-selected', 'true');
+        tabRegister.classList.remove('active');
+        tabRegister.setAttribute('aria-selected', 'false');
+        paneSignIn.classList.add('active');
+        paneRegister.classList.remove('active');
+      } else {
+        tabRegister.classList.add('active');
+        tabRegister.setAttribute('aria-selected', 'true');
+        tabSignIn.classList.remove('active');
+        tabSignIn.setAttribute('aria-selected', 'false');
+        paneRegister.classList.add('active');
+        paneSignIn.classList.remove('active');
+      }
+    }
+
+    tabSignIn?.addEventListener('click', () => switchTab('signin'));
+    tabRegister?.addEventListener('click', () => switchTab('register'));
+    document.getElementById('linkToRegister')?.addEventListener('click', (e) => { e.preventDefault(); switchTab('register'); });
+    document.getElementById('linkToSignIn')?.addEventListener('click', (e) => { e.preventDefault(); switchTab('signin'); });
+
+    async function doMemberLogin(data, isSignInOnly = false) {
+      const errNode = isSignInOnly ? document.getElementById('memberSignInError') : document.getElementById('memberLoginError');
+      const btn = isSignInOnly ? document.getElementById('studentSignInBtn') : document.getElementById('studentSubmitBtn');
+      errNode.style.display = 'none';
+      if (btn) { btn.disabled = true; btn.textContent = isSignInOnly ? 'Signing in…' : 'Registering…'; }
+      try {
+        const res = await fetch('/api/auth/member/login', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (!res.ok) {
+          if (res.status === 404 && isSignInOnly) {
+            // Auto switch to register tab and prefill email
+            switchTab('register');
+            const regEmail = document.getElementById('studentEmailInput');
+            if (regEmail) regEmail.value = data.email;
+            const regErr = document.getElementById('memberLoginError');
+            if (regErr) {
+              regErr.textContent = 'Account not found. Please complete your registration details below to join.';
+              regErr.style.display = 'block';
+            }
+            return;
+          }
+          throw new Error(result.error || 'Failed to sign in');
+        }
+        window.location.href = '/student/';
+      } catch (err) {
+        errNode.textContent = err.message;
+        errNode.style.display = 'block';
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = isSignInOnly
+            ? '<span>Sign In to Member Dashboard</span> <span aria-hidden="true">→</span>'
+            : '<span>Join Club & Open Dashboard</span> <span aria-hidden="true">→</span>';
+        }
+      }
+    }
+
+    // Sign In handler
+    document.getElementById('member-signin-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('signinEmailInput')?.value.trim();
+      if (!email) return;
+      doMemberLogin({ email, mode: 'signin' }, true);
     });
+
+    // Registration handler
+    document.getElementById('member-login-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('studentEmailInput')?.value.trim();
+      const name = document.getElementById('studentNameInput')?.value.trim();
+      const department = document.getElementById('studentDeptInput')?.value.trim();
+      const year = document.getElementById('studentYearInput')?.value.trim();
+      if (!email) return;
+      doMemberLogin({ email, name, department, year, mode: 'register' }, false);
+    });
+
+    document.getElementById('apple-signin')?.addEventListener('click', () => {
+      window.location.assign('/api/auth/apple');
+    });
+
+    document.getElementById('signout')?.addEventListener('click', async () => {
+      try {
+        await fetch('/api/auth/signout', { method: 'POST', credentials: 'same-origin' });
+        window.location.reload();
+      } catch {}
+    });
+
+    checkAuth();
   </script>
 </body>
 </html>

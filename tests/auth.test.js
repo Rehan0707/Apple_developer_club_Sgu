@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { randomBytes, scryptSync } from 'node:crypto';
 import { createApp } from '../server.js';
 async function withServer(config, run) {
   const server = createApp(config).listen(0, '127.0.0.1');
@@ -8,9 +9,14 @@ async function withServer(config, run) {
   finally { await new Promise(resolve => server.close(resolve)); }
 }
 const config = { PUBLIC_ORIGIN:'https://club.example.com', APPLE_CLIENT_ID:'club.test', APPLE_TEAM_ID:'team', APPLE_KEY_ID:'key', APPLE_PRIVATE_KEY_PATH:'/not-a-real-key.p8' };
+function adminConfig(password = 'correct horse battery') {
+  const salt = randomBytes(16).toString('hex');
+  const hash = scryptSync(password, salt, 64).toString('hex');
+  return { ADMIN_USERNAME:'club-admin@example.test', ADMIN_PASSWORD_HASH:`scrypt$${salt}$${hash}` };
+}
 test('missing configuration never presents authentication as available', () => withServer({}, async base => {
   const status = await fetch(base+'/api/auth/status');
-  assert.deepEqual(await status.json(), {available:false,authenticated:false});
+  assert.deepEqual(await status.json(), {available:false,authenticated:false,role:null});
   assert.equal(status.headers.get('cache-control'),'no-store');
   const start = await fetch(base+'/api/auth/apple',{redirect:'manual'});
   assert.equal(start.headers.get('location'),'/join/?auth=unavailable');
@@ -41,4 +47,32 @@ test('bound cancellation is handled and state cannot be replayed', () => withSer
 }));
 test('cross-origin sign-out is rejected', () => withServer(config, async base => {
   assert.equal((await fetch(base+'/api/auth/signout',{method:'POST',headers:{origin:'https://other.example'}})).status,403);
+}));
+test('admin login creates a protected session and rejects bad credentials', () => withServer(adminConfig(), async base => {
+  const wrong = await fetch(base+'/api/auth/admin/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username:'CLUB-ADMIN@EXAMPLE.TEST',password:'wrong'})});
+  assert.equal(wrong.status,401);
+  const response = await fetch(base+'/api/auth/admin/login',{method:'POST',headers:{origin:'http://127.0.0.1:5173','content-type':'application/json'},body:JSON.stringify({username:'CLUB-ADMIN@EXAMPLE.TEST',password:'correct horse battery'})});
+  assert.equal(response.status,200);
+  assert.deepEqual(await response.json(),{authenticated:true});
+  assert.match(response.headers.get('set-cookie'),/HttpOnly; Secure; SameSite=Lax/);
+  const cookie = response.headers.get('set-cookie').split(';')[0];
+  const protectedResponse = await fetch(base+'/api/admin/events/example/registrations',{headers:{cookie}});
+  assert.equal(protectedResponse.status,200);
+}));
+test('admin login rejects cross-origin attempts and missing account configuration', async () => {
+  await withServer(adminConfig(), async base => {
+    const response = await fetch(base+'/api/auth/admin/login',{method:'POST',headers:{origin:'https://attacker.example','content-type':'application/json'},body:JSON.stringify({username:'club-admin@example.test',password:'correct horse battery'})});
+    assert.equal(response.status,403);
+  });
+  await withServer({}, async base => {
+    const response = await fetch(base+'/api/auth/admin/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username:'club-admin@example.test',password:'anything'})});
+    assert.equal(response.status,503);
+  });
+});
+test('admin login is rate limited and the public mock-admin bypass is removed', () => withServer(adminConfig(), async base => {
+  for (let i=0;i<5;i++) {
+    const response = await fetch(base+'/api/auth/admin/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username:'club-admin@example.test',password:'wrong'})});
+    assert.equal(response.status,i===4?429:401);
+  }
+  assert.equal((await fetch(base+'/api/auth/mock/admin',{method:'POST'})).status,404);
 }));

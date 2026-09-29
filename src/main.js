@@ -471,3 +471,27 @@ if (joinOverlay) {
     }, 420);
   });
 }
+
+// ── Auth-Aware Navigation Header ─────────────────────────────────────
+async function updateNavAuth() {
+  try {
+    const res = await fetch('/api/auth/status', { credentials: 'same-origin' });
+    if (!res.ok) return;
+    const auth = await res.json();
+    if (!auth.authenticated) return;
+    const joinButtons = document.querySelectorAll('a[href="/join/"]');
+    joinButtons.forEach(btn => {
+      if (btn.classList.contains('button') || btn.closest('nav')) {
+        if (auth.role === 'admin') {
+          btn.textContent = 'Admin Portal';
+          btn.href = '/admin/index.html';
+        } else {
+          btn.textContent = 'Member Dashboard';
+          btn.href = '/student/';
+        }
+      }
+    });
+  } catch {}
+}
+updateNavAuth();
+

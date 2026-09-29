@@ -1,30 +1,119 @@
-import fs from 'node:fs';
 import express from 'express';
-import { randomBytes, timingSafeEqual } from 'node:crypto';
+import fs from 'node:fs';
+import { createHash, randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SignJWT, importPKCS8, createRemoteJWKSet, jwtVerify } from 'jose';
 import { sheetsService } from './lib/sheets.js';
+import { createJsonStore } from './lib/store.js';
+import { createDataApi } from './lib/data-api.js';
+import { firestoreSync } from './lib/firestore.js';
 
 const random = () => randomBytes(32).toString('base64url');
 const safeEqual = (a, b) => typeof a === 'string' && typeof b === 'string' && a.length === b.length && timingSafeEqual(Buffer.from(a), Buffer.from(b));
+const validPasswordHash = encoded => {
+  if (typeof encoded !== 'string') return false;
+  const [scheme, salt, expected, ...extra] = encoded.split('$');
+  return scheme === 'scrypt' && !extra.length && /^[a-f0-9]{32}$/i.test(salt || '') && /^[a-f0-9]{128}$/i.test(expected || '');
+};
+const passwordMatches = (password, encoded) => {
+  if (typeof password !== 'string' || password.length > 1024 || !validPasswordHash(encoded)) return false;
+  const [, salt, expected] = encoded.split('$');
+  const actual = scryptSync(password, salt, 64).toString('hex');
+  return safeEqual(actual, expected.toLowerCase());
+};
 const cookies = req => Object.fromEntries((req.headers.cookie || '').split(';').map(v => { const i = v.indexOf('='); return i < 0 ? ['', ''] : [v.slice(0, i).trim(), v.slice(i + 1)]; }));
 export function createApp(config = process.env) {
   const app = express();
-  const pending = new Map(), sessions = new Map();
+  const pending = new Map(), sessions = new Map(), adminLoginAttempts = new Map(), registrationAttempts = new Map();
+  const store = createJsonStore(config.DATA_FILE_PATH || 'data/db.json');
+  const sheets = config.SHEETS_SERVICE || sheetsService;
   const origin = config.PUBLIC_ORIGIN?.replace(/\/$/, '');
+  const adminUsername = typeof config.ADMIN_USERNAME === 'string' ? config.ADMIN_USERNAME.trim().toLowerCase() : '';
+  const adminPasswordHash = typeof config.ADMIN_PASSWORD_HASH === 'string' ? config.ADMIN_PASSWORD_HASH.trim() : '';
   let configured = false;
   try { const url = new URL(origin); configured = url.protocol === 'https:' && url.origin === origin && !['localhost','127.0.0.1','[::1]'].includes(url.hostname) && ['APPLE_CLIENT_ID','APPLE_TEAM_ID','APPLE_KEY_ID','APPLE_PRIVATE_KEY_PATH'].every(key => Boolean(config[key])); } catch {}
   const appleKeys = createRemoteJWKSet(new URL('https://appleid.apple.com/auth/keys'));
-  const cookieOptions = { httpOnly: true, secure: true, sameSite: 'lax', path: '/' };
-  const cleanup = () => { for (const map of [pending, sessions]) for (const [key,value] of map) if (value.expires < Date.now()) map.delete(key); };
+  const isSecure = Boolean(origin && origin.startsWith('https://')) || (process.env.NODE_ENV === 'production');
+  const cookieOptions = { httpOnly: true, secure: isSecure, sameSite: 'lax', path: '/' };
+  const getSessionToken = req => {
+    const c = cookies(req);
+    return c['__Host-sgu_session'] || c['sgu_session'] || '';
+  };
+  const setSessionCookie = (res, token) => {
+    // 1. __Host-sgu_session for strict HTTPS production and automated test suites
+    res.cookie('__Host-sgu_session', token, { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 3600000 });
+    // 2. sgu_session without forced Secure on HTTP so Safari & local development work flawlessly
+    res.cookie('sgu_session', token, { httpOnly: true, secure: isSecure, sameSite: 'lax', path: '/', maxAge: 3600000 });
+  };
+  const clearSessionCookie = res => {
+    res.clearCookie('__Host-sgu_session', { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
+    res.clearCookie('sgu_session', { httpOnly: true, secure: isSecure, sameSite: 'lax', path: '/' });
+  };
+  const cleanup = () => { for (const map of [pending, sessions, adminLoginAttempts, registrationAttempts]) for (const [key,value] of map) if (value.expires < Date.now()) map.delete(key); };
+  const newId = prefix => `${prefix}-${randomBytes(9).toString('hex')}`;
+  const normalizedEmail = value => typeof value === 'string' ? value.trim().toLowerCase() : '';
+  const safeText = (value, max = 160) => typeof value === 'string' ? value.trim().replace(/[\u0000-\u001f\u007f]/g, '').slice(0, max) : '';
+  const validEmail = value => value.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  const validLocalImage = value => !value || (typeof value === 'string' && /^\/images\/[A-Za-z0-9_./-]+$/.test(value) && !value.includes('..'));
+  const trustedOrigin = req => {
+    const requestOrigin = req.get('origin');
+    if (!requestOrigin) return true;
+    try {
+      const parsed = new URL(requestOrigin);
+      if (origin) return parsed.origin === origin;
+      return parsed.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(parsed.hostname);
+    } catch { return false; }
+  };
+  const saveToSheets = async (tab, idField, row) => {
+    if (!sheets?.isConfigured) return 'not-configured';
+    try { return await sheets.upsertObject(tab, idField, row) ? 'synced' : 'pending'; }
+    catch { return 'pending'; }
+  };
+  const sheetsReady = sheets?.isConfigured && typeof sheets.setupSchema === 'function'
+    ? Promise.resolve().then(() => sheets.setupSchema()).then(Boolean, () => false)
+    : Promise.resolve(true);
   app.disable('x-powered-by');
   app.use('/api', (req, res, next) => { cleanup(); res.set('Cache-Control','no-store'); res.set('X-Content-Type-Options','nosniff'); next(); });
   app.use(express.urlencoded({ extended: false, limit: '8kb' }));
+  app.post(['/api/auth/admin/login', '/api/auth/login'], express.json({ limit: '8kb' }), (req, res) => {
+    const requestOrigin = req.get('origin');
+    if (requestOrigin) {
+      try {
+        const parsedOrigin = new URL(requestOrigin);
+        const isLoopback = ['localhost', '127.0.0.1', '[::1]'].includes(parsedOrigin.hostname);
+        if ((origin && requestOrigin !== origin) || (!origin && (!isLoopback || parsedOrigin.protocol !== 'http:'))) return res.status(403).json({ error: 'Invalid origin' });
+      } catch { return res.status(403).json({ error: 'Invalid origin' }); }
+    }
+    if (!adminUsername || !validPasswordHash(adminPasswordHash)) return res.status(503).json({ error: 'Admin sign-in is not configured' });
+
+    const address = req.ip || req.socket.remoteAddress || 'unknown';
+    const attempt = adminLoginAttempts.get(address);
+    if (attempt?.failures >= 5 && attempt.expires > Date.now()) return res.status(429).json({ error: 'Too many attempts. Try again later.' });
+
+    const username = typeof req.body?.username === 'string' ? req.body.username.trim().toLowerCase() : '';
+    const password = typeof req.body?.password === 'string' ? req.body.password : '';
+    const validUsername = safeEqual(username, adminUsername);
+    const validPassword = passwordMatches(password, adminPasswordHash);
+    if (!validUsername || !validPassword) {
+      const current = attempt?.expires > Date.now() ? attempt : { failures: 0, expires: Date.now() + 15 * 60 * 1000 };
+      current.failures += 1;
+      adminLoginAttempts.set(address, current);
+      return res.status(current.failures >= 5 ? 429 : 401).json({ error: current.failures >= 5 ? 'Too many attempts. Try again later.' : 'Incorrect username or password.' });
+    }
+
+    adminLoginAttempts.delete(address);
+    const previous = getSessionToken(req);
+    if (previous) sessions.delete(previous);
+    const session = random();
+    sessions.set(session, { subject: adminUsername, role: 'admin', memberId: adminUsername, expires: Date.now() + 3600000 });
+    setSessionCookie(res, session);
+    res.json({ authenticated: true });
+  });
   app.get('/api/auth/status', (req, res) => {
-    const session = sessions.get(cookies(req)['__Host-sgu_session']);
-    res.json({ available: configured, authenticated: Boolean(session) });
+    const session = sessions.get(getSessionToken(req));
+    res.json({ available: configured, authenticated: Boolean(session), role: session?.role || null });
   });
   app.get('/api/auth/apple', (req, res) => {
     if (!configured) return res.redirect('/join/?auth=unavailable');
@@ -52,275 +141,140 @@ export function createApp(config = process.env) {
       const tokens = await response.json();
       const { payload } = await jwtVerify(tokens.id_token, appleKeys, { issuer: 'https://appleid.apple.com', audience: config.APPLE_CLIENT_ID, algorithms: ['RS256'], requiredClaims: ['sub','iat','exp','nonce'] });
       if (!safeEqual(payload.nonce, attempt.nonce)) throw new Error('Invalid nonce');
-      // Ephemeral verified session only. No membership or persistent account is created.
-      const previous = cookies(req)['__Host-sgu_session'];
+      const generatedMemberId = `MEM-${createHash('sha256').update(payload.sub).digest('hex').slice(0, 24)}`;
+      const email = normalizedEmail(payload.email || '');
+      const emailVerified = payload.email_verified === true || payload.email_verified === 'true';
+      let appleName = '';
+      try {
+        const appleUser = typeof req.body.user === 'string' ? JSON.parse(req.body.user) : req.body.user;
+        appleName = safeText([appleUser?.name?.firstName, appleUser?.name?.lastName].filter(Boolean).join(' '), 100);
+      } catch {}
+      const member = await store.transact(db => {
+        let member = db.members.find(item => item.appleSubjectHash === generatedMemberId || (emailVerified && email && item.email === email));
+        if (!member) {
+          member = { id: generatedMemberId, appleSubjectHash: generatedMemberId, name: appleName, email: emailVerified ? email : '', department: '', year: '', status: 'pending', badges: [], createdAt: new Date().toISOString() };
+          db.members.push(member);
+        } else {
+          member.appleSubjectHash = generatedMemberId;
+          if (appleName && !member.name) member.name = appleName;
+          if (emailVerified && email) member.email = email;
+        }
+        if (emailVerified && email) db.registrations.filter(row => row.email === email && !row.memberId).forEach(row => { row.memberId = member.id; });
+        return member;
+      });
+      const previous = getSessionToken(req);
       if (previous) sessions.delete(previous);
       const session = random();
-      sessions.set(session, { subject: payload.sub, expires: Date.now() + 3600000 });
-      res.cookie('__Host-sgu_session', session, { ...cookieOptions, maxAge: 3600000 });
-      res.redirect('/join/');
+      sessions.set(session, { subject: payload.sub, role: 'member', memberId: member.id, expires: Date.now() + 3600000 });
+      setSessionCookie(res, session);
+      res.redirect('/student/');
     } catch { res.redirect('/join/?auth=error'); }
   });
   app.post('/api/auth/signout', (req, res) => {
-    if (!origin || req.get('origin') !== origin) return res.status(403).json({ error: 'Invalid origin' });
-    sessions.delete(cookies(req)['__Host-sgu_session']);
-    res.clearCookie('__Host-sgu_session', cookieOptions);
+    if (!trustedOrigin(req)) return res.status(403).json({ error: 'Invalid origin' });
+    const token = getSessionToken(req);
+    if (token) sessions.delete(token);
+    clearSessionCookie(res);
     res.sendStatus(204);
-  });
-
-  // --- MOCK AUTH FOR DEVELOPMENT ---
-  app.post('/api/auth/mock/:role', (req, res) => {
-    const role = req.params.role === 'admin' ? 'admin' : 'student';
-    const memberId = role === 'admin' ? 'admin_123' : 'student_123';
-    const previous = cookies(req)['__Host-sgu_session'];
-    if (previous) sessions.delete(previous);
-    
-    const session = random();
-    sessions.set(session, { 
-      subject: memberId,
-      role: role,
-      memberId: memberId,
-      expires: Date.now() + 3600000 
-    });
-    res.cookie('__Host-sgu_session', session, { ...cookieOptions, maxAge: 3600000 });
-    res.sendStatus(200);
   });
 
   // Auth Middleware
   const requireAuth = (req, res, next) => {
-    const session = sessions.get(cookies(req)['__Host-sgu_session']);
+    const session = sessions.get(getSessionToken(req));
     if (!session) return res.status(401).json({ error: 'Unauthorized' });
     req.session = session;
     next();
   };
 
   const requireAdmin = (req, res, next) => {
-    const session = sessions.get(cookies(req)['__Host-sgu_session']);
+    const session = sessions.get(getSessionToken(req));
     if (!session || session.role !== 'admin') return res.status(403).json({ error: 'Forbidden' });
     req.session = session;
     next();
   };
 
-  // --- EVENTS API ---
-  app.get('/api/events', async (req, res) => {
-    const rows = await sheetsService.getRows('Events');
-    res.json(rows);
-  });
-
-  app.post('/api/admin/events', requireAdmin, express.json(), async (req, res) => {
-    const { title, date, location, status } = req.body;
-    const eventId = `EVT-${Date.now()}`;
-    const success = await sheetsService.appendRow('Events', [eventId, title, date, location, status]);
-    if (success) {
-      res.status(201).json({ eventId, title, date, location, status });
-    } else {
-      res.status(500).json({ error: 'Failed to create event' });
+  const requireMember = (req, res, next) => {
+    const session = sessions.get(getSessionToken(req));
+    if (!session || (session.role !== 'member' && session.role !== 'admin') || !session.memberId) {
+      return res.status(401).json({ error: 'Sign in to view your member page.' });
     }
-  });
-
-  app.put('/api/admin/events/:id', requireAdmin, express.json(), async (req, res) => {
-    const { id } = req.params;
-    const { title, date, location, status } = req.body;
-    const rows = await sheetsService.getRows('Events');
-    const index = rows.findIndex(r => r.eventId === id);
-    if (index === -1) return res.status(404).json({ error: 'Event not found' });
-    
-    const success = await sheetsService.updateRow('Events', index, [id, title, date, location, status]);
-    if (success) res.json({ success: true });
-    else res.status(500).json({ error: 'Failed to update event' });
-  });
-
-  app.delete('/api/admin/events/:id', requireAdmin, async (req, res) => {
-    // Note: Google Sheets API requires a different endpoint to delete rows.
-    // For now, let's just mark it as 'deleted' or similar, or skip if full delete is complex via append/update.
-    // To properly delete, we need a batchUpdate with DeleteDimensionRequest.
-    // We will just update status to 'deleted' as a soft delete for simplicity.
-    const { id } = req.params;
-    const rows = await sheetsService.getRows('Events');
-    const index = rows.findIndex(r => r.eventId === id);
-    if (index === -1) return res.status(404).json({ error: 'Event not found' });
-    
-    const row = rows[index];
-    const success = await sheetsService.updateRow('Events', index, [id, row.title, row.date, row.location, 'deleted']);
-    if (success) res.json({ success: true });
-    else res.status(500).json({ error: 'Failed to delete event' });
-  });
-
-  // --- REGISTRATIONS & BADGES API ---
-  app.post('/api/events/:id/register', requireAuth, async (req, res) => {
-    const eventId = req.params.id;
-    const memberId = req.session.memberId;
-    
-    const registrations = await sheetsService.getRows('Registrations');
-    const existing = registrations.find(r => r.eventId === eventId && r.memberId === memberId);
-    if (existing) {
-      return res.status(409).json({ error: 'Already registered' });
-    }
-
-    const regId = `REG-${Date.now()}`;
-    const success = await sheetsService.appendRow('Registrations', [regId, eventId, memberId, new Date().toISOString(), 'false']);
-    if (!success) {
-      return res.status(500).json({ error: 'Failed to register' });
-    }
-
-    // Auto-award logic: Check if this is their first event
-    const myRegs = registrations.filter(r => r.memberId === memberId);
-    if (myRegs.length === 0) { // They had 0 before this one
-      const awardId = `AWD-${Date.now()}`;
-      await sheetsService.appendRow('BadgeAwards', [awardId, 'FIRST_EVENT', memberId, new Date().toISOString(), 'system']);
-    }
-
-    res.status(201).json({ registrationId: regId, eventId, memberId, attended: false });
-  });
-
-  app.get('/api/admin/events/:id/registrations', requireAdmin, async (req, res) => {
-    const eventId = req.params.id;
-    const registrations = await sheetsService.getRows('Registrations');
-    const eventRegs = registrations.filter(r => r.eventId === eventId);
-    res.json(eventRegs);
-  });
-
-  app.post('/api/admin/badges/award', requireAdmin, express.json(), async (req, res) => {
-    const { badgeId, memberId } = req.body;
-    const awardId = `AWD-${Date.now()}`;
-    const success = await sheetsService.appendRow('BadgeAwards', [awardId, badgeId, memberId, new Date().toISOString(), req.session.memberId]);
-    if (success) {
-      res.status(201).json({ awardId, badgeId, memberId });
-    } else {
-      res.status(500).json({ error: 'Failed to award badge' });
-    }
-  });
-
-  // --- DASHBOARD API ---
-  app.get('/api/me/dashboard', requireAuth, async (req, res) => {
-    const memberId = req.session.memberId;
-    
-    // Fetch data from Sheets
-    const [events, registrations, badges, badgeAwards] = await Promise.all([
-      sheetsService.getRows('Events'),
-      sheetsService.getRows('Registrations'),
-      sheetsService.getRows('Badges'),
-      sheetsService.getRows('BadgeAwards')
-    ]);
-
-    const myRegistrations = registrations.filter(r => r.memberId === memberId);
-    const myEvents = myRegistrations.map(reg => {
-      const eventDetails = events.find(e => e.eventId === reg.eventId) || {};
-      return {
-        ...reg,
-        title: eventDetails.title,
-        date: eventDetails.date,
-        location: eventDetails.location,
-        status: eventDetails.status
-      };
-    });
-
-    const myBadgeAwards = badgeAwards.filter(b => b.memberId === memberId);
-    const myBadges = myBadgeAwards.map(award => {
-      const badgeDetails = badges.find(b => b.badgeId === award.badgeId) || {};
-      return {
-        ...award,
-        name: badgeDetails.name,
-        icon: badgeDetails.icon
-      };
-    });
-
-    res.json({
-      memberId,
-      registeredEvents: myEvents,
-      badges: myBadges
-    });
-  });
-
-
-  // --- LOCAL JSON DB HELPER ---
-  const DB_PATH = resolve('data/db.json');
-  const getDb = async () => {
-    try {
-      const data = await readFile(DB_PATH, 'utf8');
-      return JSON.parse(data);
-    } catch {
-      return { events: [], resources: [], badges: [], students: [] };
-    }
+    req.session = session;
+    next();
   };
-  const saveDb = async (data) => {
-    await fs.promises.writeFile(DB_PATH, JSON.stringify(data, null, 2));
-  };
-  
-  // --- RESOURCES API ---
-  app.get('/api/resources', async (req, res) => {
-    const db = await getDb();
-    res.json(db.resources || []);
-  });
 
-  app.post('/api/admin/resources', requireAdmin, express.json(), async (req, res) => {
-    const db = await getDb();
-    const newResource = { id: 'RES-' + Date.now(), ...req.body };
-    db.resources = db.resources || [];
-    db.resources.push(newResource);
-    await saveDb(db);
-    res.status(201).json(newResource);
-  });
+  app.post('/api/auth/member/login', express.json({ limit: '8kb' }), async (req, res) => {
+    if (!trustedOrigin(req)) return res.status(403).json({ error: 'Invalid origin' });
+    const rawEmail = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+    const rawName = typeof req.body?.name === 'string' ? req.body.name.trim() : '';
+    const rawDept = typeof req.body?.department === 'string' ? req.body.department.trim() : '';
+    const rawYear = typeof req.body?.year === 'string' ? req.body.year.trim() : '';
+    const mode = req.body?.mode || 'auto'; // 'signin', 'register', or 'auto'
 
-  app.put('/api/admin/resources/:id', requireAdmin, express.json(), async (req, res) => {
-    const db = await getDb();
-    const index = (db.resources || []).findIndex(r => r.id === req.params.id);
-    if (index === -1) return res.status(404).json({ error: 'Not found' });
-    db.resources[index] = { ...db.resources[index], ...req.body };
-    await saveDb(db);
-    res.json(db.resources[index]);
-  });
-
-  app.delete('/api/admin/resources/:id', requireAdmin, async (req, res) => {
-    const db = await getDb();
-    const index = (db.resources || []).findIndex(r => r.id === req.params.id);
-    if (index === -1) return res.status(404).json({ error: 'Not found' });
-    db.resources.splice(index, 1);
-    await saveDb(db);
-    res.json({ success: true });
-  });
-
-  // --- BADGES API (Extended) ---
-  app.get('/api/badges', async (req, res) => {
-    const db = await getDb();
-    res.json(db.badges || []);
-  });
-
-  app.post('/api/admin/badges', requireAdmin, express.json(), async (req, res) => {
-    const db = await getDb();
-    const newBadge = { id: 'BDG-' + Date.now(), ...req.body };
-    db.badges = db.badges || [];
-    db.badges.push(newBadge);
-    await saveDb(db);
-    res.status(201).json(newBadge);
-  });
-
-  app.get('/api/admin/students', requireAdmin, async (req, res) => {
-    const db = await getDb();
-    res.json(db.students || []);
-  });
-
-  app.post('/api/admin/badges/assign', requireAdmin, express.json(), async (req, res) => {
-    const db = await getDb();
-    const { badgeId, studentId } = req.body;
-    
-    const student = db.students.find(s => s.id === studentId);
-    if (!student) return res.status(404).json({ error: 'Student not found' });
-    
-    student.badges = student.badges || [];
-    if (!student.badges.includes(badgeId)) {
-      student.badges.push(badgeId);
-      await saveDb(db);
+    if (!rawEmail || !validEmail(rawEmail)) {
+      return res.status(400).json({ error: 'Please enter a valid student email address.' });
     }
-    res.json({ success: true, student });
+
+    if (mode === 'signin') {
+      const currentDb = await store.read();
+      const existing = currentDb.members.find(item => item.email && item.email.toLowerCase() === rawEmail && item.status !== 'archived');
+      if (!existing) {
+        return res.status(404).json({ error: 'No member profile found with this email. Please register to create your account.' });
+      }
+    }
+
+    const member = await store.transact(db => {
+      let m = db.members.find(item => item.email && item.email.toLowerCase() === rawEmail && item.status !== 'archived');
+      if (!m) {
+        m = {
+          id: `MEM-${createHash('sha256').update(rawEmail).digest('hex').slice(0, 16)}`,
+          name: rawName || rawEmail.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+          email: rawEmail,
+          department: rawDept || 'Computer Science & Engineering',
+          year: rawYear || 'Student',
+          status: 'active',
+          badges: [],
+          createdAt: new Date().toISOString()
+        };
+        db.members.push(m);
+      } else {
+        if (rawName && (!m.name || m.name.includes('@'))) m.name = rawName;
+        if (rawDept && !m.department) m.department = rawDept;
+        if (rawYear && !m.year) m.year = rawYear;
+      }
+      // Link any existing registrations for this email in real time
+      db.registrations.filter(row => row.email && row.email.toLowerCase() === rawEmail && !row.memberId).forEach(row => {
+        row.memberId = m.id;
+      });
+      return m;
+    });
+
+    if (sheets?.isConfigured) {
+      sheets.upsertObject('Members', 'memberId', {
+        memberId: member.id,
+        name: member.name,
+        email: member.email,
+        department: member.department,
+        academicYear: member.year,
+        status: member.status,
+        createdAt: member.createdAt
+      }).catch(err => console.error('Sheet sync error:', err.message));
+    }
+
+    firestoreSync.save('members', member.id, member).catch(err => {
+      console.error('Firestore member sync error:', err.message);
+    });
+
+    const previous = getSessionToken(req);
+    if (previous) sessions.delete(previous);
+    const session = random();
+    sessions.set(session, { subject: member.email, role: 'member', memberId: member.id, expires: Date.now() + 3600000 });
+    setSessionCookie(res, session);
+    res.json({ authenticated: true, role: 'member', member: { id: member.id, name: member.name, email: member.email } });
   });
 
-  app.get('/api/admin/badges/:id/students', requireAdmin, async (req, res) => {
-    const db = await getDb();
-    const badgeId = req.params.id;
-    const studentsWithBadge = (db.students || []).filter(s => (s.badges || []).includes(badgeId));
-    res.json(studentsWithBadge);
-  });
+  app.use('/api', createDataApi({ store, sheets, sheetsReady, requireAdmin, requireMember, newId, trustedOrigin }));
+
+
 
   app.use('/api', (_req, res) => res.status(404).json({ error: 'Not found' }));
   app.use(express.static(resolve('dist')));
@@ -330,6 +284,3 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const port = Number(process.env.PORT || 3001);
   createApp().listen(port, () => console.log(`Club server: http://127.0.0.1:${port}`));
 }
-
-
-

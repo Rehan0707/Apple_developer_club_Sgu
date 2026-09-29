@@ -1,41 +1,166 @@
 {
-  "events": [],
-  "resources": [],
-  "badges": [
+  "events": [
     {
-      "id": "BDG-1",
-      "name": "September Challenge",
-      "imageUrl": "/images/badge_orange.jpg",
-      "desc": "Complete 10 activities"
+      "id": "EVT-01",
+      "title": "Getting started with Xcode",
+      "category": "Workshop",
+      "description": "Explore the Xcode workspace, learn key shortcuts, build your first SwiftUI preview, and take your first steps in iOS app development.",
+      "date": "2026-10-15T15:30:00.000Z",
+      "location": "Lab 402, Technology Block, SGU",
+      "capacity": 50,
+      "imageUrl": "/images/event-xcode-art.jpg",
+      "status": "published",
+      "createdAt": "2026-09-10T10:00:00.000Z"
     },
     {
-      "id": "BDG-4",
-      "name": "April Challenge",
-      "imageUrl": "/images/badge_green.jpg",
-      "desc": "Accessibility Expert"
+      "id": "EVT-02",
+      "title": "Your first idea. Your first app.",
+      "category": "Build Session",
+      "description": "From a blank canvas to a working prototype. Learn state management, user input, and UI layout principles in Swift.",
+      "date": "2026-10-22T15:30:00.000Z",
+      "location": "Auditorium Hall B, SGU",
+      "capacity": 60,
+      "imageUrl": "/images/event-app-art.jpg",
+      "status": "published",
+      "createdAt": "2026-09-12T10:00:00.000Z"
     },
     {
-      "id": "BDG-5",
-      "name": "February Challenge",
-      "imageUrl": "/images/badge_blue.jpg",
-      "desc": "Core ML basics"
-    },
-    {
-      "id": "BDG-6",
-      "name": "November Challenge",
-      "imageUrl": "/images/badge_red.jpg",
-      "desc": "Swift Data architecture"
+      "id": "EVT-03",
+      "title": "Find your community: Swift & Design Lab",
+      "category": "Swift & Design Lab",
+      "description": "Connect with curious minds, exchange perspectives, master Apple's Human Interface Guidelines, and build together with peer developers.",
+      "date": "2026-10-29T15:30:00.000Z",
+      "location": "Apple Student Lounge, Campus Center",
+      "capacity": 45,
+      "imageUrl": "/images/event-design-art.jpg",
+      "status": "published",
+      "createdAt": "2026-09-15T10:00:00.000Z"
     }
   ],
-  "students": [
+  "resources": [
     {
-      "id": "mock_student_1",
-      "name": "Alex Chen",
-      "email": "alex@sgu.ac.in",
-      "badges": [
-        "BDG-4",
-        "BDG-5"
-      ]
+      "id": "RES-01",
+      "title": "Swift Programming Language Documentation",
+      "category": "Learning Swift",
+      "url": "https://www.swift.org/documentation/",
+      "status": "active",
+      "createdAt": "2026-09-01T10:00:00.000Z"
+    },
+    {
+      "id": "RES-02",
+      "title": "Apple Human Interface Guidelines (HIG)",
+      "category": "Design & UX",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/",
+      "status": "active",
+      "createdAt": "2026-09-01T10:00:00.000Z"
+    },
+    {
+      "id": "RES-03",
+      "title": "Swift Playgrounds for Mac & iPad",
+      "category": "Interactive Coding",
+      "url": "https://developer.apple.com/swift-playgrounds/",
+      "status": "active",
+      "createdAt": "2026-09-01T10:00:00.000Z"
+    },
+    {
+      "id": "RES-04",
+      "title": "Apple Developer Documentation",
+      "category": "API Reference",
+      "url": "https://developer.apple.com/documentation/",
+      "status": "active",
+      "createdAt": "2026-09-01T10:00:00.000Z"
+    },
+    {
+      "id": "RES-05",
+      "title": "Swift Student Challenge",
+      "category": "Competitions",
+      "url": "https://developer.apple.com/swift-student-challenge/",
+      "status": "active",
+      "createdAt": "2026-09-01T10:00:00.000Z"
+    },
+    {
+      "id": "RES-06",
+      "title": "WWDC Technical Sessions Archive",
+      "category": "Video Guides",
+      "url": "https://developer.apple.com/videos/",
+      "status": "active",
+      "createdAt": "2026-09-01T10:00:00.000Z"
     }
-  ]
+  ],
+  "badges": [
+    {
+      "id": "BDG-01",
+      "name": "Swift Explorer",
+      "desc": "Completed the introductory Swift syntax and SwiftUI basics workshop.",
+      "icon": "verified",
+      "color": "orange",
+      "status": "active",
+      "createdAt": "2026-09-01T10:00:00.000Z"
+    },
+    {
+      "id": "BDG-02",
+      "name": "HIG Design Apprentice",
+      "desc": "Demonstrated adherence to Apple's Human Interface Guidelines in app UI/UX.",
+      "icon": "verified",
+      "color": "purple",
+      "status": "active",
+      "createdAt": "2026-09-01T10:00:00.000Z"
+    },
+    {
+      "id": "BDG-03",
+      "name": "Prototype Pioneer",
+      "desc": "Built and demonstrated a working iOS app prototype during a club build session.",
+      "icon": "verified",
+      "color": "blue",
+      "status": "active",
+      "createdAt": "2026-09-01T10:00:00.000Z"
+    },
+    {
+      "id": "BDG-04",
+      "name": "Campus Contributor",
+      "desc": "Contributed code, design assets, or organized workshops for the Apple Developer Club at SGU.",
+      "icon": "verified",
+      "color": "green",
+      "status": "active",
+      "createdAt": "2026-09-01T10:00:00.000Z"
+    }
+  ],
+  "members": [
+    {
+      "id": "rehan@lead",
+      "name": "Rehan Sanadi",
+      "email": "rehan@lead",
+      "department": "Computer Science & Engineering",
+      "year": "Club Lead",
+      "status": "active",
+      "badges": [],
+      "createdAt": "2026-08-01T08:00:00.000Z"
+    },
+    {
+      "id": "MEM-e5f066f158eb1b1d",
+      "name": "Aaditya Patil",
+      "email": "aaditya.patil@sgu.ac.in",
+      "department": "Computer Science & Engineering",
+      "year": "2nd Year",
+      "status": "active",
+      "badges": [],
+      "createdAt": "2026-09-28T18:02:04.448Z"
+    }
+  ],
+  "registrations": [
+    {
+      "id": "REG-4fca34b0771f071f81",
+      "eventId": "EVT-01",
+      "eventTitle": "Getting started with Xcode",
+      "memberId": "MEM-e5f066f158eb1b1d",
+      "name": "Aaditya Patil",
+      "email": "aaditya.patil@sgu.ac.in",
+      "department": "Computer Science & Engineering",
+      "year": "2nd Year",
+      "notes": "Excited to join from dashboard!",
+      "createdAt": "2026-09-28T18:02:04.565Z",
+      "status": "registered"
+    }
+  ],
+  "badgeAwards": []
 }
