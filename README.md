@@ -23,15 +23,30 @@ The production build is served on http://127.0.0.1:3001. No external deployment 
 
 ## Pages and content
 
-- `/`: centered club introduction, Join button, demo workspace image, club mission, event previews, learning resources, and FAQ.
-- `/events/`: two clearly labeled layout previews. The user confirmed these are examples, not scheduled events; no dates or registration claims are published.
-- `/join/`: Apple authentication availability and club contact link.
+- `/`: club introduction, current published events, resources entry point, and FAQ.
+- `/resources/`: a focused library linking to the official Apple Developer video channel, documentation, Human Interface Guidelines, and Swift Playgrounds.
+- `/events/`: published future events loaded from the server-side store.
+- `/register/?event=<event-id>`: a validated registration form for the selected event; confirmed records are saved to local JSON and mirrored to Sheets when configured.
+- `/join/`: Apple authentication availability and club contact link. No mock sign-in path exists.
+- `/admin/` and `/student/`: authenticated event, member, badge, resource, registration, and profile views.
 - `public/images/`: the two original user-supplied logos, copied without image modifications.
 - `src/style.css`: shared dark visual system based on the supplied Apple screenshots, with CSS-framed original club branding.
 
-The user subsequently authorized demo imagery. The homepage uses an explicitly labeled AI-generated workspace image, while event cards use CSS illustrations of a coding workspace and a concept app. Replace these with real club photography when available. Original logos are preserved; CSS frames their central artwork for readable navigation and footer placement. Event previews appear in both the homepage and event page; update both when confirmed details are supplied.
+Event listings and registration details are no longer hard-coded: public pages read the published event records and show an explicit empty state when none are available. The home page no longer presents unsupported success stories or member claims. Event images are optional and are only shown when an admin adds a local image path. Original logos are preserved.
 
 The club's Instagram could not be publicly fetched. Copy uses only the confirmed club name and link; no team members, participation figures, or past events are invented.
+
+## Admin Portal sign-in
+
+The admin login is verified by Express, not by browser code. Configure `ADMIN_USERNAME` and a scrypt-encoded `ADMIN_PASSWORD_HASH` in the ignored local `.env` file or the deployment's server-side secret settings. Never put a raw password in HTML, JavaScript, or a `VITE_` variable. The local admin account is not committed or automatically deployed; production must receive its own server-side settings.
+
+The hash format is `scrypt$<32 hex characters of salt>$<128 hex characters of derived key>`. The login route issues an HttpOnly, Secure, SameSite=Lax session cookie and rate-limits repeated failures.
+
+## Website data and Google Sheets
+
+Events, registrations, members, badges, and resources use the server-side JSON store at `data/db.json` for the local preview. Public event registration validates on the server and is visible in the protected Admin → Registrations page. When Google Sheets is configured, the server mirrors these records into the `Events`, `Registrations`, `Members`, `Resources`, `Badges`, and `BadgeAwards` tabs; browser code never receives Google credentials. The Admin Dashboard reports whether the spreadsheet connection is actually reachable.
+
+The HeyClicky Sheets provider is an agent-side connector and is not available to unauthenticated website visitors or this runtime. For automatic website submissions, configure a website-owned Google service account: create/select the workbook, enable the Google Sheets API, create a service-account JSON key, and share the workbook with that service account as an Editor. Put the spreadsheet ID and the key file path in the ignored local `.env` as `GOOGLE_SPREADSHEET_ID` and `GOOGLE_SERVICE_ACCOUNT_KEY_PATH`, then restart the server. Never commit the key file or paste it into frontend code. The server creates missing tabs and appends missing schema headers without replacing existing columns.
 
 ## Enable Sign in with Apple
 
@@ -51,5 +66,5 @@ The implementation uses Apple's authorization endpoint, a one-time state bound t
 
 Without configuration the page reports sign-in unavailable. Live Apple authentication cannot be tested on this unconfigured localhost preview. Tests cover unavailable and invalid requests, state/cookie binding, cancellation, replay rejection, and sign-out origin protection; they do not substitute for an end-to-end Apple test.
 
-This is an authentication scaffold, not a membership database. Verified sessions expire after one hour and are in memory; restarting the server clears them. No persistent account, email record, or club membership is created. Before opening registration, add the club's approved membership process, durable data/session storage, privacy and deletion handling, and production hosting with HTTPS. Keep the API and frontend on the same origin, and avoid logging callback bodies or tokens.
+This Apple-authentication path remains an identity scaffold, not confirmation of club membership. Verified sessions expire after one hour and are in memory; restarting the server clears them. Public event registration is separate and is persisted by the event API. Before using Apple sign-in as a membership intake, add the club's approved membership process, durable session storage, privacy and deletion handling, and production hosting with HTTPS. Keep the API and frontend on the same origin, and avoid logging callback bodies or tokens.
 # Apple_developer_club_Sgu

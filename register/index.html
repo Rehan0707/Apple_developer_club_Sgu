@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="Register for a published Apple Developer Club SGU event.">
+  <title>Event Registration — Apple Developer Club SGU</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/src/style.css">
+  <style>
+    .registration-page { min-height: 100vh; background: #f5f5f7; }
+    .registration-main { width: min(760px, calc(100% - 40px)); margin: 0 auto; padding: 70px 0 96px; }
+    .registration-back { display: inline-block; margin-bottom: 26px; color: #0066cc; font-size: 14px; }
+    .registration-panel { padding: clamp(24px, 5vw, 48px); border: 1px solid rgba(0,0,0,.07); border-radius: 24px; background: #fff; box-shadow: 0 12px 38px rgba(0,0,0,.055); }
+    .registration-panel h1 { margin: 0; font-size: clamp(30px, 5vw, 44px); letter-spacing: -.045em; line-height: 1.08; }
+    .registration-lede { margin: 12px 0 26px; color: #6e6e73; line-height: 1.55; }
+    .registration-event { margin-bottom: 28px; padding: 18px 20px; border-radius: 16px; background: #f5f5f7; }
+    .registration-event h2 { margin: 0 0 6px; font-size: 19px; letter-spacing: -.02em; }
+    .registration-event p { margin: 4px 0; color: #6e6e73; font-size: 14px; line-height: 1.5; }
+    .registration-form { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .registration-field { display: grid; gap: 7px; }
+    .registration-field.full, .registration-notice, .registration-submit { grid-column: 1 / -1; }
+    .registration-field label { font-size: 13px; font-weight: 600; }
+    .registration-field input, .registration-field textarea { width: 100%; border: 1px solid #d2d2d7; border-radius: 11px; background: #fff; padding: 12px 13px; color: #1d1d1f; font: inherit; }
+    .registration-field input:focus, .registration-field textarea:focus { outline: 3px solid rgba(0,102,204,.18); border-color: #06c; }
+    .registration-field textarea { min-height: 96px; resize: vertical; }
+    .registration-notice { margin: 0; color: #6e6e73; font-size: 13px; line-height: 1.5; }
+    .registration-message { grid-column: 1 / -1; margin: 0; min-height: 1.4em; color: #b42318; font-size: 14px; line-height: 1.5; }
+    .registration-message[data-tone="good"] { color: #137333; }
+    .registration-submit { justify-self: start; min-width: 190px; }
+    .registration-submit:disabled { cursor: wait; opacity: .6; }
+    .registration-empty { color: #6e6e73; line-height: 1.5; }
+    @media (max-width: 600px) { .registration-main { padding: 44px 0 64px; } .registration-form { grid-template-columns: 1fr; } .registration-field.full, .registration-notice, .registration-submit { grid-column: auto; } .registration-submit { width: 100%; } }
+  </style>
+</head>
+<body class="registration-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="site-header">
+    <div class="header-glow-wrap" aria-hidden="true"></div>
+    <div class="nav-inner local-inner">
+      <a class="brand" href="/" aria-label="Apple Developer Club SGU home"><img src="/images/club-lockup.png" alt="Apple Developer Club SGU" class="brand-logo" width="180" height="60"></a>
+      <button class="menu-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="navigation"><span></span><span></span></button>
+      <nav id="navigation" aria-label="Main navigation">
+        <a href="/#about">The Club</a><a href="/events/">Upcoming Events</a><a href="/resources/">Resources</a><a class="button small" href="/join/">Join the Club</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main" class="registration-main">
+    <a class="registration-back" href="/events/">← Back to events</a>
+    <section class="registration-panel" aria-labelledby="registration-title">
+      <p class="eyebrow">APPLE DEVELOPER CLUB SGU</p>
+      <h1 id="registration-title">Event registration</h1>
+      <p class="registration-lede">Share your details to reserve a place at this published event.</p>
+      <div class="registration-event" id="selectedEvent" aria-live="polite"><p class="registration-empty">Loading the selected event…</p></div>
+      <form class="registration-form" id="registrationForm">
+        <div class="registration-field"><label for="registrationName">Full name</label><input id="registrationName" name="name" autocomplete="name" maxlength="100" required></div>
+        <div class="registration-field"><label for="registrationEmail">Email address</label><input id="registrationEmail" name="email" type="email" autocomplete="email" maxlength="254" required></div>
+        <div class="registration-field"><label for="registrationDepartment">Department</label><input id="registrationDepartment" name="department" autocomplete="organization-title" maxlength="120" required></div>
+        <div class="registration-field"><label for="registrationYear">Academic year</label><input id="registrationYear" name="year" maxlength="40" placeholder="e.g. 2nd year" required></div>
+        <div class="registration-field full"><label for="registrationNotes">Anything you’d like us to know <span class="optional-tag">(Optional)</span></label><textarea id="registrationNotes" name="notes" maxlength="1000"></textarea></div>
+        <p class="registration-notice">Your information is used to manage this event registration and is visible to authorized club administrators.</p>
+        <p class="registration-message" id="registrationMessage" role="status" aria-live="polite"></p>
+        <button class="button registration-submit" id="registrationSubmit" type="submit" disabled>Loading event…</button>
+      </form>
+    </section>
+  </main>
+  <footer><div class="container"><div class="footer-bottom"><span>© <span id="year">2026</span> Apple Developer Club SGU.</span><a href="/admin/login.html">Admin sign in</a></div></div></footer>
+  <script type="module" src="/src/main.js"></script>
+  <script type="module" src="/src/register.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isValidEmail(email) {
+      return email is string && email.matches('^[^@\\s]+@[^@\\s]+$');
+    }
+
+    // Events: public read, allow updates
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Resources: public read, allow updates
+    match /resources/{resourceId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Badges: public read, allow updates
+    match /badges/{badgeId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Members: student profiles
+    match /members/{memberId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.email is string && isValidEmail(request.resource.data.email);
+      allow delete: if true;
+    }
+
+    // Registrations: created in real time via public form or member dashboard
+    match /registrations/{registrationId} {
+      allow read: if true;
+      allow create: if request.resource.data.name is string &&
+                      request.resource.data.name.size() > 0 &&
+                      isValidEmail(request.resource.data.email) &&
+                      request.resource.data.eventId is string;
+      allow update, delete: if true;
+    }
+
+    // Badge Awards: earned member recognitions
+    match /badgeAwards/{awardId} {
+      allow read, write: if true;
+    }
+  }
+}
