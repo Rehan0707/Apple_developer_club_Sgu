@@ -4,31 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registrations - Admin</title>
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-  <script id="tailwind-config">
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            background: "#f5f5f7",
-            "on-surface": "#1d1d1f",
-            "surface-container": "#f0f0f3",
-            "surface-container-lowest": "#ffffff",
-            primary: "#0071e3",
-            "outline-variant": "#e5e5ea",
-            "on-surface-variant": "#6e6e73"
-          }
-        }
-      }
-    }
-  </script>
-</head>
+
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/generated/admin--registrations.css"><link rel="stylesheet" href="/src/portal.css">
+<link href="/favicon.svg" rel="icon"></head>
 <body class="bg-background text-on-surface antialiased font-sans">
   <aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-lowest border-r border-outline-variant z-50 flex flex-col justify-between p-4">
     <div class="flex flex-col gap-6">
       <a href="/" class="flex items-center justify-center py-2 px-1 transition-opacity hover:opacity-80">
-        <img alt="Apple Developer Club SGU" class="w-full object-contain" src="/images/club-lockup-sgu-text-bak.png"/>
+        <img alt="Apple Developer Club SGU" class="w-full object-contain" src="/images/club-lockup-sgu-text-bak.png">
       </a>
       <div class="flex flex-col gap-1">
         <span class="px-2 font-semibold text-[11px] text-[#86868b] tracking-wider uppercase mb-1">Navigation</span>
@@ -51,17 +35,20 @@
   <div class="pl-64">
     <header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/80 backdrop-blur-xl z-40 flex items-center justify-end px-6 border-b border-outline-variant">
       <div class="flex items-center gap-4">
-        <span class="text-sm font-semibold text-on-surface">Alex Chen</span>
+        <span class="text-sm font-semibold text-on-surface">Administrator</span>
       </div>
     </header>
     <main class="w-full pt-24 px-8 max-w-5xl mx-auto">
-      <h1 class="text-3xl font-bold mb-2">Registrations</h1>
-      <p class="text-on-surface-variant mb-8">View students registered for upcoming events.</p>
-      
-      <div class="bg-white rounded-xl border border-outline-variant shadow-sm overflow-hidden p-8 text-center text-on-surface-variant">
+      <h1 class="text-3xl font-bold mb-2">Registrations <span id="registration-count" class="text-on-surface-variant"></span></h1>
+      <p class="text-on-surface-variant mb-8">View registrations and confirm event attendance to award badges.</p>
+
+      <section class="bg-white rounded-xl border border-outline-variant shadow-sm p-6 mb-6" aria-labelledby="checkin-heading"><h2 id="checkin-heading" class="text-xl font-semibold mb-2">QR entry check-in</h2><p class="text-on-surface-variant mb-4">Scan a guest’s pass, or enter the code shown below their QR. Check their name before confirming entry.</p><form id="checkin-form" class="flex flex-col sm:flex-row gap-3"><label for="checkin-code" class="sr-only">Entry code</label><input id="checkin-code" type="text" autocomplete="off" placeholder="SGU-ENTRY:... or registration ID" class="flex-1 border border-outline-variant rounded-lg px-4 py-2 min-w-0"><button type="submit" class="px-4 py-2 rounded-lg bg-primary text-white font-semibold">Find registration</button><button id="checkin-camera" type="button" class="px-4 py-2 rounded-lg border border-outline-variant font-semibold">Scan with camera</button></form><p id="checkin-status" class="text-sm text-on-surface-variant mt-3" role="status"></p><video id="checkin-video" hidden playsinline muted class="w-full max-w-md mt-4 rounded-xl bg-black"></video><div id="checkin-result" hidden class="mt-5 p-5 rounded-xl border border-outline-variant bg-background"><h3 id="checkin-name" class="text-lg font-semibold"></h3><p id="checkin-event" class="text-on-surface-variant mt-1"></p><p id="checkin-email" class="text-sm text-on-surface-variant mt-1"></p><p id="checkin-state" class="text-sm font-semibold mt-3"></p><button id="checkin-confirm" type="button" class="mt-4 px-4 py-2 rounded-lg bg-primary text-white font-semibold">Confirm entry</button></div></section>
+
+      <div id="registrations-list" class="bg-white rounded-xl border border-outline-variant shadow-sm overflow-hidden p-8 text-center text-on-surface-variant">
         No registrations found yet.
       </div>
+      <section class="bg-white rounded-xl border border-outline-variant shadow-sm p-6 mt-6 mb-10" aria-labelledby="feedback-heading"><div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"><div><h2 id="feedback-heading" class="text-xl font-semibold">Post-event feedback</h2><p id="feedback-count" class="text-sm text-on-surface-variant">Loading responses...</p></div><label class="text-sm font-medium" for="feedback-event-filter">Event <select id="feedback-event-filter" class="border border-outline-variant rounded-lg px-3 py-2 ml-2 bg-white"><option value="all">All events</option></select></label></div><div id="feedback-results" aria-live="polite" class="flex flex-col gap-3 text-sm text-on-surface-variant">No feedback yet.</div></section>
     </main>
   </div>
-</body>
+<script type="module" src="/src/admin.js"></script></body>
 </html>

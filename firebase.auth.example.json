@@ -1,0 +1,10 @@
+{
+  "auth": {
+    "providers": {
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "Apple Developer Club SGU",
+        "supportEmail": "YOUR_VERIFIED_SUPPORT_EMAIL"
+      }
+    }
+  }
+}

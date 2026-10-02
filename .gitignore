@@ -4,4 +4,14 @@ dist/
 .env
 .env.*
 !.env.example
+firebase.json
 *.p8
+
+.local-access.txt
+data/*.sqlite*
+data/uploads/
+output/
+.playwright-cli/
+.firebase/
+
+src/generated/

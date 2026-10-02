@@ -41,6 +41,12 @@
     .team-member {
       text-align: center;
     }
+    .team-section { max-width: 1060px; margin: 0 auto; padding: 72px 20px 96px; }
+    .team-section h2 { font-size: 32px; letter-spacing: -0.6px; margin: 0; color: #1d1d1f; }
+    .team-section > p { color: #6e6e73; margin: 12px 0 0; }
+    .team-section .team-grid { padding: 40px 0 0; }
+    .team-member { background: #fff; border: 1px solid #e5e5ea; border-radius: 20px; padding: 40px 28px; box-shadow: 0 4px 24px rgba(0,0,0,.04); }
+    .member-photo-placeholder { display: inline-grid !important; place-items: center; color: #0071e3; font-size: 50px; background: #f5f5f7 !important; }
     
     .member-photo {
       width: 160px;
@@ -81,6 +87,7 @@
       <nav id="navigation">
         <a href="/">The Club</a>
         <a href="/events/">Events</a>
+        <a href="/guide/">Club Guide</a>
         <a href="/resources/">Resources</a>
         <a href="/team/" aria-current="page">Team</a>
         <a class="button small" href="/join/">Sign In</a>
@@ -94,45 +101,9 @@
       <p class="page-desc">The club leaders dedicated to bringing the best of Apple platforms to SGU.</p>
     </header>
 
-    <div class="team-grid" id="team-container">
-      <!-- Generated via JS -->
-    </div>
+    <section class="team-section" aria-labelledby="core-team-heading"><h2 id="core-team-heading">Core Team</h2><p>These roles will be updated with confirmed club member profiles.</p><div class="team-grid" id="team-container"><!-- Generated via JS --></div></section>
   </main>
 
-  <script>
-    const team = [
-      {
-        name: "Soham",
-        role: "Club Lead",
-        bio: "Passionate about building fluid interfaces and exploring the Apple ecosystem.",
-        photo: "https://ui-avatars.com/api/?name=Soham&background=0071e3&color=fff&size=200"
-      },
-      {
-        name: "Jane Doe",
-        role: "Technical Lead",
-        bio: "Swift enthusiast and iOS architecture expert.",
-        photo: "https://ui-avatars.com/api/?name=Jane+Doe&background=34c759&color=fff&size=200"
-      },
-      {
-        name: "John Smith",
-        role: "Design Lead",
-        bio: "Focused on human interface guidelines and intuitive experiences.",
-        photo: "https://ui-avatars.com/api/?name=John+Smith&background=af52de&color=fff&size=200"
-      }
-    ];
-
-    const container = document.getElementById('team-container');
-    team.forEach(member => {
-      const el = document.createElement('div');
-      el.className = 'team-member';
-      el.innerHTML = `
-        <img src="${member.photo}" alt="${member.name}" class="member-photo" loading="lazy" />
-        <h2 class="member-name">${member.name}</h2>
-        <div class="member-role">${member.role}</div>
-        <p class="member-bio">${member.bio}</p>
-      `;
-      container.appendChild(el);
-    });
-  </script>
+  <script type="module" src="/src/public-data.js"></script>
 </body>
 </html>

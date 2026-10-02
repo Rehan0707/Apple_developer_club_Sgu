@@ -1,3 +1,6 @@
+import './auth-ui.js';
+import { api, live, escapeHTML as esc, entryCode } from './client.js';
+import QRCode from 'qrcode';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 
@@ -6,7 +9,7 @@ const lenis = new Lenis({
   lerp: 0.09, // Linear interpolation damping for silky smooth scroll
   wheelMultiplier: 0.95,
   touchMultiplier: 1.5,
-  smoothWheel: true,
+  smoothWheel: !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   infinite: false,
 });
 
@@ -48,18 +51,18 @@ document.querySelectorAll('a[href*="#"]').forEach(anchor => {
 const menuButton = document.querySelector('.menu-toggle');
 const navigation = document.querySelector('#navigation');
 function closeMenu() {
-  menuButton.setAttribute('aria-expanded', 'false');
-  menuButton.setAttribute('aria-label', 'Open navigation');
-  navigation.classList.remove('is-open');
+  menuButton?.setAttribute('aria-expanded', 'false');
+  menuButton?.setAttribute('aria-label', 'Open navigation');
+  navigation?.classList.remove('is-open');
 }
-menuButton.addEventListener('click', () => {
-  const isOpen = menuButton.getAttribute('aria-expanded') !== 'true';
-  menuButton.setAttribute('aria-expanded', String(isOpen));
-  menuButton.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
-  navigation.classList.toggle('is-open', isOpen);
+menuButton?.addEventListener('click', () => {
+  const isOpen = menuButton?.getAttribute('aria-expanded') !== 'true';
+  menuButton?.setAttribute('aria-expanded', String(isOpen));
+  menuButton?.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
+  navigation?.classList.toggle('is-open', isOpen);
 });
-navigation.addEventListener('click', (event) => { if (event.target.closest('a:not(#contact-menu-btn)')) closeMenu(); });
-document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && menuButton.getAttribute('aria-expanded') === 'true') { closeMenu(); menuButton.focus(); } });
+navigation?.addEventListener('click', (event) => { if (event.target.closest('a:not(#contact-menu-btn)')) closeMenu(); });
+document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && menuButton?.getAttribute('aria-expanded') === 'true') { closeMenu(); menuButton.focus(); } });
 document.addEventListener('click', (event) => { if (!event.target.closest('.local-inner') && !event.target.closest('.nav-flyout-drawer')) closeMenu(); });
 window.matchMedia('(min-width: 701px)').addEventListener('change', closeMenu);
 
@@ -157,8 +160,8 @@ if (contactItem && contactFlyout) {
   });
 }
 
-document.querySelector('#year').textContent = new Date().getFullYear();
-const navLinks = [...navigation.querySelectorAll('a')];
+if(document.querySelector('#year')) document.querySelector('#year').textContent = new Date().getFullYear();
+const navLinks = [...(navigation?.querySelectorAll('a') || [])];
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -168,35 +171,8 @@ const observer = new IntersectionObserver((entries) => {
 }, { rootMargin: '-15% 0px -55% 0px' });
 ['about', 'resources', 'faq'].forEach(id => document.getElementById(id) && observer.observe(document.getElementById(id)));
 
-if (location.pathname.startsWith('/events')) navigation.querySelector('a[href="/events/"]').setAttribute('aria-current', 'page');
-if (location.pathname.startsWith('/join')) navigation.querySelector('a[href="/join/"]').setAttribute('aria-current', 'page');
-const authStatus = document.getElementById('auth-status');
-if (authStatus) {
-  const messages = { error: 'Sign-in could not be completed. Please try again.', cancelled: 'Sign-in was cancelled. You can try again whenever you’re ready.' };
-  const signIn = document.getElementById('apple-signin');
-  const signOut = document.getElementById('signout');
-  async function loadAuth() {
-    try {
-      const response = await fetch('/api/auth/status');
-      if (!response.ok) throw new Error();
-      const status = await response.json();
-      signIn.hidden = !status.available || status.authenticated;
-      signOut.hidden = !status.authenticated;
-      authStatus.textContent = status.authenticated ? 'You’re signed in with Apple. Online membership registration is not open yet. Contact the club on Instagram for the next step.' : !status.available ? 'Apple sign-in is not available yet. Please check back soon, or contact the club on Instagram to express your interest.' : messages[new URLSearchParams(location.search).get('auth')] || 'Continue securely with Apple to verify your account.';
-    } catch {
-      signIn.hidden = true;
-      authStatus.textContent = 'Sign-in is temporarily unavailable. Please try again later or contact the club on Instagram.';
-    }
-  }
-  signOut.addEventListener('click', async () => {
-    signOut.disabled = true;
-    try { const response = await fetch('/api/auth/signout', { method: 'POST' }); if (!response.ok) throw new Error(); await loadAuth(); }
-    catch { authStatus.textContent = 'Could not sign out. Please try again.'; }
-    finally { signOut.disabled = false; }
-  });
-  loadAuth();
-}
-
+if (location.pathname.startsWith('/events')) navigation?.querySelector('a[href="/events/"]')?.setAttribute('aria-current', 'page');
+if (location.pathname.startsWith('/join')) navigation?.querySelector('a[href="/join/"]')?.setAttribute('aria-current', 'page');
 // Event Registration Modal
 const eventModal = document.getElementById('event-registration-modal');
 if (eventModal) {
@@ -210,7 +186,7 @@ if (eventModal) {
 
   function openEventModal(eventName) {
     if (eventName && eventSelect) {
-      const matchOption = [...eventSelect.options].find(opt => opt.value === eventName || opt.text.includes(eventName));
+      const matchOption = [...eventSelect.options].find(opt => opt.value === eventName || opt.text === eventName);
       if (matchOption) eventSelect.value = matchOption.value;
     }
     modalForm.hidden = false;
@@ -238,13 +214,12 @@ if (eventModal) {
     }
   }
 
-  document.querySelectorAll('[data-open-event-modal="true"]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+  document.addEventListener('click', (e) => {
+      const btn=e.target.closest('[data-open-event-modal="true"]');if(!btn)return;
       e.preventDefault();
       activeTriggerBtn = btn;
       const eventName = btn.getAttribute('data-event-name');
       openEventModal(eventName);
-    });
   });
 
   document.querySelectorAll('[data-close-modal]').forEach(el => {
@@ -263,7 +238,7 @@ if (eventModal) {
     }
   });
 
-  modalForm?.addEventListener('submit', (e) => {
+  modalForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (errorMsg) errorMsg.hidden = true;
 
@@ -279,16 +254,26 @@ if (eventModal) {
       return;
     }
 
-    if (successEventName) successEventName.textContent = selectedEvent;
-    if (successEmail) successEmail.textContent = email;
+    const submit = modalForm.querySelector('[type="submit"]');
+    if(submit.disabled) return; submit.disabled = true;
+    try {
+      const result = await api('/api/events/'+encodeURIComponent(selectedEvent)+'/register', {method:'POST',body:JSON.stringify({name,email,branch,year,notes:document.getElementById('reg-notes')?.value || ''})});
+      if(successEventName) successEventName.textContent=result.title;
+      if(successEmail) successEmail.textContent=email;
+      const code=entryCode(result.registrationId);
+      const qrImage=document.getElementById('entry-qr-image');
+      const qrDownload=document.getElementById('entry-qr-download');
+      const qrData=await QRCode.toDataURL(code,{width:260,margin:2}).catch(()=>null);
+      if(qrImage){qrImage.hidden=!qrData;if(qrData)qrImage.src=qrData;}
+      if(qrDownload){qrDownload.hidden=!qrData;if(qrData){qrDownload.href=qrData;qrDownload.download=`sgu-entry-${result.registrationId}.png`;}}
+      const codeText=document.getElementById('entry-code-text');if(codeText)codeText.textContent=code;
+      modalForm.hidden=true;modalSuccess.hidden=false;modalForm.reset();
+    } catch(error) { if(errorMsg){errorMsg.textContent=error.message;errorMsg.hidden=false;} }
+    finally {submit.disabled=false;}
 
-    modalForm.hidden = true;
-    modalSuccess.hidden = false;
-    modalForm.reset();
   });
 }
 
-// Stories Carousel Scroll Control
 import Matter from 'matter-js';
 
 // Stories Carousel Scroll Control
@@ -564,3 +549,46 @@ if (joinOverlay) {
     }, 420);
   });
 }
+
+// Keep the existing card design while displaying published database records.
+const eventGrid = document.querySelector('.apple-events-grid');
+if(eventGrid) {
+  const templates = [...eventGrid.querySelectorAll('.apple-events-card')].map(node=>node.cloneNode(true));
+  live(async()=>{
+    const events = await api('/api/events');
+    const upcoming = events.filter(e=>e.registrationOpen);
+    const select = document.getElementById('reg-event');
+    const previous = select?.value;
+    if(select){select.replaceChildren(...upcoming.map(e=>new Option(e.title,e.id)));if(upcoming.some(e=>e.id===previous))select.value=previous;}
+    if(!upcoming.length){
+      // Preserve illustrations as explicitly labelled previews; never accept fake reservations.
+      eventGrid.replaceChildren(...templates.map(template=>{
+        const card=template.cloneNode(true);
+        card.querySelector('.events-card-date').textContent='Schedule to be announced';
+        const button=card.querySelector('[data-open-event-modal]');button.disabled=true;button.removeAttribute('data-open-event-modal');button.querySelector('.action-text').textContent='Coming soon';
+        return card;
+      }));
+      return;
+    }
+    eventGrid.replaceChildren(...upcoming.map((event,index)=>{
+      const card=templates[index%templates.length].cloneNode(true);
+      card.querySelector('.events-card-title').textContent=event.title;
+      card.querySelector('.events-card-type').textContent=event.category||'Club event';
+      card.querySelector('.events-card-date').textContent=new Date(event.date).toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'});
+      card.querySelector('.events-card-desc').textContent=event.description||event.location;
+      const image=card.querySelector('.events-card-img');
+      if(event.bannerUrl)image.src=event.bannerUrl;
+      image.alt=event.title;
+      const button=card.querySelector('[data-open-event-modal]');button.dataset.eventName=event.id;
+      const full=event.capacity&&event.registeredCount>=event.capacity;
+      button.disabled=Boolean(full);button.querySelector('.action-text').textContent=full?'Event full':'Register Now';
+      return card;
+    }));
+  },{intervalMs:60000});
+}
+
+const homeResources = document.querySelector('#resources #resources-container');
+if(homeResources)live(async()=>{
+ const rows=await api('/api/resources');
+ homeResources.innerHTML=rows.length?rows.map(r=>`<a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer" style="display:flex;justify-content:space-between;align-items:center;padding:20px;background:#fff;border:1px solid #e5e5ea;border-radius:12px;text-decoration:none;color:#1d1d1f"><div style="display:flex;flex-direction:column;gap:5px"><span style="font-weight:600;font-size:1.1rem">${esc(r.title)}</span><span style="font-size:.9rem;color:#86868b;background:#f5f5f7;padding:2px 8px;border-radius:4px;width:fit-content">${esc(r.category||'General')}</span></div><span style="color:#0071e3">↗</span></a>`).join(''):'<div style="color:#86868b;padding:20px;background:#f5f5f7;border-radius:12px;text-align:center">No resources available right now. Check back later!</div>';
+});

@@ -64,6 +64,10 @@
     .step-body h3 { font-size: 15px; font-weight: 600; color: #1d1d1f; margin: 0 0 3px; }
     .step-body p  { font-size: 13px; color: #6e6e73; margin: 0; line-height: 1.5; }
     @media (max-width: 500px) { .signin-card { padding: 38px 26px 34px; border-radius: 22px; } .signin-heading { font-size: 24px; } }
+    .signin-google-btn { background: #fff; color: #1d1d1f; border: 1px solid #dadce0; margin-top: 12px; }
+    .signin-google-btn:hover { background: #f5f5f7; }
+    .signin-apple-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .local-preview-btn { margin:16px 0 0;border:0;background:transparent;color:#0071e3;font:inherit;font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px; }
   </style>
 </head>
 <body class="signin-page">
@@ -76,7 +80,8 @@
       <nav id="navigation" aria-label="Main navigation">
         <a href="/#about">The Club</a>
         <a href="/events/">Upcoming Events</a>
-        <a href="/#resources">Resources</a>
+        <a href="/guide/">Club Guide</a>
+        <a href="/resources/">Resources</a>
         <a href="/#faq">FAQ</a>
         <div class="nav-dropdown-item" id="nav-contact-item">
           <a href="#contact" class="nav-dropdown-trigger" id="contact-menu-btn" aria-haspopup="true" aria-expanded="false">
@@ -152,17 +157,23 @@
         </div>
 
         <h1 class="signin-heading">Join the Club</h1>
-        <span class="signin-sub">Sign in with your Apple Account to verify your identity and take the first step.</span>
+        <span class="signin-sub">Your events. Your progress. Your collection. Sign in with Apple or Google to get started.</span>
 
-        <button id="apple-signin" class="signin-apple-btn" aria-label="Sign In">
+        <p id="auth-status" role="status">Checking sign-in availability…</p><button id="apple-signin" hidden class="signin-apple-btn" aria-label="Continue with Apple">
           <svg viewBox="-2 -2 28 28" fill="currentColor"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>
-          Sign In
+          Continue with Apple
         </button>
+
+        <button id="google-signin" class="signin-apple-btn signin-google-btn" type="button" disabled>
+          <svg aria-hidden="true" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59A14.41 14.41 0 0 1 9.75 24c0-1.59.27-3.13.78-4.59l-7.98-6.19A23.87 23.87 0 0 0 0 24c0 3.87.93 7.52 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.91-5.8l-7.73-6c-2.15 1.45-4.92 2.3-8.18 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          Continue with Google
+        </button>
+        <button id="local-preview" class="local-preview-btn" type="button" hidden>Preview locally</button>
 
         <div id="signout-wrap" class="signed-in-wrap" hidden>
           <div class="signed-in-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
           <p class="signed-in-heading">You're signed in.</p>
-          <p class="signed-in-text">Membership is confirmed separately by the club.<br/>Follow us on Instagram for the next step.</p>
+          <p class="signed-in-text"><a href="/student/">Open your member dashboard →</a></p>
           <button id="signout" type="button">Sign out</button>
         </div>
 
@@ -173,7 +184,7 @@
           Say hello on Instagram ↗
         </a>
 
-        <p class="signin-legal">Signing in verifies your Apple Account only. Club membership is confirmed separately. This site is not affiliated with Apple Inc.</p>
+        <p class="signin-legal">Your account keeps your event registrations and earned badges together. Use the same sign-in provider each time. This site is not affiliated with Apple Inc.</p>
       </div>
 
       <div class="signin-steps" aria-label="How to get involved">
@@ -228,11 +239,6 @@
   </footer>
 
   <script type="module" src="/src/main.js"></script>
-  <script>
-    document.getElementById('apple-signin').addEventListener('click', async () => {
-      await fetch('/api/auth/mock/student', { method: 'POST' });
-      window.location.href = '/student/';
-    });
-  </script>
+
 </body>
 </html>

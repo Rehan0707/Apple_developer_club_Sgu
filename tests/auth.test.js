@@ -2,18 +2,19 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createApp } from '../server.js';
 async function withServer(config, run) {
-  const server = createApp(config).listen(0, '127.0.0.1');
+  const app=createApp(config);
+  const server = app.listen(0, '127.0.0.1');
   await new Promise(resolve => server.once('listening', resolve));
   try { await run(`http://127.0.0.1:${server.address().port}`); }
-  finally { await new Promise(resolve => server.close(resolve)); }
+  finally { await new Promise(resolve => server.close(resolve)); app.locals.close(); }
 }
 const config = { PUBLIC_ORIGIN:'https://club.example.com', APPLE_CLIENT_ID:'club.test', APPLE_TEAM_ID:'team', APPLE_KEY_ID:'key', APPLE_PRIVATE_KEY_PATH:'/not-a-real-key.p8' };
 test('missing configuration never presents authentication as available', () => withServer({}, async base => {
   const status = await fetch(base+'/api/auth/status');
-  assert.deepEqual(await status.json(), {available:false,authenticated:false});
+  assert.deepEqual(await status.json(), {available:false,authenticated:false,providers:{apple:false,google:false},googleMode:null});
   assert.equal(status.headers.get('cache-control'),'no-store');
   const start = await fetch(base+'/api/auth/apple',{redirect:'manual'});
-  assert.equal(start.headers.get('location'),'/join/?auth=unavailable');
+  assert.equal(start.headers.get('location'),'/join/?auth=unavailable&provider=apple');
 }));
 test('malformed and forged callbacks fail without creating a session', () => withServer({}, async base => {
   const callback = await fetch(base+'/api/auth/apple/callback',{method:'POST',redirect:'manual'});

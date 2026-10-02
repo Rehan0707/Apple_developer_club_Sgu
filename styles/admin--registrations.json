@@ -1,0 +1,15 @@
+{
+  "theme": {
+    "extend": {
+      "colors": {
+        "background": "#f5f5f7",
+        "on-surface": "#1d1d1f",
+        "surface-container": "#f0f0f3",
+        "surface-container-lowest": "#ffffff",
+        "primary": "#0071e3",
+        "outline-variant": "#e5e5ea",
+        "on-surface-variant": "#6e6e73"
+      }
+    }
+  }
+}

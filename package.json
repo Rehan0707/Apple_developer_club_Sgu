@@ -8,10 +8,19 @@
     "build": "vite build",
     "start": "node --env-file-if-exists=.env server.js",
     "preview": "node --env-file-if-exists=.env server.js",
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js",
+    "setup:local": "node scripts/setup-local.js",
+    "check:deployment": "node scripts/check-deployment.mjs",
+    "prebuild": "node scripts/build-styles.js",
+    "predev": "node scripts/build-styles.js"
   },
   "devDependencies": {
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/forms": "^0.5.11",
     "concurrently": "^10.0.5",
+    "linkedom": "^0.18.13",
+    "postcss": "^8.5.28",
+    "tailwindcss": "^3.4.19",
     "vite": "^7.1.0"
   },
   "dependencies": {
@@ -19,11 +28,19 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "express": "^5.2.1",
+    "firebase": "^12.19.0",
     "googleapis": "^181.0.0",
     "jose": "^6.2.12",
     "lenis": "^1.3.26",
     "matter-js": "^0.20.0",
     "motion": "^13.4.0",
+    "qrcode": "^1.5.4",
     "tailwind-merge": "^3.7.0"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "overrides": {
+    "@grpc/grpc-js": "^1.14.5"
   }
 }

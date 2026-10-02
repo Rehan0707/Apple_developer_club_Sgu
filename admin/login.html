@@ -15,7 +15,7 @@
 
     .signin-card { background: #ffffff; border-radius: 28px; padding: 52px 48px 44px; width: 100%; box-shadow: 0 2px 6px rgba(0,0,0,.06), 0 12px 40px rgba(0,0,0,.09); text-align: center; position: relative; overflow: hidden; }
     .signin-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg,#0071e3,#5e5ce6,#bf5af2,#ff375f,#ff9f0a); }
-    
+
     .signin-heading { font-size: 28px; font-weight: 700; letter-spacing: -.6px; color: #1d1d1f; margin: 0 0 10px; line-height: 1.15; }
     .signin-sub { font-size: 15px; line-height: 1.55; color: #6e6e73; margin: 0 auto 28px; max-width: 300px; display: block; }
 
@@ -54,22 +54,6 @@
     </div>
   </main>
 
-  <script>
-    document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const user = document.getElementById('username').value;
-      const pass = document.getElementById('password').value;
-      const errorMsg = document.getElementById('error-msg');
-      
-      // Dummy check
-      if (user === 'soham@dev' && pass === '7777777') {
-        errorMsg.style.display = 'none';
-        await fetch('/api/auth/mock/admin', { method: 'POST' });
-        window.location.href = '/admin/index.html';
-      } else {
-        errorMsg.style.display = 'block';
-      }
-    });
-  </script>
-</body>
+
+<script type="module" src="/src/admin.js"></script></body>
 </html>
