@@ -3,12 +3,12 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
     function admin() {
-      return signedIn() && request.auth.token.email_verified == true
-        && request.auth.token.email == 'developerclubapple@gmail.com';
+      return signedIn() && request.auth.token.get('email_verified', false) == true
+        && request.auth.token.get('email', '').lower() == 'developerclubapple@gmail.com';
     }
     function verifiedEmail(email) {
-      return signedIn() && request.auth.token.email_verified == true
-        && request.auth.token.email == email;
+      return signedIn() && request.auth.token.get('email_verified', false) == true
+        && request.auth.token.get('email', '').lower() == email;
     }
     function eventPath(eventId) { return /databases/$(database)/documents/events/$(eventId); }
     function registrationPath(key) { return /databases/$(database)/documents/registrations/$(key); }
@@ -107,7 +107,11 @@ service cloud.firestore {
       allow update: if admin() || validCountChange(eventId);
     }
     match /registrations/{key} {
-      allow read: if admin() || (signedIn() && resource.data.ownerUid == request.auth.uid)
+      allow get: if admin() || (signedIn() && (
+          (resource == null && key.matches('^.+_' + request.auth.uid + '$'))
+          || (resource != null && resource.data.ownerUid == request.auth.uid)
+        )) || (resource != null && verifiedEmail(resource.data.email));
+      allow list: if admin() || (signedIn() && resource.data.ownerUid == request.auth.uid)
         || verifiedEmail(resource.data.email);
       allow create: if validRegistrationCreate(key);
       allow update: if admin() || validRegistrationCancel(key)
@@ -119,7 +123,7 @@ service cloud.firestore {
       allow create, update: if signedIn() && request.auth.uid == uid
         && request.auth.token.email_verified == true
         && request.resource.data.id == uid
-        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.email == request.auth.token.email.lower()
         && request.resource.data.name is string
         && request.resource.data.name.size() <= 100;
       allow delete: if false;
@@ -127,7 +131,9 @@ service cloud.firestore {
     match /feedback/{id} {
       allow read: if admin() || (signedIn() && resource.data.memberId == request.auth.uid);
       allow create, update: if signedIn()
+        && request.resource.data.keys().hasOnly(['id','registrationId','registrationKey','eventId','memberId','rating','liked','improve','createdAt','updatedAt'])
         && request.resource.data.id == id
+        && request.resource.data.registrationId == id
         && request.resource.data.memberId == request.auth.uid
         && request.resource.data.rating is int
         && request.resource.data.rating >= 1 && request.resource.data.rating <= 5
@@ -135,6 +141,7 @@ service cloud.firestore {
         && request.resource.data.improve is string && request.resource.data.improve.size() <= 1000
         && get(registrationPath(request.resource.data.registrationKey)).data.ownerUid == request.auth.uid
         && get(registrationPath(request.resource.data.registrationKey)).data.id == id
+        && get(registrationPath(request.resource.data.registrationKey)).data.eventId == request.resource.data.eventId
         && get(registrationPath(request.resource.data.registrationKey)).data.attended == true
         && get(registrationPath(request.resource.data.registrationKey)).data.cancelledAt == null;
       allow delete: if admin();

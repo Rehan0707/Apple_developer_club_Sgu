@@ -1,4 +1,14 @@
 {
+  "auth": {
+    "providers": {
+      "anonymous": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "Apple Developer Club SGU",
+        "supportEmail": "yumyoo007@gmail.com",
+        "authorizedRedirectUris": ["https://appledeveloperacademysgu.web.app"]
+      }
+    }
+  },
   "firestore": { "rules": "firestore.rules" },
   "hosting": {
     "site": "appledeveloperacademysgu",

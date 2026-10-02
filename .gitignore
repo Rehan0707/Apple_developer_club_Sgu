@@ -13,5 +13,8 @@ data/uploads/
 output/
 .playwright-cli/
 .firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
 
 src/generated/

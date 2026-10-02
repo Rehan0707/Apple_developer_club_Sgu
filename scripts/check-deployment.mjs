@@ -4,16 +4,19 @@ if (!/^https:\/\//.test(origin)) {
   process.exit(2);
 }
 
+const firebaseHosted = /\.web\.app$|\.firebaseapp\.com$/.test(new URL(origin).hostname);
 const checks = [
   { path: '/', type: 'text/html', text: 'Apple Developer Club' },
   { path: '/events/', type: 'text/html', text: 'Events' },
   { path: '/join/', type: 'text/html', text: 'Join the Club' },
   { path: '/student/', type: 'text/html', text: 'Student Dashboard' },
   { path: '/admin/login.html', type: 'text/html', text: 'Admin' },
-  { path: '/api/health', type: 'application/json', json: data => data.status === 'ok' },
-  { path: '/api/events', type: 'application/json', json: Array.isArray },
-  { path: '/api/resources', type: 'application/json', json: Array.isArray },
-  { path: '/api/auth/status', type: 'application/json', json: data => typeof data === 'object' && data !== null && 'authenticated' in data }
+  ...(firebaseHosted ? [] : [
+    { path: '/api/health', type: 'application/json', json: data => data.status === 'ok' },
+    { path: '/api/events', type: 'application/json', json: Array.isArray },
+    { path: '/api/resources', type: 'application/json', json: Array.isArray },
+    { path: '/api/auth/status', type: 'application/json', json: data => typeof data === 'object' && data !== null && 'authenticated' in data }
+  ])
 ];
 
 let failed = false;
@@ -29,6 +32,22 @@ for (const check of checks) {
   } catch (error) {
     failed = true;
     console.log(`FAIL ${check.path} — ${error.message}`);
+  }
+}
+if (firebaseHosted) {
+  const projectId = 'adc-sgu-portal-2026';
+  const firestore = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents`;
+  for (const name of ['events', 'resources', 'badges']) {
+    try {
+      const response = await fetch(`${firestore}/${name}?pageSize=1`, { signal: AbortSignal.timeout(10000) });
+      const data = await response.json();
+      const okay = response.ok && (data.documents === undefined || Array.isArray(data.documents));
+      console.log(`${okay ? 'PASS' : 'FAIL'} Firestore ${name} — HTTP ${response.status}`);
+      if (!okay) failed = true;
+    } catch (error) {
+      failed = true;
+      console.log(`FAIL Firestore ${name} — ${error.message}`);
+    }
   }
 }
 if (failed) process.exitCode = 1;

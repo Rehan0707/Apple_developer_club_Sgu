@@ -75,7 +75,7 @@ export async function signInGoogle() {
     await setDoc(ref('members', user.uid), { id: user.uid, name: user.displayName || user.email.split('@')[0], email: user.email.toLowerCase(), joinedDate: now() }, { merge: true });
     // A verified email can reclaim a guest registration made with that address.
     const matches = await getDocs(query(collection(db, 'registrations'), where('email', '==', user.email.toLowerCase())));
-    for (const item of matches.docs) if (item.data().ownerUid !== user.uid && !item.data().memberId) await updateDoc(item.ref, { ownerUid: user.uid, memberId: user.uid });
+    for (const item of matches.docs) if (!item.data().memberId) await updateDoc(item.ref, { ownerUid: user.uid, memberId: user.uid });
   } else await seedResources();
   return { role: isAdmin(user) ? 'admin' : 'student' };
 }
@@ -169,14 +169,14 @@ export async function firebaseApi(path, options = {}) {
   if (route[0] === 'badges' && method === 'GET') return badgeCatalog();
   if (route[0] === 'admin' && route[1] === 'badges') {
     await requireAdmin();
-    if (route[2] === 'summary') { const badges = await badgeCatalog(), registrations = await all('registrations'), events = await all('events'), awards = await all('awards'); const counts = Object.fromEntries(badges.map(b => [b.id, 0])); for (const registration of registrations) if (registration.attended && !registration.cancelledAt) { const badgeId = events.find(e => e.id === registration.eventId)?.badgeId; if (badgeId) counts[badgeId]++; } for (const award of awards) if (counts[award.badgeId] !== undefined) counts[award.badgeId]++; return counts; }
+    if (route[2] === 'summary') { const badges = await badgeCatalog(), registrations = await all('registrations'), events = await all('events'), awards = await all('awards'); const counts = Object.fromEntries(badges.map(b => [b.id, 0])); for (const registration of registrations) if (registration.attended && !registration.cancelledAt && registration.memberId) { const badgeId = events.find(e => e.id === registration.eventId)?.badgeId; if (badgeId) counts[badgeId]++; } for (const award of awards) if (counts[award.badgeId] !== undefined) counts[award.badgeId]++; return counts; }
     if ((route[2] === 'assign' || route[2] === 'award') && method === 'POST') { const badgeId = clean(value.badgeId, 'badge'), studentId = clean(value.studentId || value.memberId, 'member'); const badge = (await badgeCatalog()).find(b => b.id === badgeId); if (!badge || badge.type === 'event' || !await byId('members', studentId)) fail('Badge or member not found.', 404); const id = `${studentId}_${badgeId}`; await setDoc(ref('awards', id), { id, badgeId, memberId: studentId, date: now() }); return { success: true }; }
     if (route[3] === 'students') { const awards = await all('awards'), registrations = await all('registrations'), events = await all('events'); const ids = new Set(awards.filter(a => a.badgeId === route[2]).map(a => a.memberId)); for (const reg of registrations) if (reg.attended && events.find(e => e.id === reg.eventId)?.badgeId === route[2] && reg.memberId) ids.add(reg.memberId); return (await all('members')).filter(m => ids.has(m.id)); }
     if (method === 'POST') { const id = crypto.randomUUID(); const color = value.color || 'primary'; if (!['primary','secondary','tertiary','error'].includes(color)) fail('Invalid badge color.'); const badge = { id, name: clean(value.name, 'name'), desc: clean(value.desc, 'description', 2000, false), icon: clean(value.icon || 'star', 'icon', 50), color, imageUrl: value.imageUrl || ({ primary:'/images/badge_blue.jpg', secondary:'/images/badge_green.jpg', tertiary:'/images/badge_orange.jpg', error:'/images/badge_red.jpg' })[color] }; await setDoc(ref('badges', id), badge); return badge; }
   }
   if (route[0] === 'team' && method === 'GET') return all('team');
   if (route[0] === 'admin' && route[1] === 'students') { await requireAdmin(); return all('members'); }
-  if (route[0] === 'admin' && route[1] === 'stats') { await requireAdmin(); const [members, badges, awards, registrations] = await Promise.all([all('members'), badgeCatalog(), all('awards'), all('registrations')]); return { members: members.length, badges: badges.length, awards: awards.length + registrations.filter(r => r.attended).length }; }
+  if (route[0] === 'admin' && route[1] === 'stats') { await requireAdmin(); const [members, badges, awards, registrations] = await Promise.all([all('members'), badgeCatalog(), all('awards'), all('registrations')]); return { members: members.length, badges: badges.length, awards: awards.length + registrations.filter(r => r.attended && r.memberId && !r.cancelledAt).length }; }
   if (route[0] === 'admin' && route[1] === 'registrations') {
     await requireAdmin();
     if (route.length === 2 && method === 'GET') { const events = await all('events'); return (await all('registrations')).map(r => { const event = events.find(e => e.id === r.eventId); return { ...r, title: event?.title || 'Removed event', eventDate: event?.date || null, eventStatus: event?.status || 'deleted', eventLocation: event?.location || '' }; }); }

@@ -9,12 +9,14 @@
     "start": "node --env-file-if-exists=.env server.js",
     "preview": "node --env-file-if-exists=.env server.js",
     "test": "node --test tests/*.test.js",
+    "test:rules": "node tests/firestore-rules.emulator.mjs",
     "setup:local": "node scripts/setup-local.js",
     "check:deployment": "node scripts/check-deployment.mjs",
     "prebuild": "node scripts/build-styles.js",
     "predev": "node scripts/build-styles.js"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/forms": "^0.5.11",
     "concurrently": "^10.0.5",
