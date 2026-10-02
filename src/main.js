@@ -1,5 +1,5 @@
 import './auth-ui.js';
-import { api, live, escapeHTML as esc, entryCode } from './client.js';
+import { api, live, escapeHTML as esc, entryCode, isFirebaseHosted } from './client.js';
 import QRCode from 'qrcode';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
@@ -184,6 +184,23 @@ if (eventModal) {
   const successEmail = document.getElementById('success-email');
   let activeTriggerBtn = null;
 
+  async function showRegistrationPass(result, email, existing = false) {
+    if(successEventName) successEventName.textContent=result.title;
+    if(successEmail) successEmail.textContent=email;
+    const code=entryCode(result.registrationId);
+    const qrImage=document.getElementById('entry-qr-image');
+    const qrDownload=document.getElementById('entry-qr-download');
+    const qrData=await QRCode.toDataURL(code,{width:260,margin:2}).catch(()=>null);
+    if(qrImage){qrImage.hidden=!qrData;if(qrData)qrImage.src=qrData;}
+    if(qrDownload){qrDownload.hidden=!qrData;if(qrData){qrDownload.href=qrData;qrDownload.download=`sgu-entry-${result.registrationId}.png`;}}
+    const codeText=document.getElementById('entry-code-text');if(codeText)codeText.textContent=code;
+    const details=modalSuccess.querySelector('.success-sub');
+    if(details) details.textContent=existing?`Your spot is already reserved for ${email}. Show this pass at the event entrance.`:`Your registration has been saved for ${email}. Contact the club if you need to change your details.`;
+    modalForm.hidden=true;modalSuccess.hidden=false;
+    eventModal.classList.add('showing-success');
+    eventModal.querySelector('.modal-box')?.scrollTo({top:0});
+  }
+
   function openEventModal(eventName) {
     if (eventName && eventSelect) {
       const matchOption = [...eventSelect.options].find(opt => opt.value === eventName || opt.text === eventName);
@@ -191,6 +208,7 @@ if (eventModal) {
     }
     modalForm.hidden = false;
     modalSuccess.hidden = true;
+    eventModal.classList.remove('showing-success');
     if (errorMsg) errorMsg.hidden = true;
 
     if (typeof eventModal.showModal === 'function') {
@@ -200,6 +218,12 @@ if (eventModal) {
     }
     document.body.style.overflow = 'hidden';
     setTimeout(() => document.getElementById('reg-name')?.focus(), 50);
+    if(isFirebaseHosted && eventSelect?.value) {
+      const selectedEvent=eventSelect.value;
+      api('/api/events/'+encodeURIComponent(selectedEvent)+'/my-registration').then(registration=>{
+        if(registration && eventModal.hasAttribute('open') && eventSelect.value===selectedEvent) showRegistrationPass(registration,registration.email,true);
+      }).catch(()=>{});
+    }
   }
 
   function closeEventModal() {
@@ -258,17 +282,15 @@ if (eventModal) {
     if(submit.disabled) return; submit.disabled = true;
     try {
       const result = await api('/api/events/'+encodeURIComponent(selectedEvent)+'/register', {method:'POST',body:JSON.stringify({name,email,branch,year,notes:document.getElementById('reg-notes')?.value || ''})});
-      if(successEventName) successEventName.textContent=result.title;
-      if(successEmail) successEmail.textContent=email;
-      const code=entryCode(result.registrationId);
-      const qrImage=document.getElementById('entry-qr-image');
-      const qrDownload=document.getElementById('entry-qr-download');
-      const qrData=await QRCode.toDataURL(code,{width:260,margin:2}).catch(()=>null);
-      if(qrImage){qrImage.hidden=!qrData;if(qrData)qrImage.src=qrData;}
-      if(qrDownload){qrDownload.hidden=!qrData;if(qrData){qrDownload.href=qrData;qrDownload.download=`sgu-entry-${result.registrationId}.png`;}}
-      const codeText=document.getElementById('entry-code-text');if(codeText)codeText.textContent=code;
-      modalForm.hidden=true;modalSuccess.hidden=false;modalForm.reset();
-    } catch(error) { if(errorMsg){errorMsg.textContent=error.message;errorMsg.hidden=false;} }
+      await showRegistrationPass(result,email);
+      modalForm.reset();
+    } catch(error) {
+      if(isFirebaseHosted && error.status===409 && selectedEvent) {
+        const registration=await api('/api/events/'+encodeURIComponent(selectedEvent)+'/my-registration').catch(()=>null);
+        if(registration) { await showRegistrationPass(registration,registration.email,true); return; }
+      }
+      if(errorMsg){errorMsg.textContent=error.message;errorMsg.hidden=false;}
+    }
     finally {submit.disabled=false;}
 
   });

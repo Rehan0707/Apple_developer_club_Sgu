@@ -151,6 +151,15 @@ export async function firebaseApi(path, options = {}) {
   }
   if (route[0] === 'admin' && route[1] === 'event-banner' && method === 'POST') { await requireAdmin(); return compressBanner(options.body); }
   if (route[0] === 'events' && route.length === 1 && method === 'GET') return publicEvents(await all('events'));
+  if (route[0] === 'events' && route[2] === 'my-registration' && method === 'GET') {
+    await auth.authStateReady();
+    const user = auth.currentUser;
+    if (!user) return null;
+    const registration = await byId('registrations', `${route[1]}_${user.uid}`);
+    if (!registration || registration.cancelledAt) return null;
+    const event = await byId('events', route[1]);
+    return { registrationId: registration.id, eventId: registration.eventId, title: event?.title || 'Club event', email: registration.email };
+  }
   if (route[0] === 'events' && route[2] === 'register' && method === 'POST') {
     const user = await requireUser(true);
     const eventRef = ref('events', route[1]);
