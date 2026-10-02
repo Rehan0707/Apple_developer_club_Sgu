@@ -11,6 +11,7 @@ const checks = [
   { path: '/join/', type: 'text/html', text: 'Join the Club' },
   { path: '/student/', type: 'text/html', text: 'Student Dashboard' },
   { path: '/admin/login.html', type: 'text/html', text: 'Admin' },
+  { path: '/admin/login', type: 'text/html', text: 'Admin' },
   ...(firebaseHosted ? [] : [
     { path: '/api/health', type: 'application/json', json: data => data.status === 'ok' },
     { path: '/api/events', type: 'application/json', json: Array.isArray },
