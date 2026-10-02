@@ -1,4 +1,4 @@
-import {api,live} from './client.js';
+import {api,live,isFirebaseHosted} from './client.js';
 import {initializeApp} from 'firebase/app';
 import {getAuth,GoogleAuthProvider,signInWithPopup,signOut as firebaseSignOut} from 'firebase/auth';
 const statusText=document.getElementById('auth-status');
@@ -9,7 +9,7 @@ if(statusText){
     try{
       const status=await api('/api/auth/status');
       googleMode=status.googleMode;
-      if(googleMode==='firebase'&&!firebaseAuth)firebaseAuth=getAuth(initializeApp(status.firebaseConfig));
+      if(googleMode==='firebase'&&!firebaseAuth&&!isFirebaseHosted)firebaseAuth=getAuth(initializeApp(status.firebaseConfig));
       const memberSignedIn=status.authenticated&&status.role==='student';
       apple.hidden=google.hidden=memberSignedIn;
       apple.disabled=!status.providers.apple;google.disabled=!status.providers.google;
@@ -25,6 +25,7 @@ if(statusText){
   }
   apple.addEventListener('click',()=>{location.href='/api/auth/apple';});
   google.addEventListener('click',async()=>{
+    if(isFirebaseHosted){google.disabled=true;statusText.textContent='Connecting to Google…';try{const {signInGoogle}=await import('./firebase-backend.js');const result=await signInGoogle();location.href=result.role==='admin'?'/admin/':'/student/';}catch(error){statusText.textContent=error.message||'Google sign-in could not be completed.';google.disabled=false;}return;}
     if(googleMode!=='firebase'){location.href='/api/auth/google';return;}
     google.disabled=true;statusText.textContent='Connecting to Google…';
     try{

@@ -1,0 +1,9 @@
+{
+  "firestore": { "rules": "firestore.rules" },
+  "hosting": {
+    "site": "appledeveloperacademysgu",
+    "public": "dist",
+    "ignore": ["firebase.deploy.json", "**/.*", "**/node_modules/**"],
+    "cleanUrls": true
+  }
+}

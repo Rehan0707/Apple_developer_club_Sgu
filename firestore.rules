@@ -1,0 +1,151 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function admin() {
+      return signedIn() && request.auth.token.email_verified == true
+        && request.auth.token.email == 'developerclubapple@gmail.com';
+    }
+    function verifiedEmail(email) {
+      return signedIn() && request.auth.token.email_verified == true
+        && request.auth.token.email == email;
+    }
+    function eventPath(eventId) { return /databases/$(database)/documents/events/$(eventId); }
+    function registrationPath(key) { return /databases/$(database)/documents/registrations/$(key); }
+    function activeEvent(eventId) {
+      return exists(eventPath(eventId))
+        && get(eventPath(eventId)).data.status == 'upcoming'
+        && get(eventPath(eventId)).data.dateMs > request.time.toMillis();
+    }
+    function countIncreased(eventId, key) {
+      return getAfter(eventPath(eventId)).data.registeredCount
+          == get(eventPath(eventId)).data.registeredCount + 1
+        && getAfter(eventPath(eventId)).data.lastRegistrationKey == key;
+    }
+    function countDecreased(eventId, key) {
+      return getAfter(eventPath(eventId)).data.registeredCount
+          == get(eventPath(eventId)).data.registeredCount - 1
+        && getAfter(eventPath(eventId)).data.lastRegistrationKey == key;
+    }
+    function registrationFields(key) {
+      return request.resource.data.keys().hasOnly([
+          'id','registrationId','key','eventId','ownerUid','memberId','name','email',
+          'branch','year','notes','timestamp','attended','cancelledAt','completedAt'
+        ])
+        && request.resource.data.key == key
+        && request.resource.data.eventId is string
+        && key == request.resource.data.eventId + '_' + request.auth.uid
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.memberId == (request.auth.token.firebase.sign_in_provider == 'anonymous' ? null : request.auth.uid)
+        && request.resource.data.id is string
+        && request.resource.data.id.matches('^[0-9a-f-]{36}$')
+        && request.resource.data.registrationId == request.resource.data.id
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 100
+        && request.resource.data.email is string && request.resource.data.email.size() <= 254
+        && request.resource.data.email.matches('^[^@ ]+@[^@ ]+\\.[^@ ]+$')
+        && request.resource.data.branch is string && request.resource.data.branch.size() <= 100
+        && request.resource.data.year is string && request.resource.data.year.size() <= 40
+        && request.resource.data.notes is string && request.resource.data.notes.size() <= 1000
+        && request.resource.data.timestamp is string
+        && request.resource.data.attended == false
+        && request.resource.data.cancelledAt == null;
+    }
+    function validRegistrationCreate(key) {
+      return signedIn() && registrationFields(key)
+        && activeEvent(request.resource.data.eventId)
+        && countIncreased(request.resource.data.eventId, key)
+        && (get(eventPath(request.resource.data.eventId)).data.capacity == null
+          || getAfter(eventPath(request.resource.data.eventId)).data.registeredCount
+            <= get(eventPath(request.resource.data.eventId)).data.capacity);
+    }
+    function validRegistrationCancel(key) {
+      return signedIn() && resource.data.ownerUid == request.auth.uid
+        && resource.data.cancelledAt == null && resource.data.attended == false
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['cancelledAt'])
+        && request.resource.data.cancelledAt is string
+        && activeEvent(resource.data.eventId)
+        && countDecreased(resource.data.eventId, key);
+    }
+    function validRegistrationClaim() {
+      return verifiedEmail(resource.data.email)
+        && resource.data.memberId == null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ownerUid','memberId'])
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.memberId == request.auth.uid;
+    }
+    function validRegistrationReopen(key) {
+      return signedIn() && resource.data.ownerUid == request.auth.uid
+        && resource.data.cancelledAt != null
+        && registrationFields(key)
+        && activeEvent(request.resource.data.eventId)
+        && countIncreased(request.resource.data.eventId, key);
+    }
+    function validCountChange(eventId) {
+      let key = request.resource.data.lastRegistrationKey;
+      let path = registrationPath(key);
+      return signedIn() && key is string
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['registeredCount','lastRegistrationKey'])
+        && getAfter(path).data.eventId == eventId
+        && getAfter(path).data.ownerUid == request.auth.uid
+        && (
+          (request.resource.data.registeredCount == resource.data.registeredCount + 1
+            && resource.data.status == 'upcoming' && resource.data.dateMs > request.time.toMillis()
+            && (resource.data.capacity == null || request.resource.data.registeredCount <= resource.data.capacity)
+            && getAfter(path).data.cancelledAt == null
+            && (!exists(path) || get(path).data.cancelledAt != null))
+          ||
+          (request.resource.data.registeredCount == resource.data.registeredCount - 1
+            && resource.data.registeredCount > 0
+            && exists(path) && get(path).data.cancelledAt == null
+            && getAfter(path).data.cancelledAt != null)
+        );
+    }
+
+    match /events/{eventId} {
+      allow read: if true;
+      allow create, delete: if admin();
+      allow update: if admin() || validCountChange(eventId);
+    }
+    match /registrations/{key} {
+      allow read: if admin() || (signedIn() && resource.data.ownerUid == request.auth.uid)
+        || verifiedEmail(resource.data.email);
+      allow create: if validRegistrationCreate(key);
+      allow update: if admin() || validRegistrationCancel(key)
+        || validRegistrationClaim() || validRegistrationReopen(key);
+      allow delete: if false;
+    }
+    match /members/{uid} {
+      allow read: if admin() || (signedIn() && request.auth.uid == uid);
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.auth.token.email_verified == true
+        && request.resource.data.id == uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 100;
+      allow delete: if false;
+    }
+    match /feedback/{id} {
+      allow read: if admin() || (signedIn() && resource.data.memberId == request.auth.uid);
+      allow create, update: if signedIn()
+        && request.resource.data.id == id
+        && request.resource.data.memberId == request.auth.uid
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1 && request.resource.data.rating <= 5
+        && request.resource.data.liked is string && request.resource.data.liked.size() <= 1000
+        && request.resource.data.improve is string && request.resource.data.improve.size() <= 1000
+        && get(registrationPath(request.resource.data.registrationKey)).data.ownerUid == request.auth.uid
+        && get(registrationPath(request.resource.data.registrationKey)).data.id == id
+        && get(registrationPath(request.resource.data.registrationKey)).data.attended == true
+        && get(registrationPath(request.resource.data.registrationKey)).data.cancelledAt == null;
+      allow delete: if admin();
+    }
+    match /awards/{id} {
+      allow read: if admin() || (signedIn() && resource.data.memberId == request.auth.uid);
+      allow write: if admin();
+    }
+    match /resources/{id} { allow read: if true; allow write: if admin(); }
+    match /badges/{id} { allow read: if true; allow write: if admin(); }
+    match /team/{id} { allow read: if true; allow write: if admin(); }
+    match /{document=**} { allow read, write: if false; }
+  }
+}

@@ -1,4 +1,4 @@
-import {api,escapeHTML as esc,message,submit,live,requireRole,parseEntryCode} from './client.js';
+import {api,escapeHTML as esc,message,submit,live,requireRole,parseEntryCode,isFirebaseHosted} from './client.js';
 const el = id => document.getElementById(id);
 const value = id => el(id)?.value || '';
 const date = d => new Date(d).toLocaleString();
@@ -6,8 +6,9 @@ let events=[], resources=[], badges=[], students=[], badgeCounts={}, registratio
 function previewBanner(url){const preview=el('eventBannerPreview');if(!preview)return;preview.hidden=!url;if(url)preview.src=url;else preview.removeAttribute('src');}
 const path = location.pathname;
 if (path.endsWith('/login.html')) {
+  if(isFirebaseHosted){document.querySelectorAll('#admin-login-form .input-group').forEach(node=>{node.hidden=true;node.querySelector('input').required=false;});document.querySelector('#admin-login-form .submit-btn').textContent='Continue with Google';}
   el('admin-login-form').addEventListener('submit', event=>submit(event,async()=>{
-    try {await api('/api/auth/admin',{method:'POST',body:JSON.stringify({username:value('username'),password:value('password')})});location.href='/admin/';}
+    try {if(isFirebaseHosted){const {signInGoogle}=await import('./firebase-backend.js');const result=await signInGoogle();if(result.role!=='admin')throw new Error('This Google account does not have administrator access.');}else await api('/api/auth/admin',{method:'POST',body:JSON.stringify({username:value('username'),password:value('password')})});location.href='/admin/';}
     catch(error){el('error-msg').textContent=error.message;el('error-msg').style.display='block';}
   }));
 } else if (await requireRole('admin')) {
