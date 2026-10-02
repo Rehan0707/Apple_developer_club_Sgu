@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, linkWithPopup, signInAnonymously, signOut } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, sendPasswordResetEmail, reload, signOut } from 'firebase/auth';
 import { getFirestore, collection, doc, getDoc, getDocs, query, where, setDoc, updateDoc, deleteDoc, runTransaction, onSnapshot } from 'firebase/firestore';
 import { firebaseConfig } from './firebase-config.js';
 import { publicResourceSeeds } from '../lib/public-resource-seeds.js';
@@ -9,6 +9,11 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const adminEmail = 'developerclubapple@gmail.com';
+let adminPasswordSession = false;
+const authReady = auth.authStateReady().then(async () => {
+  const user = auth.currentUser;
+  adminPasswordSession = Boolean(user && (await user.getIdTokenResult()).claims.firebase?.sign_in_provider === 'password');
+}).catch(() => { adminPasswordSession = false; });
 const now = () => new Date().toISOString();
 const ref = (kind, id) => doc(db, kind, id);
 const fail = (text, status = 400) => { throw Object.assign(new Error(text), { status }); };
@@ -18,7 +23,7 @@ const clean = (value, label, max = 200, required = true) => {
   if (typeof value !== 'string' || value.trim().length > max || required && !value.trim()) fail(`Please enter a valid ${label}.`);
   return value.trim();
 };
-const isAdmin = user => Boolean(user && !user.isAnonymous && user.emailVerified && user.email?.toLowerCase() === adminEmail);
+const isAdmin = user => Boolean(user && adminPasswordSession && !user.isAnonymous && user.emailVerified && user.email?.toLowerCase() === adminEmail);
 const row = snapshot => snapshot.exists() ? { ...snapshot.data(), id: snapshot.data().id || snapshot.id } : null;
 const all = async kind => (await getDocs(collection(db, kind))).docs.map(row);
 const byId = async (kind, id) => row(await getDoc(ref(kind, id)));
@@ -28,7 +33,7 @@ const publicEvents = rows => sortedEvents(rows).filter(e => e.status !== 'draft'
 const member = async user => user?.isAnonymous ? null : await byId('members', user.uid);
 const ownedRegistrations = async user => (await getDocs(query(collection(db, 'registrations'), where('ownerUid', '==', user.uid)))).docs.map(row);
 const requireUser = async (anonymous = false) => {
-  await auth.authStateReady();
+  await authReady;
   if (!auth.currentUser && anonymous) await signInAnonymously(auth);
   if (!auth.currentUser) fail('Please sign in to continue.', 401);
   return auth.currentUser;
@@ -59,7 +64,7 @@ async function seedResources() {
 }
 
 export async function signInGoogle() {
-  await auth.authStateReady();
+  await authReady;
   const provider = new GoogleAuthProvider();
   let result;
   if (auth.currentUser?.isAnonymous) {
@@ -70,6 +75,7 @@ export async function signInGoogle() {
     }
   } else result = await signInWithPopup(auth, provider);
   const user = result.user;
+  adminPasswordSession = false;
   if (!user.emailVerified) fail('Sign in with a verified Google email.');
   if (!isAdmin(user)) {
     await setDoc(ref('members', user.uid), { id: user.uid, name: user.displayName || user.email.split('@')[0], email: user.email.toLowerCase(), joinedDate: now() }, { merge: true });
@@ -78,6 +84,27 @@ export async function signInGoogle() {
     for (const item of matches.docs) if (!item.data().memberId) await updateDoc(item.ref, { ownerUid: user.uid, memberId: user.uid });
   } else await seedResources();
   return { role: isAdmin(user) ? 'admin' : 'student' };
+}
+
+export async function signInAdminEmail(email, password) {
+  await authReady;
+  if (String(email).trim().toLowerCase() !== adminEmail) fail('This email does not have administrator access.', 403);
+  const result = await signInWithEmailAndPassword(auth, adminEmail, password);
+  await reload(result.user);
+  adminPasswordSession = (await result.user.getIdTokenResult(true)).claims.firebase?.sign_in_provider === 'password';
+  if (!isAdmin(result.user)) {
+    await signOut(auth);
+    adminPasswordSession = false;
+    fail('Verify the admin email address before signing in.', 403);
+  }
+  await seedResources();
+  return { role: 'admin' };
+}
+
+export async function resetAdminPassword(email) {
+  if (String(email).trim().toLowerCase() !== adminEmail) fail('Enter the club administrator email address.', 400);
+  await sendPasswordResetEmail(auth, adminEmail);
+  return { success: true };
 }
 
 function eventData(value, current, events) {
@@ -117,8 +144,8 @@ export async function firebaseApi(path, options = {}) {
   const route = path.split('?')[0].split('/').filter(Boolean).slice(1).map(decodeURIComponent);
   if (route[0] === 'health') return { status: 'ok' };
   if (route[0] === 'auth') {
-    if (route[1] === 'status') { await auth.authStateReady(); const user = auth.currentUser; return { authenticated: Boolean(user && !user.isAnonymous), role: isAdmin(user) ? 'admin' : user && !user.isAnonymous ? 'student' : null, providers: { google: true, apple: false }, googleMode: 'firebase', firebaseConfig, localPreview: false }; }
-    if (route[1] === 'signout') { await signOut(auth); return { success: true }; }
+    if (route[1] === 'status') { await authReady; const user = auth.currentUser; return { authenticated: Boolean(user && !user.isAnonymous), role: isAdmin(user) ? 'admin' : user && !user.isAnonymous ? 'student' : null, providers: { google: true, apple: false }, googleMode: 'firebase', firebaseConfig, localPreview: false }; }
+    if (route[1] === 'signout') { await signOut(auth); adminPasswordSession = false; return { success: true }; }
     if (route[1] === 'local-student') fail('Local preview is available only on localhost.', 404);
     fail('Use Google sign-in for this account.', 400);
   }

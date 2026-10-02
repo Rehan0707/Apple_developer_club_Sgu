@@ -6,11 +6,13 @@ let events=[], resources=[], badges=[], students=[], badgeCounts={}, registratio
 function previewBanner(url){const preview=el('eventBannerPreview');if(!preview)return;preview.hidden=!url;if(url)preview.src=url;else preview.removeAttribute('src');}
 const path = location.pathname;
 if (/\/admin\/login(?:\.html)?\/?$/.test(path)) {
-  if(isFirebaseHosted){document.querySelectorAll('#admin-login-form .input-group').forEach(node=>{node.hidden=true;node.querySelector('input').required=false;});document.querySelector('#admin-login-form .submit-btn').textContent='Continue with Google';}
+  if(isFirebaseHosted){el('username').value='developerclubapple@gmail.com';}
+  else {el('username').type='text';el('username').placeholder='e.g. soham@dev';document.querySelector('label[for="username"]').textContent='Username';el('reset-password').hidden=true;}
   el('admin-login-form').addEventListener('submit', event=>submit(event,async()=>{
-    try {if(isFirebaseHosted){const {signInGoogle}=await import('./firebase-backend.js');const result=await signInGoogle();if(result.role!=='admin')throw new Error('This Google account does not have administrator access.');}else await api('/api/auth/admin',{method:'POST',body:JSON.stringify({username:value('username'),password:value('password')})});location.href='/admin/';}
-    catch(error){el('error-msg').textContent=error.message;el('error-msg').style.display='block';}
+    try {if(isFirebaseHosted){const {signInAdminEmail}=await import('./firebase-backend.js');await signInAdminEmail(value('username'),value('password'));}else await api('/api/auth/admin',{method:'POST',body:JSON.stringify({username:value('username'),password:value('password')})});location.href='/admin/';}
+    catch(error){el('error-msg').textContent=error.code==='auth/invalid-credential'?'Incorrect password. Use “Set or reset password” if this is your first password sign-in.':error.message;el('error-msg').style.display='block';}
   }));
+  el('reset-password').addEventListener('click',async()=>{try{const {resetAdminPassword}=await import('./firebase-backend.js');await resetAdminPassword(value('username'));el('error-msg').textContent='Password setup email sent. Open it, set your password, then sign in here.';el('error-msg').style.color='#1d1d1f';el('error-msg').style.display='block';}catch(error){el('error-msg').textContent=error.message;el('error-msg').style.display='block';}});
 } else if (await requireRole('admin')) {
   document.querySelectorAll('header span').forEach(node=>{if(node.textContent.trim()==='Alex Chen')node.textContent='Administrator';});
   const signout=document.createElement('button');signout.textContent='Sign out';signout.className='text-primary text-sm';signout.onclick=async()=>{try{await api('/api/auth/signout',{method:'POST'});location.href='/admin/login.html';}catch(e){message(e);}};document.querySelector('header')?.append(signout);

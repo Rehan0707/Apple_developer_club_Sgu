@@ -6,7 +6,7 @@ The public website, member portal, and admin portal use Firebase Hosting, Authen
 
 ## Live setup
 
-- Admin: open `/admin/login.html` and choose **Continue with Google** using `developerclubapple@gmail.com`. Firestore rules restrict admin writes to this verified Google account. There is no production admin password.
+- Admin: open `/admin/login` and sign in with the verified `developerclubapple@gmail.com` email and its Firebase password. Use **Set or reset password** to receive a setup link at that address. Firestore rules restrict admin writes to a verified password session for this email. The admin Google sign-in button has been removed.
 - Members: open `/join/` and sign in with Google. A visitor can also register for an upcoming event without signing in; Firebase creates an anonymous identity for that registration. Signing in later with a verified matching Google email links an unclaimed guest registration to the member account.
 - An event registration is saved in Firestore, updates the admin portal and event capacity, and shows a downloadable QR pass. The pass is an entry code, not an Apple Wallet pass. No email is sent; visitors should save it when registering.
 - Admins create events, choose an event's completion badge, manage resources, review registrations and feedback, and confirm attendance. Attendance, not registration, awards an event badge. The 10 supplied badge images start locked. Events and registrations start empty.

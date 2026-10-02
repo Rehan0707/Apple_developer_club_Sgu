@@ -2,6 +2,7 @@
   "auth": {
     "providers": {
       "anonymous": true,
+      "emailPassword": true,
       "googleSignIn": {
         "oAuthBrandDisplayName": "Apple Developer Club SGU",
         "supportEmail": "yumyoo007@gmail.com",

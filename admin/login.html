@@ -40,8 +40,8 @@
 
         <form id="admin-login-form">
           <div class="input-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" placeholder="e.g. soham@dev" required autocomplete="username">
+            <label for="username">Email</label>
+            <input type="email" id="username" name="username" placeholder="developerclubapple@gmail.com" required autocomplete="username">
           </div>
           <div class="input-group">
             <label for="password">Password</label>
@@ -49,6 +49,7 @@
           </div>
           <div class="error-message" id="error-msg">Incorrect username or password.</div>
           <button type="submit" class="submit-btn">Sign In</button>
+          <button type="button" id="reset-password" class="text-primary" style="margin-top:18px;font:inherit;cursor:pointer;background:none;border:0;">Set or reset password</button>
         </form>
       </div>
     </div>

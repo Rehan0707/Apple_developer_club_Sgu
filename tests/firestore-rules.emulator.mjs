@@ -48,7 +48,9 @@ try {
   assert.equal((await memberDb.collection('registrations').where('email','==','test@example.com').get()).size,1);
   await memberDb.doc(`registrations/${key}`).update({ownerUid:'member-1',memberId:'member-1'});
   await assert.rejects(guest.doc(`registrations/${key}`).get());
-  const adminDb=env.authenticatedContext('admin-1',{email:'developerclubapple@gmail.com',email_verified:true}).firestore();
+  const oldGoogleAdmin=env.authenticatedContext('admin-google',{email:'developerclubapple@gmail.com',email_verified:true,firebase:{sign_in_provider:'google.com'}}).firestore();
+  await assert.rejects(oldGoogleAdmin.doc(`registrations/${key}`).update({attended:true}));
+  const adminDb=env.authenticatedContext('admin-1',{email:'developerclubapple@gmail.com',email_verified:true,firebase:{sign_in_provider:'password'}}).firestore();
   await adminDb.doc(`registrations/${key}`).update({attended:true,completedAt:new Date().toISOString()});
   await memberDb.doc('members/member-1').set({id:'member-1',name:'Test Member',email:'test@example.com',joinedDate:new Date().toISOString()});
   assert.equal((await memberDb.collection('awards').where('memberId','==','member-1').get()).size,0);
