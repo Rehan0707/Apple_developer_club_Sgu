@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, sendPasswordResetEmail, reload, signOut, setPersistence, browserLocalPersistence, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, collection, doc, getDoc, getDocs, query, where, setDoc, updateDoc, deleteDoc, runTransaction, onSnapshot } from 'firebase/firestore';
+import { getAuth, GoogleAuthProvider, signInWithPopup, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, sendPasswordResetEmail, reload, signOut, setPersistence, browserLocalPersistence, onAuthStateChanged, connectAuthEmulator } from 'firebase/auth';
+import { getFirestore, collection, doc, getDoc, getDocs, query, where, setDoc, updateDoc, deleteDoc, runTransaction, onSnapshot, connectFirestoreEmulator } from 'firebase/firestore';
 import { firebaseConfig } from './firebase-config.js';
 import { publicResourceSeeds } from '../lib/public-resource-seeds.js';
 import { eventBadges } from '../lib/badges.js';
@@ -8,9 +8,15 @@ import { CollectionCache } from './collection-cache.js';
 
 // Keep club administration signed in independently from member and guest flows.
 // Firebase Auth otherwise shares one account across all tabs on this origin.
-const app = /^\/admin(?:\/|$)/.test(location.pathname) ? initializeApp(firebaseConfig, 'club-admin') : initializeApp(firebaseConfig);
+const useEmulators = Boolean(import.meta.env.DEV && import.meta.env.VITE_FIREBASE_EMULATORS === 'true');
+const appConfig = useEmulators ? {...firebaseConfig, projectId:'demo-sgu-club', authDomain:'demo-sgu-club.firebaseapp.com'} : firebaseConfig;
+const app = /^\/admin(?:\/|$)/.test(location.pathname) ? initializeApp(appConfig, 'club-admin') : initializeApp(appConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+if(useEmulators){
+  connectAuthEmulator(auth, 'http://127.0.0.1:9099', {disableWarnings:true});
+  connectFirestoreEmulator(db, '127.0.0.1', 8085);
+}
 const adminEmail = 'developerclubapple@gmail.com';
 let adminPasswordSession = false;
 const authReady = auth.authStateReady().then(async () => {

@@ -8,7 +8,7 @@ export function youtubeVideoId(value) {
   } catch { return null; }
 }
 export const entryCode = registrationId => `SGU-ENTRY:${registrationId}`;
-export const isFirebaseHosted = typeof location !== 'undefined' && /(?:\.web\.app|\.firebaseapp\.com)$/.test(location.hostname);
+export const isFirebaseHosted = typeof location !== 'undefined' && (/(?:\.web\.app|\.firebaseapp\.com)$/.test(location.hostname) || Boolean(import.meta.env?.DEV && import.meta.env?.VITE_FIREBASE_EMULATORS === 'true'));
 export function parseEntryCode(value) {
   const raw = String(value || '').trim().replace(/^SGU-ENTRY:/i,'');
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(raw) ? raw.toLowerCase() : null;
