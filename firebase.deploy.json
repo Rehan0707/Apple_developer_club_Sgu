@@ -6,15 +6,52 @@
       "googleSignIn": {
         "oAuthBrandDisplayName": "Apple Developer Club SGU",
         "supportEmail": "yumyoo007@gmail.com",
-        "authorizedRedirectUris": ["https://appledeveloperacademysgu.web.app"]
+        "authorizedRedirectUris": [
+          "https://appledeveloperacademysgu.web.app"
+        ]
       }
     }
   },
-  "firestore": { "rules": "firestore.rules" },
+  "firestore": {
+    "rules": "firestore.rules"
+  },
   "hosting": {
     "site": "appledeveloperacademysgu",
     "public": "dist",
-    "ignore": ["firebase.deploy.json", "**/.*", "**/node_modules/**"],
-    "cleanUrls": true
+    "ignore": [
+      "firebase.deploy.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "cleanUrls": true,
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
+      {
+        "source": "/assets/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public,max-age=31536000,immutable"
+          }
+        ]
+      },
+      {
+        "source": "/images/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public,max-age=86400"
+          }
+        ]
+      }
+    ]
   }
 }

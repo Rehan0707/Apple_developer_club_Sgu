@@ -17,7 +17,8 @@ if (/\/admin\/login(?:\.html)?\/?$/.test(path)) {
 } else if (await requireRole('admin')) {
   document.querySelectorAll('header span').forEach(node=>{if(node.textContent.trim()==='Alex Chen')node.textContent='Administrator';});
   const signout=document.createElement('button');signout.textContent='Sign out';signout.className='text-primary text-sm';signout.onclick=async()=>{try{await api('/api/auth/signout',{method:'POST'});location.href='/admin/login.html';}catch(e){message(e);}};document.querySelector('header')?.append(signout);
-  live(load,{role:'admin',intervalMs:60000});
+  const collections=el('eventsTable')?['events','members','badges','registrations','appLogos']:el('resourcesTableBody')?['resources']:el('badgesGrid')?['events','badges','registrations','members','awards']:['events','registrations','feedback'];
+  live(load,{role:'admin',collections});
 }
 async function load() {
   if(el('eventsTable')) {

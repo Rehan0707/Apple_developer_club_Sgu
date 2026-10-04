@@ -1,6 +1,5 @@
 import './auth-ui.js';
 import { api, live, escapeHTML as esc, entryCode, isFirebaseHosted } from './client.js';
-import QRCode from 'qrcode';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 
@@ -190,7 +189,7 @@ if (eventModal) {
     const code=entryCode(result.registrationId);
     const qrImage=document.getElementById('entry-qr-image');
     const qrDownload=document.getElementById('entry-qr-download');
-    const qrData=await QRCode.toDataURL(code,{width:260,margin:2}).catch(()=>null);
+    const qrData=await import('qrcode').then(({default:QRCode})=>QRCode.toDataURL(code,{width:260,margin:2})).catch(()=>null);
     if(qrImage){qrImage.hidden=!qrData;if(qrData)qrImage.src=qrData;}
     if(qrDownload){qrDownload.hidden=!qrData;if(qrData){qrDownload.href=qrData;qrDownload.download=`sgu-entry-${result.registrationId}.png`;}}
     const codeText=document.getElementById('entry-code-text');if(codeText)codeText.textContent=code;
@@ -296,7 +295,6 @@ if (eventModal) {
   });
 }
 
-import Matter from 'matter-js';
 
 // Stories Carousel Scroll Control
 const storiesTrack = document.getElementById('stories-track');
@@ -313,10 +311,11 @@ if (storiesTrack && storiesPrevBtn && storiesNextBtn) {
 }
 
 // Matter.js 2D Gravity Physics Engine & Rolling Icons Bucket Box
-function initGravityPhysicsBucket() {
+async function initGravityPhysicsBucket() {
   const container = document.getElementById('gravity-bucket-box');
   const worldCanvas = document.getElementById('physics-world-canvas');
   if (!container || !worldCanvas) return;
+  const {default:Matter} = await import('matter-js');
 
   const { Engine, Runner, Bodies, Composite, Body, Mouse, MouseConstraint, Events } = Matter;
 
@@ -394,6 +393,13 @@ function initGravityPhysicsBucket() {
         Body.setVelocity(body, { x: (Math.random() - 0.5) * 5, y: Math.random() * 3 + 2 });
 
         bodyElements.push({ body, el, sourceId: item.id });
+        // Keep repeated double taps from growing an unbounded physics world.
+        if (bodyElements.length > 100) {
+          const oldest = bodyElements.shift();
+          Composite.remove(engine.world, oldest.body);
+          oldest.el.remove();
+        }
+        updateRunner();
       }, index * 90);
     });
   }
@@ -482,14 +488,24 @@ function initGravityPhysicsBucket() {
 
   // Run runner & engine
   const runner = Runner.create();
-  Runner.run(runner, engine);
+  let bucketVisible = false, runnerActive = false;
+  function updateRunner() {
+    const needed = bucketVisible && !document.hidden && bodyElements.length > 0;
+    if (needed === runnerActive) return;
+    runnerActive = needed;
+    if (needed) Runner.run(runner, engine);
+    else Runner.stop(runner);
+  }
+  document.addEventListener('visibilitychange', updateRunner);
 
   // Intersection Observer to drop icons when user scrolls to section
   const dropObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
+      bucketVisible = entry.isIntersecting;
       if (entry.isIntersecting) {
         dropIcons();
       }
+      updateRunner();
     });
   }, { threshold: 0.2 });
 
@@ -511,7 +527,8 @@ function initGravityPhysicsBucket() {
     const added = logos.filter(logo => !existingIds.has(logo.id)).map(logo => ({ type: 'img', id: logo.id, src: logo.imageUrl, alt: logo.name }));
     iconData.splice(0, iconData.length, ...logos.map(logo => ({ type: 'img', id: logo.id, src: logo.imageUrl, alt: logo.name })));
     if (hasDropped && added.length) spawnFallingItems(added);
-  });
+    updateRunner();
+  },{collections:['appLogos']});
 
   // Device Orientation (Gyroscope Gravity for Mobile Phones!)
   if ('ontouchstart' in window && window.DeviceOrientationEvent) {
@@ -612,11 +629,11 @@ if(eventGrid) {
       button.disabled=Boolean(full);button.querySelector('.action-text').textContent=full?'Event full':'Register Now';
       return card;
     }));
-  },{intervalMs:60000});
+  },{collections:['events'],intervalMs:60000});
 }
 
 const homeResources = document.querySelector('#resources #resources-container');
 if(homeResources)live(async()=>{
  const rows=await api('/api/resources');
  homeResources.innerHTML=rows.length?rows.map(r=>`<a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer" style="display:flex;justify-content:space-between;align-items:center;padding:20px;background:#fff;border:1px solid #e5e5ea;border-radius:12px;text-decoration:none;color:#1d1d1f"><div style="display:flex;flex-direction:column;gap:5px"><span style="font-weight:600;font-size:1.1rem">${esc(r.title)}</span><span style="font-size:.9rem;color:#86868b;background:#f5f5f7;padding:2px 8px;border-radius:4px;width:fit-content">${esc(r.category||'General')}</span></div><span style="color:#0071e3">↗</span></a>`).join(''):'<div style="color:#86868b;padding:20px;background:#f5f5f7;border-radius:12px;text-align:center">No resources available right now. Check back later!</div>';
-});
+},{collections:['resources']});

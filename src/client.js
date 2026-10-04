@@ -33,10 +33,10 @@ export async function submit(event, work) {
   if (button) button.disabled = true;
   try { await work(); } catch (error) { message(error); } finally { if(button) button.disabled=false; }
 }
-export function live(refresh, { role, intervalMs } = {}) {
+export function live(refresh, { role, intervalMs, collections } = {}) {
   let running = false, again = false;
   const run = async () => { if(running) {again=true;return;} running=true; try { await refresh(); } catch(error) { if(role && [401,403].includes(error.status)) location.replace(role==='admin'?'/admin/login.html':'/join/'); else message(error); } finally {running=false;if(again){again=false;run();}} };
-  if (isFirebaseHosted) { import('./firebase-backend.js').then(({firebaseLive}) => firebaseLive(run,role,intervalMs)).catch(message); return run; }
+  if (isFirebaseHosted) { import('./firebase-backend.js').then(({firebaseLive}) => firebaseLive(run,role,intervalMs,collections)).catch(message); return run; }
   const stream = new EventSource('/api/stream'); stream.addEventListener('change',run);
   stream.onopen = run;
   window.addEventListener('focus',run);

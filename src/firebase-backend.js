@@ -1,9 +1,10 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, sendPasswordResetEmail, reload, signOut, setPersistence, browserLocalPersistence } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, sendPasswordResetEmail, reload, signOut, setPersistence, browserLocalPersistence, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, collection, doc, getDoc, getDocs, query, where, setDoc, updateDoc, deleteDoc, runTransaction, onSnapshot } from 'firebase/firestore';
 import { firebaseConfig } from './firebase-config.js';
 import { publicResourceSeeds } from '../lib/public-resource-seeds.js';
 import { eventBadges } from '../lib/badges.js';
+import { CollectionCache } from './collection-cache.js';
 
 // Keep club administration signed in independently from member and guest flows.
 // Firebase Auth otherwise shares one account across all tabs on this origin.
@@ -27,13 +28,15 @@ const clean = (value, label, max = 200, required = true) => {
 };
 const isAdmin = user => Boolean(user && adminPasswordSession && !user.isAnonymous && user.emailVerified && user.email?.toLowerCase() === adminEmail);
 const row = snapshot => snapshot.exists() ? { ...snapshot.data(), id: snapshot.data().id || snapshot.id } : null;
-const all = async kind => (await getDocs(collection(db, kind))).docs.map(row);
+const liveData = new CollectionCache();
+const all = kind => liveData.read(kind, async () => (await getDocs(collection(db, kind))).docs.map(row));
+const owned = (kind, field, uid) => liveData.read(`${kind}:${field}:${uid}`, async () => (await getDocs(query(collection(db, kind), where(field, '==', uid)))).docs.map(row));
 const byId = async (kind, id) => row(await getDoc(ref(kind, id)));
 const sortedEvents = rows => rows.filter(e => e.status !== 'deleted').sort((a, b) => a.date.localeCompare(b.date));
 const open = event => event?.status === 'upcoming' && Date.parse(event.date) > Date.now();
 const publicEvents = rows => sortedEvents(rows).filter(e => e.status !== 'draft').map(({ lastRegistrationKey, ...e }) => ({ ...e, registrationOpen: open(e), registeredCount: e.registeredCount || 0 }));
 const member = async user => user?.isAnonymous ? null : await byId('members', user.uid);
-const ownedRegistrations = async user => (await getDocs(query(collection(db, 'registrations'), where('ownerUid', '==', user.uid)))).docs.map(row);
+const ownedRegistrations = user => owned('registrations', 'ownerUid', user.uid);
 const requireUser = async (anonymous = false) => {
   await authReady;
   if (!auth.currentUser && anonymous) await signInAnonymously(auth);
@@ -229,7 +232,7 @@ export async function firebaseApi(path, options = {}) {
     if (route[2] === 'summary') { const badges = await badgeCatalog(), registrations = await all('registrations'), events = await all('events'), awards = await all('awards'); const counts = Object.fromEntries(badges.map(b => [b.id, 0])); for (const registration of registrations) if (registration.attended && !registration.cancelledAt && registration.memberId) { const badgeId = events.find(e => e.id === registration.eventId)?.badgeId; if (badgeId) counts[badgeId]++; } for (const award of awards) if (counts[award.badgeId] !== undefined) counts[award.badgeId]++; return counts; }
     if ((route[2] === 'assign' || route[2] === 'award') && method === 'POST') { const badgeId = clean(value.badgeId, 'badge'), studentId = clean(value.studentId || value.memberId, 'member'); const badge = (await badgeCatalog()).find(b => b.id === badgeId); if (!badge || badge.type === 'event' || !await byId('members', studentId)) fail('Badge or member not found.', 404); const id = `${studentId}_${badgeId}`; await setDoc(ref('awards', id), { id, badgeId, memberId: studentId, date: now() }); return { success: true }; }
     if (route[3] === 'students') { const awards = await all('awards'), registrations = await all('registrations'), events = await all('events'); const ids = new Set(awards.filter(a => a.badgeId === route[2]).map(a => a.memberId)); for (const reg of registrations) if (reg.attended && events.find(e => e.id === reg.eventId)?.badgeId === route[2] && reg.memberId) ids.add(reg.memberId); return (await all('members')).filter(m => ids.has(m.id)); }
-    if (method === 'POST') { const id = crypto.randomUUID(); const color = value.color || 'primary'; if (!['primary','secondary','tertiary','error'].includes(color)) fail('Invalid badge color.'); const badge = { id, name: clean(value.name, 'name'), desc: clean(value.desc, 'description', 2000, false), icon: clean(value.icon || 'star', 'icon', 50), color, imageUrl: value.imageUrl || ({ primary:'/images/badge_blue.jpg', secondary:'/images/badge_green.jpg', tertiary:'/images/badge_orange.jpg', error:'/images/badge_red.jpg' })[color] }; await setDoc(ref('badges', id), badge); return badge; }
+    if (method === 'POST') { const id = crypto.randomUUID(); const color = value.color || 'primary'; if (!['primary','secondary','tertiary','error'].includes(color)) fail('Invalid badge color.'); const badge = { id, name: clean(value.name, 'name'), desc: clean(value.desc, 'description', 2000, false), icon: clean(value.icon || 'star', 'icon', 50), color, imageUrl: value.imageUrl || ({ primary:'/images/badge_blue.webp', secondary:'/images/badge_green.webp', tertiary:'/images/badge_orange.webp', error:'/images/badge_red.webp' })[color] }; await setDoc(ref('badges', id), badge); return badge; }
   }
   if (route[0] === 'team' && method === 'GET') return all('team');
   if (route[0] === 'admin' && route[1] === 'students') { await requireAdmin(); return all('members'); }
@@ -247,24 +250,38 @@ export async function firebaseApi(path, options = {}) {
     if (route[1] === 'registrations' && method === 'DELETE') { const registration = registrations.find(r => r.id === route[2]); if (!registration) fail('Registration not found.', 404); const eventRef = ref('events', registration.eventId), regRef = ref('registrations', registration.key); await runTransaction(db, async tx => { const eventSnapshot = await tx.get(eventRef), registrationSnapshot = await tx.get(regRef); const event = row(eventSnapshot), reg = row(registrationSnapshot); if (!open(event) || reg.attended || reg.cancelledAt) fail('Cancellation is available before the event starts.', 409); tx.update(regRef, { cancelledAt: now() }); tx.update(eventRef, { registeredCount: Math.max(0, (event.registeredCount || 0) - 1), lastRegistrationKey: registration.key }); }); return { success: true }; }
     if (route[1] === 'registrations' && route[3] === 'feedback' && method === 'PUT') { const registration = registrations.find(r => r.id === route[2]); if (!registration || !registration.attended) fail('Feedback opens after you attend the event.', 409); const rating = Number(value.rating); if (!Number.isInteger(rating) || rating < 1 || rating > 5) fail('Choose a rating from 1 to 5.'); const previous = await byId('feedback', registration.id); const feedback = { id: registration.id, registrationId: registration.id, registrationKey: registration.key, eventId: registration.eventId, memberId: user.uid, rating, liked: clean(value.liked, 'what worked well', 1000, false), improve: clean(value.improve, 'what could improve', 1000, false), createdAt: previous?.createdAt || now(), updatedAt: now() }; await setDoc(ref('feedback', registration.id), feedback); return feedback; }
     const catalog = await badgeCatalog();
-    const awards = (await getDocs(query(collection(db, 'awards'), where('memberId', '==', user.uid)))).docs.map(row);
+    const awards = await owned('awards', 'memberId', user.uid);
     const progress = await progressFor(user, registrations, events, catalog, awards);
     if (route[1] === 'badges') return progress;
-    if (route[1] === 'dashboard') { const profile = await member(user); const feedback = (await getDocs(query(collection(db, 'feedback'), where('memberId', '==', user.uid)))).docs.map(row); const registeredEvents = registrations.map(r => ({ ...events.find(e => e.id === r.eventId), ...r, feedback: feedback.find(f => f.registrationId === r.id) || null })); const badges = progress.badges.filter(b => b.earned).sort((a, b) => a.awardedAt.localeCompare(b.awardedAt)); return { ...(profile || { name: user.displayName || user.email }), memberId: user.uid, registeredEvents, badges, badgeProgress: progress }; }
+    if (route[1] === 'dashboard') { const profile = await member(user); const feedback = await owned('feedback', 'memberId', user.uid); const registeredEvents = registrations.map(r => ({ ...events.find(e => e.id === r.eventId), ...r, feedback: feedback.find(f => f.registrationId === r.id) || null })); const badges = progress.badges.filter(b => b.earned).sort((a, b) => a.awardedAt.localeCompare(b.awardedAt)); return { ...(profile || { name: user.displayName || user.email }), memberId: user.uid, registeredEvents, badges, badgeProgress: progress }; }
   }
   fail('This action is not available.', 404);
 }
 
-export async function firebaseLive(refresh, role, intervalMs) {
+export async function firebaseLive(refresh, role, intervalMs, selectedCollections) {
   await auth.authStateReady();
-  const collections = role === 'admin' ? ['events','resources','badges','registrations','feedback','members','awards','appLogos'] : role === 'student' ? ['events','resources','badges'] : ['events','resources','badges','team','appLogos'];
-  const stops = collections.map(name => onSnapshot(collection(db, name), refresh, error => console.error('Live update unavailable', error)));
+  const collections = selectedCollections ?? (role === 'admin' ? ['events','resources','badges','registrations','feedback','members','awards','appLogos'] : role === 'student' ? ['events','resources','badges'] : ['events','resources','badges','team','appLogos']);
+  let refreshTimer;
+  const waiting = new Set(collections);
+  const schedule = () => { if(waiting.size)return; clearTimeout(refreshTimer); refreshTimer = setTimeout(refresh, 60); };
+  const stops = collections.map(name => onSnapshot(collection(db, name), snapshot => {
+    liveData.publish(name, snapshot.docs.map(row));
+    waiting.delete(name);
+    schedule();
+  }, error => { liveData.forget(name); waiting.delete(name); console.error('Live update unavailable', error); schedule(); }));
+  if (!collections.length) stops.push(onAuthStateChanged(auth, schedule));
   if (role === 'student' && auth.currentUser) {
-    stops.push(onSnapshot(query(collection(db, 'registrations'), where('ownerUid', '==', auth.currentUser.uid)), refresh));
-    stops.push(onSnapshot(query(collection(db, 'awards'), where('memberId', '==', auth.currentUser.uid)), refresh));
+    const uid = auth.currentUser.uid;
+    for (const [name, field] of [['registrations','ownerUid'],['awards','memberId'],['feedback','memberId']]) {
+      const key = `${name}:${field}:${uid}`;
+      waiting.add(key);
+      const stop = onSnapshot(query(collection(db, name), where(field, '==', uid)), snapshot => {
+        liveData.publish(key, snapshot.docs.map(row)); waiting.delete(key); schedule();
+      }, error => { liveData.forget(key); waiting.delete(key); console.error('Live update unavailable', error); schedule(); });
+      stops.push(() => { stop(); liveData.forget(key); });
+    }
   }
   const timer = intervalMs ? setInterval(refresh, intervalMs) : null;
-  window.addEventListener('focus', refresh);
-  window.addEventListener('pagehide', () => { stops.forEach(stop => stop()); if (timer) clearInterval(timer); }, { once: true });
-  refresh();
+  window.addEventListener('focus', schedule);
+  window.addEventListener('pagehide', () => { stops.forEach(stop => stop()); collections.forEach(name => liveData.forget(name)); clearTimeout(refreshTimer); if (timer) clearInterval(timer); }, { once: true });
 }

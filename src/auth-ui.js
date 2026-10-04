@@ -37,5 +37,5 @@ if(statusText){
   });
   preview.addEventListener('click',async()=>{preview.disabled=true;try{await api('/api/auth/local-student',{method:'POST'});location.href='/student/';}catch(error){statusText.textContent=error.message;preview.disabled=false;}});
   signout.addEventListener('click',async()=>{signout.disabled=true;try{await api('/api/auth/signout',{method:'POST'});await load();}catch(error){statusText.textContent=error.message;}finally{signout.disabled=false;}});
-  live(load);
+  live(load,{collections:[]});
 }
