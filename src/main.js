@@ -345,7 +345,7 @@ async function initGravityPhysicsBucket() {
   function spawnFallingItems(items) {
     items.forEach((item, index) => {
       setTimeout(() => {
-        if (item.id && !iconData.some(icon => icon.id === item.id)) return;
+        if (item.id && (!iconData.some(icon => icon.id === item.id) || bodyElements.some(existing => existing.sourceId === item.id))) return;
         // Random horizontal drop position spread dynamically across full container width
         const spawnX = Math.random() * Math.max(100, width - 160) + 80;
         const spawnY = iconSize / 2 + 16;
@@ -393,7 +393,7 @@ async function initGravityPhysicsBucket() {
         Body.setVelocity(body, { x: (Math.random() - 0.5) * 5, y: Math.random() * 3 + 2 });
 
         bodyElements.push({ body, el, sourceId: item.id });
-        // Keep repeated double taps from growing an unbounded physics world.
+        // Bound the number of published logos in the physics world.
         if (bodyElements.length > 100) {
           const oldest = bodyElements.shift();
           Composite.remove(engine.world, oldest.body);
@@ -412,23 +412,6 @@ async function initGravityPhysicsBucket() {
     hasDropped = true;
     spawnFallingBatch();
   }
-
-  // Trigger falling icons when user clicks twice (double click / double tap)
-  const bucketWrapper = container.closest('.gravity-bucket-wrapper') || container;
-  bucketWrapper.addEventListener('dblclick', () => {
-    spawnFallingBatch();
-  });
-
-  // Handle double-tap gesture on mobile screens
-  let lastTapTime = 0;
-  bucketWrapper.addEventListener('touchstart', (e) => {
-    const currentTime = new Date().getTime();
-    const tapLength = currentTime - lastTapTime;
-    if (tapLength < 300 && tapLength > 0) {
-      spawnFallingBatch();
-    }
-    lastTapTime = currentTime;
-  }, { passive: true });
 
   // Mouse & Touch Drag Interaction Physics Constraint
   const mouse = Mouse.create(container);
