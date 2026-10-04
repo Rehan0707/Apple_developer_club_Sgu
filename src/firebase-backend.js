@@ -1,3 +1,4 @@
+import {projectDetails} from '../lib/project-data.js';
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, sendPasswordResetEmail, reload, signOut, setPersistence, browserLocalPersistence, onAuthStateChanged, connectAuthEmulator } from 'firebase/auth';
 import { getFirestore, collection, doc, getDoc, getDocs, query, where, setDoc, updateDoc, deleteDoc, runTransaction, onSnapshot, connectFirestoreEmulator } from 'firebase/firestore';
@@ -162,6 +163,30 @@ export async function firebaseApi(path, options = {}) {
     fail('Use Google sign-in for this account.', 400);
   }
   if (route[0] === 'admin' && route[1] === 'event-banner' && method === 'POST') { await requireAdmin(); return compressBanner(options.body); }
+  if(route[0]==='me' && route[1]==='projects') {
+    const user=await requireMember();
+    if(method==='GET') return owned('projects','memberId',user.uid);
+    if(method==='POST') {
+      const details=projectDetails(value), imageUrl=clean(value.imageUrl,'app logo',700000);
+      if(!/^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/]+={0,2}$/.test(imageUrl)) fail('Choose a valid app logo.');
+      const profile=await member(user),id=crypto.randomUUID();
+      const project={...details,id,imageUrl,memberId:user.uid,creator:profile?.name||user.displayName||'Club member',status:'pending',createdAt:now()};
+      await setDoc(ref('projects',id),project);return project;
+    }
+  }
+  if(route[0]==='admin' && route[1]==='projects') {
+    await requireAdmin();
+    if(method==='GET') return all('projects');
+    if(method==='PUT' && route[2]) {
+      const status=value.status;if(!['approved','rejected'].includes(status)) fail('Choose an approval status.');
+      await runTransaction(db,async tx=>{
+        const snapshot=await tx.get(ref('projects',route[2]));if(!snapshot.exists())fail('Project not found.',404);
+        const project=row(snapshot);tx.update(ref('projects',route[2]),{status,reviewedAt:now()});
+        if(status==='approved')tx.set(ref('appLogos',project.id),{id:project.id,name:project.name,description:project.description,url:project.url,imageUrl:project.imageUrl,creator:project.creator,memberId:project.memberId,createdAt:project.createdAt});
+        else tx.delete(ref('appLogos',project.id));
+      });return {status};
+    }
+  }
   if (route[0] === 'app-logos' && method === 'GET') return (await all('appLogos')).sort((a,b) => a.createdAt.localeCompare(b.createdAt));
   if (route[0] === 'admin' && route[1] === 'app-logos') {
     await requireAdmin();
@@ -170,13 +195,17 @@ export async function firebaseApi(path, options = {}) {
       const imageUrl = clean(value.imageUrl, 'app logo', 700000);
       if (!/^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/]+={0,2}$/.test(imageUrl)) fail('Choose a valid app logo image.');
       const id = crypto.randomUUID();
-      const logo = { id, name, imageUrl, createdAt: now() };
+      const logo = { id, name, imageUrl, description:clean(value.description,'description',1000,false),url:value.url?projectDetails({name,description:value.description||name,url:value.url}).url:'',creator:clean(value.creator,'creator',100,false),createdAt: now() };
       await setDoc(ref('appLogos', id), logo);
       return logo;
     }
+    if(route.length===3 && method==='PUT') {
+      const logo=await byId('appLogos',route[2]);if(!logo)fail('App logo not found.',404);
+      const details=projectDetails(value);await updateDoc(ref('appLogos',route[2]),{...details,creator:clean(value.creator,'creator',100,false)});return {...logo,...details};
+    }
     if (route.length === 3 && method === 'DELETE') {
       if (!await byId('appLogos', route[2])) fail('App logo not found.', 404);
-      await deleteDoc(ref('appLogos', route[2]));
+      await runTransaction(db,async tx=>{const project=await tx.get(ref('projects',route[2]));tx.delete(ref('appLogos',route[2]));if(project.exists())tx.update(ref('projects',route[2]),{status:'rejected',reviewedAt:now()});});
       return null;
     }
   }
@@ -278,7 +307,7 @@ export async function firebaseLive(refresh, role, intervalMs, selectedCollection
   if (!collections.length) stops.push(onAuthStateChanged(auth, schedule));
   if (role === 'student' && auth.currentUser) {
     const uid = auth.currentUser.uid;
-    for (const [name, field] of [['registrations','ownerUid'],['awards','memberId'],['feedback','memberId']]) {
+    for (const [name, field] of [['registrations','ownerUid'],['awards','memberId'],['feedback','memberId'],['projects','memberId']]) {
       const key = `${name}:${field}:${uid}`;
       waiting.add(key);
       const stop = onSnapshot(query(collection(db, name), where(field, '==', uid)), snapshot => {

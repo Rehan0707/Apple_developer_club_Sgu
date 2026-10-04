@@ -1,3 +1,5 @@
+import {setupShowcase} from './community.js';
+setupShowcase();
 import './auth-ui.js';
 import { api, live, escapeHTML as esc, entryCode, isFirebaseHosted } from './client.js';
 import Lenis from 'lenis';
@@ -362,6 +364,7 @@ async function initGravityPhysicsBucket() {
         // DOM element corresponding to the physics body
         const el = document.createElement('div');
         el.className = 'physics-icon-item';
+        el.dataset.projectId=item.id;el.tabIndex=0;el.setAttribute('role','button');el.setAttribute('aria-label','View '+item.alt+' project');
         el.style.width = `${iconSize}px`;
         el.style.height = `${iconSize}px`;
 

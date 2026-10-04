@@ -59,3 +59,18 @@ Use only disposable emulator accounts. Create a verified email/password account
 for the configured administrator email in the Auth emulator, and use its Google
 login widget to create test members. Never run the rules test while preserving an
 active browser test dataset: the rules test resets emulator Firestore data.
+
+## Community enhancements — 4 October 2026
+
+Verified in the Firebase emulators through the browser: member login, My Profile,
+1024 × 1024 image upload and project submission, live admin review queue,
+approval publishing into app logos, live member publication status, keyboard
+opening of the app showcase with the correct creator/description/demo URL,
+member directory search, and checked-in versus awaiting attendance filters.
+The member profile was also checked at 390 px without horizontal page overflow.
+
+Project rules tests cover owner-only reads, rejection of member self-approval,
+admin publication, forged ownership, and unsafe links. Calendar tests cover UTC
+conversion, escaped text, 30-minute reminders, and UTF-8 line folding. The unit
+suite now passes 34 tests, including local project approval/unpublication. Calendar reminders are calendar-file alarms; delivery
+is controlled by the calendar application, not email or push notifications.

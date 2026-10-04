@@ -38,6 +38,7 @@
             <span class="material-symbols-outlined text-[20px]">verified</span>
             <span class="text-sm">Badges</span>
           </button>
+          <button onclick="switchTab('profile')" id="nav-profile" class="nav-btn flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container w-full text-left"><span class="material-symbols-outlined">person</span> My Profile</button>
           <button onclick="switchTab('resources')" id="nav-resources" class="nav-btn flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors w-full text-left">
             <span class="material-symbols-outlined text-[20px]">developer_mode_tv</span>
             <span class="text-sm">Resources</span>
@@ -142,6 +143,7 @@
       </div>
 
       <!-- RESOURCES TAB -->
+      <div id="tab-profile" class="tab-content"><h1 class="text-3xl font-bold">My Profile</h1><p class="text-on-surface-variant">Your projects, achievements, and club journey.</p><div id="member-profile"></div><section class="community-card"><h2>Submit an app</h2><form id="project-submit-form"></form></section></div>
       <div id="tab-resources" class="tab-content flex flex-col gap-10">
         <div>
           <h1 class="text-3xl font-bold mb-2">Learning Resources</h1>

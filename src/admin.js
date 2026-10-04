@@ -1,3 +1,4 @@
+import {setupAdminCommunity} from './community.js';
 import {api,escapeHTML as esc,message,submit,live,requireRole,parseEntryCode,isFirebaseHosted} from './client.js';
 import {prepareAppLogo} from './app-logo-image.js';
 const el = id => document.getElementById(id);
@@ -15,6 +16,7 @@ if (/\/admin\/login(?:\.html)?\/?$/.test(path)) {
   }));
   el('reset-password').addEventListener('click',async()=>{try{const {resetAdminPassword}=await import('./firebase-backend.js');await resetAdminPassword(value('username'));el('error-msg').textContent='Password setup email sent. Open it, set your password, then sign in here.';el('error-msg').style.color='#1d1d1f';el('error-msg').style.display='block';}catch(error){el('error-msg').textContent=error.message;el('error-msg').style.display='block';}});
 } else if (await requireRole('admin')) {
+  setupAdminCommunity();
   document.querySelectorAll('header span').forEach(node=>{if(node.textContent.trim()==='Alex Chen')node.textContent='Administrator';});
   const signout=document.createElement('button');signout.textContent='Sign out';signout.className='text-primary text-sm';signout.onclick=async()=>{try{await api('/api/auth/signout',{method:'POST'});location.href='/admin/login.html';}catch(e){message(e);}};document.querySelector('header')?.append(signout);
   const collections=el('eventsTable')?['events','members','badges','registrations','appLogos']:el('resourcesTableBody')?['resources']:el('badgesGrid')?['events','badges','registrations','members','awards']:['events','registrations','feedback'];
@@ -66,7 +68,7 @@ function renderAppLogos(){
     const image=document.createElement('img');image.src=logo.imageUrl;image.alt='';image.className='w-20 h-20 rounded-2xl object-cover shadow-sm';
     const name=document.createElement('strong');name.className='font-caption-sm text-on-surface break-words w-full';name.textContent=logo.name;
     const remove=document.createElement('button');remove.type='button';remove.dataset.deleteAppLogo=logo.id;remove.className='text-error hover:underline font-caption-sm font-semibold';remove.textContent='Remove';remove.setAttribute('aria-label',`Remove ${logo.name} app logo`);
-    card.append(image,name,remove);list.append(card);
+    const edit=document.createElement('button');edit.type='button';edit.dataset.editShowcase=logo.id;edit.className='text-primary font-semibold';edit.textContent='Edit details';card.append(image,name,edit,remove);list.append(card);
   }
 }
 function renderFeedback(){
@@ -138,7 +140,7 @@ window.handleResourceSubmit=event=>submit(event,async()=>{const id=value('resId'
 window.handleAppLogoSubmit=event=>submit(event,async()=>{
   const file=el('appLogoFile').files[0];
   const imageUrl=await prepareAppLogo(file);
-  await api('/api/admin/app-logos',{method:'POST',body:JSON.stringify({name:value('appLogoName'),imageUrl})});
+  await api('/api/admin/app-logos',{method:'POST',body:JSON.stringify({name:value('appLogoName'),imageUrl,creator:value('appLogoCreator'),description:value('appLogoDescription'),url:value('appLogoUrl')})});
   el('addAppLogoModal').close();await load();message('App logo published to What We Build.');
 });
 window.updatePreview=()=>{el('badgePreviewIcon').textContent=value('badgeIcon')||'star';el('badgePreview').style.color=({primary:'#0071e3',secondary:'#34c759',tertiary:'#af52de',error:'#d70015'})[value('badgeColor')];};

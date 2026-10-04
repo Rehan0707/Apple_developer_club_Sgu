@@ -62,5 +62,16 @@ try {
   assert.equal((await memberDb.collection('awards').where('memberId','==','member-1').get()).size,0);
   await memberDb.doc('feedback/22222222-2222-4222-8222-222222222222').set({id:'22222222-2222-4222-8222-222222222222',registrationId:'22222222-2222-4222-8222-222222222222',registrationKey:key,eventId,memberId:'member-1',rating:5,liked:'Useful',improve:'',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()});
   await assert.rejects(env.authenticatedContext('other').firestore().collection('feedback').get());
+  const project={id:'member-project',memberId:'member-1',creator:'Test Member',name:'Test App',description:'A useful app',url:'https://example.com',imageUrl:'data:image/webp;base64,AAAA',status:'pending',createdAt:new Date().toISOString()};
+  await memberDb.doc('projects/member-project').set(project);
+  await assert.rejects(memberDb.doc('projects/member-project').update({status:'approved'}));
+  await assert.rejects(publicDb.doc('projects/member-project').get());
+  await assert.rejects(env.authenticatedContext('other').firestore().doc('projects/member-project').get());
+  assert.equal((await memberDb.collection('projects').where('memberId','==','member-1').get()).size,1);
+  const batch=adminDb.batch();batch.update(adminDb.doc('projects/member-project'),{status:'approved'});batch.set(adminDb.doc('appLogos/member-project'),{...logo,id:'member-project'});await batch.commit();
+  assert.equal((await publicDb.doc('appLogos/member-project').get()).data().id,'member-project');
+  await assert.rejects(memberDb.doc('projects/forged').set({...project,id:'forged',memberId:'other'}));
+  await assert.rejects(memberDb.doc('projects/unsafe').set({...project,id:'unsafe',url:'javascript:alert(1)'}));
+  console.log('Project submission ownership, private review, admin publication and unsafe-link denial passed.');
   console.log('Cancellation, re-registration, verified ownership, attendance and feedback allowed; cross-member access denied.');
 } finally { await env.cleanup(); }

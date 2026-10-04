@@ -152,6 +152,22 @@ service cloud.firestore {
       allow write: if admin();
     }
     match /resources/{id} { allow read: if true; allow write: if admin(); }
+    match /projects/{id} {
+      allow read: if admin() || (signedIn() && resource.data.memberId == request.auth.uid);
+      allow create: if signedIn() && request.auth.token.email_verified == true
+        && request.resource.data.keys().hasOnly(['id','memberId','creator','name','description','url','imageUrl','status','createdAt'])
+        && request.resource.data.id == id && request.resource.data.memberId == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 80
+        && request.resource.data.description is string && request.resource.data.description.size() > 0 && request.resource.data.description.size() <= 1000
+        && request.resource.data.creator is string && request.resource.data.creator.size() <= 100
+        && request.resource.data.url is string && request.resource.data.url.size() <= 2048
+        && (request.resource.data.url == '' || request.resource.data.url.matches('https://.+'))
+        && request.resource.data.imageUrl is string && request.resource.data.imageUrl.size() <= 700000
+        && request.resource.data.imageUrl.matches('data:image/(webp|png|jpeg);base64,[A-Za-z0-9+/]+={0,2}')
+        && request.resource.data.createdAt is string;
+      allow update, delete: if admin();
+    }
     match /appLogos/{id} { allow read: if true; allow write: if admin(); }
     match /badges/{id} { allow read: if true; allow write: if admin(); }
     match /team/{id} { allow read: if true; allow write: if admin(); }

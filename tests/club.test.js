@@ -186,3 +186,16 @@ test('ten supplied badges start locked, are event-specific and correct with atte
  await req('/api/admin/registrations/'+reg.registrationId,{method:'PUT',cookie:admin,body:{attended:false}});
  const corrected=await(await req('/api/me/badges',{cookie:student})).json();assert.equal(corrected.earnedCount,0);assert.equal(corrected.completedEvents,0);
 }));
+test('member project stays private until admin approval and can be unpublished',()=>server(config,async req=>{
+ const admin=await login(req),student=await login(req,'student');
+ const data={name:'Member App',description:'An app for our club',url:'https://example.com',imageUrl:'data:image/webp;base64,AAAA'};
+ assert.equal((await req('/api/me/projects',{method:'POST',body:data})).status,401);
+ const response=await req('/api/me/projects',{method:'POST',cookie:student,body:data});assert.equal(response.status,201);const project=await response.json();
+ assert.equal(project.status,'pending');assert.equal((await(await req('/api/app-logos')).json()).length,0);
+ assert.equal((await req('/api/admin/projects/'+project.id,{method:'PUT',cookie:student,body:{status:'approved'}})).status,403);
+ assert.equal((await req('/api/admin/projects/'+project.id,{method:'PUT',cookie:admin,body:{status:'approved'}})).status,200);
+ assert.equal((await(await req('/api/app-logos')).json())[0].description,data.description);
+ await req('/api/admin/app-logos/'+project.id,{method:'DELETE',cookie:admin});
+ assert.equal((await(await req('/api/app-logos')).json()).length,0);
+ assert.equal((await(await req('/api/me/projects',{cookie:student})).json())[0].status,'rejected');
+}));
