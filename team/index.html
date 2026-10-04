@@ -78,6 +78,21 @@
       line-height: 1.5;
       color: #6e6e73;
     }
+    .lead-profile { background: #000; color: #f5f5f7; padding: 72px 24px 80px; }
+    .lead-story { max-width: 980px; margin: 0 auto; display: flow-root; }
+    .lead-story h2 { color: #f5f5f7; font-size: 28px; font-weight: 600; letter-spacing: -.6px; margin: 0 0 8px; }
+    .lead-country { color: #86868b; font-weight: 400; }
+    .lead-role { color: #a1a1a6; font-size: 17px; margin: 0 0 32px; }
+    .lead-portrait { float: right; width: 46%; margin: 0 0 28px 36px; border-radius: 20px; height: auto; }
+    .lead-copy p { font-size: 18px; line-height: 1.6; margin: 0 0 24px; color: #e5e5e7; }
+    .lead-copy strong { color: #fff; font-weight: 600; }
+    @media (max-width: 680px) {
+      .page-title { font-size: 36px; }
+      .lead-profile { padding: 48px 24px; }
+      .lead-story h2 { color: #f5f5f7; font-size: 25px; }
+      .lead-portrait { float: none; display: block; width: 100%; max-width: 430px; margin: 0 auto 32px; }
+      .lead-copy p { font-size: 17px; }
+    }
   </style>
 </head>
 <body>
@@ -101,7 +116,24 @@
       <p class="page-desc">The club leaders dedicated to bringing the best of Apple platforms to SGU.</p>
     </header>
 
-    <section class="team-section" aria-labelledby="core-team-heading"><h2 id="core-team-heading">Core Team</h2><p>These roles will be updated with confirmed club member profiles.</p><div class="team-grid" id="team-container"><!-- Generated via JS --></div></section>
+    <section class="lead-profile" aria-labelledby="lead-name">
+      <article class="lead-story">
+        <h2 id="lead-name">Rehan Sanadi <span class="lead-country">(India)</span></h2>
+        <p class="lead-role">Founder &amp; Club Lead · Apple Developer Club SGU</p>
+        <img class="lead-portrait" src="/images/rehan-sanadi.webp" alt="Rehan Sanadi, founder and Club Lead of Apple Developer Club SGU" width="900" height="1239" fetchpriority="high" />
+        <div class="lead-copy">
+          <p>Rehan Sanadi is a computer science student, iOS engineer, and young developer from Maharashtra, India, focused on building products around Apple technologies, artificial intelligence, and real-world problem solving.</p>
+          <p>Currently pursuing a B.Tech in Computer Science with a specialization in <strong>AI &amp; Data Science at Sanjay Ghodawat University</strong>, Rehan has spent much of his college journey building iOS applications with Swift, SwiftUI, Xcode, SwiftData, Core ML, MapKit, AVFoundation, and Apple’s on-device intelligence technologies.</p>
+          <p>Alongside academics, Rehan has worked as a <strong>Software Developer Intern at Neuroverse Software Solutions</strong>, contributing to SwiftUI interfaces, application features, debugging, and collaborative development workflows.</p>
+          <p>One of his major current projects is <strong>Suzzme</strong>, a voice-first personal assistant for iPhone and Mac. Suzzme is designed to understand a user’s daily communications, summarize important information, provide proactive reminders, and help complete actions through natural voice interaction. Rehan is building the project around Apple’s privacy-focused, on-device AI ecosystem, with a strong emphasis on minimal design, local intelligence, and a seamless Apple-style experience.</p>
+          <p>His other projects include <strong>Hearly</strong>, an AI-powered voice isolation system; <strong>Solace</strong>, a sunlight and Vitamin D tracking app; <strong>Roam</strong>, an intelligent travel companion; and <strong>ResQAssist</strong>, an emergency-response platform.</p>
+          <p>Beyond building apps, Rehan founded and leads the <strong>Apple Developer Club at Sanjay Ghodawat University</strong>, where he works to introduce students to Swift, SwiftUI, Xcode, Apple design principles, and opportunities such as the Swift Student Challenge.</p>
+          <p>For Rehan, technology is less about simply writing code and more about creating experiences that feel useful, intuitive, and human. His long-term focus is to continue building Apple-platform products that combine <strong>AI, voice interaction, privacy, and thoughtful design</strong>.</p>
+        </div>
+      </article>
+    </section>
+
+    <section class="team-section" aria-labelledby="core-team-heading"><h2 id="core-team-heading">Core Team</h2><p>Meet the people helping our community learn, build, and grow.</p><div class="team-grid" id="team-container"><!-- Generated via JS --></div></section>
   </main>
 
   <script type="module" src="/src/public-data.js"></script>
