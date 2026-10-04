@@ -348,7 +348,7 @@ async function initGravityPhysicsBucket() {
         if (item.id && !iconData.some(icon => icon.id === item.id)) return;
         // Random horizontal drop position spread dynamically across full container width
         const spawnX = Math.random() * Math.max(100, width - 160) + 80;
-        const spawnY = -60 - index * 20;
+        const spawnY = iconSize / 2 + 16;
 
         // Chamfered rounded rectangle body for realistic physics rolling & tumbling
         const body = Bodies.rectangle(spawnX, spawnY, iconSize, iconSize, {
@@ -556,7 +556,7 @@ async function initGravityPhysicsBucket() {
     Body.setPosition(ground, { x: width / 2, y: height + wallThickness / 2 - 4 });
     Body.setPosition(rightWall, { x: width + wallThickness / 2 - 4, y: height / 2 });
     Body.setPosition(leftWall, { x: -wallThickness / 2 + 4, y: height / 2 });
-    Body.setPosition(ceiling, { x: width / 2, y: -wallThickness / 2 - 300 });
+    Body.setPosition(ceiling, { x: width / 2, y: -wallThickness / 2 + 4 });
 
     // Keep icons gracefully within boundaries when window width contracts
     bodyElements.forEach(({ body }) => {
@@ -599,8 +599,16 @@ if (joinOverlay) {
 const eventGrid = document.querySelector('.apple-events-grid');
 if(eventGrid) {
   const templates = [...eventGrid.querySelectorAll('.apple-events-card')].map(node=>node.cloneNode(true));
+  eventGrid.replaceChildren();
+  eventGrid.setAttribute('aria-busy','true');
+  const eventLoading = document.createElement('p');
+  eventLoading.setAttribute('role','status');
+  eventLoading.textContent = 'Loading upcoming events…';
+  eventGrid.before(eventLoading);
   live(async()=>{
     const events = await api('/api/events');
+    eventLoading.remove();
+    eventGrid.removeAttribute('aria-busy');
     const upcoming = events.filter(e=>e.registrationOpen);
     const select = document.getElementById('reg-event');
     const previous = select?.value;

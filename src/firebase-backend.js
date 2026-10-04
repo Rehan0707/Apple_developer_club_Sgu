@@ -289,5 +289,12 @@ export async function firebaseLive(refresh, role, intervalMs, selectedCollection
   }
   const timer = intervalMs ? setInterval(refresh, intervalMs) : null;
   window.addEventListener('focus', schedule);
-  window.addEventListener('pagehide', () => { stops.forEach(stop => stop()); collections.forEach(name => liveData.forget(name)); clearTimeout(refreshTimer); if (timer) clearInterval(timer); }, { once: true });
+  window.addEventListener('pagehide', event => {
+    stops.forEach(stop => stop()); collections.forEach(name => liveData.forget(name));
+    clearTimeout(refreshTimer); if (timer) clearInterval(timer);
+    window.removeEventListener('focus', schedule);
+    if (event.persisted) window.addEventListener('pageshow', restored => {
+      if (restored.persisted) firebaseLive(refresh, role, intervalMs, selectedCollections);
+    }, {once:true});
+  }, { once: true });
 }

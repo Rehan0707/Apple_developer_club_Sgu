@@ -3706,3 +3706,6 @@ select.form-input option {
 
 .event-modal:not([open]) { display: none; }
 button:disabled { cursor: not-allowed; }
+
+/* Hide static event templates until the published event snapshot arrives. */
+.apple-events-grid[aria-busy="true"] > .apple-events-card { display: none; }
