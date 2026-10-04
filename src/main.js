@@ -337,21 +337,8 @@ function initGravityPhysicsBucket() {
 
   Composite.add(engine.world, [ground, leftWall, rightWall, ceiling]);
 
-  // App icons to spawn in the physics bucket across full width
-  const iconData = [
-    { type: 'img', src: '/images/app-icon-showcase.png', alt: 'Nature App' },
-    { type: 'badge', emoji: '🍎', label: 'Swift', bg: 'linear-gradient(135deg, #ff5e3a, #ff2a68)' },
-    { type: 'badge', emoji: '🛠️', label: 'Xcode', bg: 'linear-gradient(135deg, #1d72b8, #00c6ff)' },
-    { type: 'badge', emoji: '🎨', label: 'HIG Lab', bg: 'linear-gradient(135deg, #8e44ad, #f39c12)' },
-    { type: 'badge', emoji: '🪪', label: 'SGU Pass', bg: 'linear-gradient(135deg, #0071e3, #42a5f5)' },
-    { type: 'badge', emoji: '⚡', label: 'Playroom', bg: 'linear-gradient(135deg, #11998e, #38ef7d)' },
-    { type: 'badge', emoji: '🧭', label: 'ARKit', bg: 'linear-gradient(135deg, #fc4a1a, #f7b731)' },
-    { type: 'badge', emoji: '💡', label: 'App Idea', bg: 'linear-gradient(135deg, #f093fb, #f5576c)' },
-    { type: 'badge', emoji: '🥽', label: 'visionOS', bg: 'linear-gradient(135deg, #5b86e5, #36d1dc)' },
-    { type: 'badge', emoji: '🧠', label: 'Core ML', bg: 'linear-gradient(135deg, #fa709a, #fee140)' },
-    { type: 'badge', emoji: '🚀', label: 'TestFlight', bg: 'linear-gradient(135deg, #2af598, #009efd)' },
-    { type: 'badge', emoji: '📐', label: 'Metal', bg: 'linear-gradient(135deg, #ff0844, #ffb199)' }
-  ];
+  // Only app logos published through the admin portal appear here.
+  const iconData = [];
 
   const bodyElements = [];
   const iconSize = 76;
@@ -522,7 +509,7 @@ function initGravityPhysicsBucket() {
       }
     }
     const added = logos.filter(logo => !existingIds.has(logo.id)).map(logo => ({ type: 'img', id: logo.id, src: logo.imageUrl, alt: logo.name }));
-    iconData.splice(iconData.findIndex(icon => icon.id) < 0 ? iconData.length : iconData.findIndex(icon => icon.id), iconData.length, ...logos.map(logo => ({ type: 'img', id: logo.id, src: logo.imageUrl, alt: logo.name })));
+    iconData.splice(0, iconData.length, ...logos.map(logo => ({ type: 'img', id: logo.id, src: logo.imageUrl, alt: logo.name })));
     if (hasDropped && added.length) spawnFallingItems(added);
   });
 
