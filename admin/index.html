@@ -50,6 +50,10 @@
           <span class="material-symbols-outlined text-[18px]">developer_mode_tv</span>
           <span>Add Resource</span>
         </button>
+        <button onclick="document.getElementById('addAppLogoModal').showModal()" class="flex items-center gap-space-xs h-10 px-space-md bg-surface-container-highest hover:bg-outline-variant text-on-surface rounded-lg font-title-md transition-all active:scale-95 border border-outline-variant shadow-sm">
+          <span class="material-symbols-outlined text-[18px]">apps</span>
+          <span>Add App Logo</span>
+        </button>
       </div>
     </div>
 
@@ -125,7 +129,29 @@
         </table>
       </div>
     </div>
+    <section class="bg-white rounded-xl border border-outline-variant shadow-sm overflow-hidden" aria-labelledby="app-logos-heading">
+      <div class="p-space-md border-b border-outline-variant flex flex-wrap justify-between items-center gap-space-sm bg-surface-container-lowest">
+        <div><h2 id="app-logos-heading" class="font-title-md font-semibold text-on-surface">What We Build · App Logos</h2><p class="font-caption-sm text-on-surface-variant mt-1">Published logos join the falling icons on the landing page.</p></div>
+        <button type="button" onclick="document.getElementById('addAppLogoModal').showModal()" class="text-primary hover:underline font-caption-sm font-semibold">Add logo</button>
+      </div>
+      <div id="appLogosList" class="p-space-md grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-space-md" aria-live="polite"><p class="col-span-full text-on-surface-variant">Loading app logos…</p></div>
+    </section>
   </div>
+
+  <dialog id="addAppLogoModal" class="bg-white rounded-2xl shadow-2xl p-0 w-[90%] max-w-md backdrop:bg-black/40 backdrop:backdrop-blur-sm border border-outline-variant open:animate-in open:fade-in open:zoom-in-95">
+    <form method="dialog" class="flex flex-col" onsubmit="handleAppLogoSubmit(event)">
+      <div class="p-space-lg border-b border-outline-variant flex items-center justify-between">
+        <h2 class="font-headline-lg font-bold">Add App Logo</h2>
+        <button aria-label="Close dialog" type="button" onclick="document.getElementById('addAppLogoModal').close()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container text-on-surface-variant transition-colors"><span class="material-symbols-outlined text-[20px]">close</span></button>
+      </div>
+      <div class="p-space-lg flex flex-col gap-space-md">
+        <div class="flex flex-col gap-1.5"><label for="appLogoName" class="font-caption-sm font-semibold text-on-surface-variant uppercase tracking-wider">App Name</label><input id="appLogoName" type="text" maxlength="80" required class="border border-outline-variant rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all text-body-md" placeholder="e.g. My First App"></div>
+        <div class="flex flex-col gap-1.5"><label for="appLogoFile" class="font-caption-sm font-semibold text-on-surface-variant uppercase tracking-wider">App Icon</label><input id="appLogoFile" type="file" accept="image/png,image/jpeg,image/webp" required class="border border-outline-variant rounded-lg p-2.5 bg-white text-body-md"><p class="font-caption-sm text-on-surface-variant">Exactly 1024 × 1024 pixels · PNG, JPEG, or WebP · up to 10 MB.</p></div>
+        <img id="appLogoPreview" hidden alt="App logo preview" class="w-28 h-28 rounded-2xl object-cover border border-outline-variant shadow-sm self-center">
+      </div>
+      <div class="p-space-md bg-surface-container-lowest border-t border-outline-variant flex justify-end gap-space-sm rounded-b-2xl"><button type="button" onclick="document.getElementById('addAppLogoModal').close()" class="px-space-md py-2 font-medium text-on-surface hover:bg-surface-container rounded-lg transition-colors">Cancel</button><button type="submit" class="px-space-md py-2 font-semibold text-white bg-primary hover:bg-[#0062c4] rounded-lg transition-colors shadow-sm">Publish Logo</button></div>
+    </form>
+  </dialog>
 
   <!-- ADD EVENT MODAL -->
   <dialog id="addEventModal" class="bg-white rounded-2xl shadow-2xl p-0 w-[90%] max-w-lg backdrop:bg-black/40 backdrop:backdrop-blur-sm border border-outline-variant open:animate-in open:fade-in open:zoom-in-95">

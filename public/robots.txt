@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /student/
+
+Sitemap: https://appledeveloperacademysgu.web.app/sitemap.xml

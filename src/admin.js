@@ -1,8 +1,9 @@
 import {api,escapeHTML as esc,message,submit,live,requireRole,parseEntryCode,isFirebaseHosted} from './client.js';
+import {prepareAppLogo} from './app-logo-image.js';
 const el = id => document.getElementById(id);
 const value = id => el(id)?.value || '';
 const date = d => new Date(d).toLocaleString();
-let events=[], resources=[], badges=[], students=[], badgeCounts={}, registrationRows=[], feedbackRows=[], checkinId=null, cameraStream=null, cameraTimer=null, scanBusy=false, editId=null, badgeId=null, bannerPreviewUrl=null;
+let events=[], resources=[], badges=[], students=[], appLogos=[], badgeCounts={}, registrationRows=[], feedbackRows=[], checkinId=null, cameraStream=null, cameraTimer=null, scanBusy=false, editId=null, badgeId=null, bannerPreviewUrl=null, appLogoPreviewUrl=null;
 function previewBanner(url){const preview=el('eventBannerPreview');if(!preview)return;preview.hidden=!url;if(url)preview.src=url;else preview.removeAttribute('src');}
 const path = location.pathname;
 if (/\/admin\/login(?:\.html)?\/?$/.test(path)) {
@@ -25,6 +26,10 @@ async function load() {
     document.querySelector('#eventsTable tbody').innerHTML=events.length?events.map(e=>`<tr><td class="p-space-md"><span class="font-medium">${esc(e.title)}</span><br><small>${esc(e.category)} · ${esc(e.status)}</small></td><td class="p-space-md">${esc(date(e.date))}</td><td class="p-space-md">${esc(e.location)}</td><td class="p-space-md text-right"><button class="text-primary" data-edit-event="${e.id}">Edit</button> <button class="text-error" data-delete-event="${e.id}">Delete</button></td></tr>`).join(''):'<tr><td colspan="4" class="p-space-md">No events yet. Add an event to open registration.</td></tr>';
     document.querySelectorAll('.font-display-lg:not(#registration-total)').forEach((node,i)=>node.textContent=[students.length,events.filter(e=>e.status==='upcoming'&&Date.parse(e.date)>Date.now()).length,badges.length][i]);
     el('registration-total').textContent=registrations.filter(r=>!r.cancelledAt).length;
+  }
+  if(el('appLogosList')) {
+    appLogos=await api('/api/app-logos');
+    renderAppLogos();
   }
   if(el('resourcesTableBody')) {
     resources=await api('/api/resources');
@@ -49,6 +54,18 @@ async function load() {
     el('registration-count').textContent=`· ${rows.filter(r=>!r.cancelledAt).length} active`;
     el('registrations-list').innerHTML=rows.length?`<div class="overflow-x-auto"><table class="w-full text-left"><thead><tr><th class="p-3">Event</th><th class="p-3">Student</th><th class="p-3">Department / Year</th><th class="p-3">Attendance</th><th class="p-3">Entry</th></tr></thead><tbody>${rows.map(r=>`<tr><td class="p-3">${esc(r.title)}</td><td class="p-3">${esc(r.name)}<br><small>${esc(r.email)}</small></td><td class="p-3">${esc(r.branch)} ${esc(r.year)}</td><td class="p-3">${r.cancelledAt?'Cancelled':`<input type="checkbox" aria-label="Attendance for ${esc(r.name)}" data-attendance="${r.id}" ${r.attended?'checked':''}>`}</td><td class="p-3">${r.cancelledAt?'—':`<button type="button" class="text-primary font-semibold" data-checkin-id="${r.id}">Check in</button>`}</td></tr>`).join('')}</tbody></table></div>`:'No registrations found yet.';
     if(checkinId)renderCheckin();
+  }
+}
+function renderAppLogos(){
+  const list=el('appLogosList');if(!list)return;
+  list.replaceChildren();
+  if(!appLogos.length){const empty=document.createElement('p');empty.className='col-span-full text-on-surface-variant';empty.textContent='No app logos yet. Add a 1024 × 1024 icon to bring it into the falling-icons section.';list.append(empty);return;}
+  for(const logo of appLogos){
+    const card=document.createElement('article');card.className='rounded-xl border border-outline-variant bg-surface-container-lowest p-space-md flex flex-col items-center gap-space-sm text-center';
+    const image=document.createElement('img');image.src=logo.imageUrl;image.alt='';image.className='w-20 h-20 rounded-2xl object-cover shadow-sm';
+    const name=document.createElement('strong');name.className='font-caption-sm text-on-surface break-words w-full';name.textContent=logo.name;
+    const remove=document.createElement('button');remove.type='button';remove.dataset.deleteAppLogo=logo.id;remove.className='text-error hover:underline font-caption-sm font-semibold';remove.textContent='Remove';remove.setAttribute('aria-label',`Remove ${logo.name} app logo`);
+    card.append(image,name,remove);list.append(card);
   }
 }
 function renderFeedback(){
@@ -109,6 +126,7 @@ document.addEventListener('click',async event=>{
     if(b.dataset.deleteEvent&&confirm('Delete this event? Existing registrations will remain in your records.')){await api('/api/admin/events/'+b.dataset.deleteEvent,{method:'DELETE'});await load();}
     if(b.dataset.editResource){const r=resources.find(r=>r.id===b.dataset.editResource);el('resId').value=r.id;el('resTitle').value=r.title;el('resUrl').value=r.url;el('resDesc').value=r.desc||'';el('resCategory').value=r.category||'General';el('resourceModalTitle').textContent='Edit Resource';el('addResourceModal').showModal();}
     if(b.dataset.deleteResource&&confirm('Delete this resource?')){await api('/api/admin/resources/'+b.dataset.deleteResource,{method:'DELETE'});await load();}
+    if(b.dataset.deleteAppLogo&&confirm('Remove this app logo from the landing page?')){await api('/api/admin/app-logos/'+encodeURIComponent(b.dataset.deleteAppLogo),{method:'DELETE'});await load();message('App logo removed.');}
     if(b.dataset.badge)await showBadge(b.dataset.badge);
     if(b.dataset.checkinId)lookupCheckin(b.dataset.checkinId);
   }catch(error){message(error);}
@@ -116,13 +134,20 @@ document.addEventListener('click',async event=>{
 document.addEventListener('change',async event=>{if(event.target.dataset.attendance){try{await api('/api/admin/registrations/'+event.target.dataset.attendance,{method:'PUT',body:JSON.stringify({attended:event.target.checked})});}catch(e){event.target.checked=!event.target.checked;message(e);}}});
 window.handleEventSubmit=event=>submit(event,async()=>{const file=el('eventBanner').files[0];if(file&&file.size>5*1024*1024)throw new Error('Banner image must be 5 MB or smaller.');let bannerUrl=editId?events.find(e=>e.id===editId)?.bannerUrl||'':'';if(file){const upload=await api('/api/admin/event-banner',{method:'POST',headers:{'Content-Type':file.type},body:file});bannerUrl=upload.url;}await api('/api/admin/events'+(editId?'/'+editId:''),{method:editId?'PUT':'POST',body:JSON.stringify({title:value('eventName'),category:value('eventCat'),description:value('eventDescription'),date:new Date(value('eventDate')).toISOString(),location:value('eventLoc'),capacity:value('eventCap'),badgeId:value('eventBadge'),status:value('eventStatus'),bannerUrl})});el('addEventModal').close();await load();message('Event saved.');});
 window.handleResourceSubmit=event=>submit(event,async()=>{const id=value('resId');await api('/api/admin/resources'+(id?'/'+id:''),{method:id?'PUT':'POST',body:JSON.stringify({title:value('resTitle'),url:value('resUrl'),category:value('resCategory'),desc:value('resDesc')})});el('addResourceModal').close();await load();message('Resource saved.');});
+window.handleAppLogoSubmit=event=>submit(event,async()=>{
+  const file=el('appLogoFile').files[0];
+  const imageUrl=await prepareAppLogo(file);
+  await api('/api/admin/app-logos',{method:'POST',body:JSON.stringify({name:value('appLogoName'),imageUrl})});
+  el('addAppLogoModal').close();await load();message('App logo published to What We Build.');
+});
 window.updatePreview=()=>{el('badgePreviewIcon').textContent=value('badgeIcon')||'star';el('badgePreview').style.color=({primary:'#0071e3',secondary:'#34c759',tertiary:'#af52de',error:'#d70015'})[value('badgeColor')];};
 window.handleBadgeSubmit=event=>submit(event,async()=>{await api('/api/admin/badges',{method:'POST',body:JSON.stringify({name:value('badgeName'),desc:value('badgeDesc'),icon:value('badgeIcon')||'star',color:value('badgeColor')})});el('addBadgeModal').close();await load();message('Badge saved.');});
 async function showBadge(id,show=true){badgeId=id;const badge=badges.find(b=>b.id===id);if(!badge)return;const assigned=events.find(e=>e.badgeId===id);el('detailBadgeName').textContent=badge.name;el('detailBadgeImage').src=badge.imageUrl;el('detailBadgeEvent').textContent=badge.type==='event'?(assigned?'Event: '+assigned.title:'No event assigned yet'):'Custom badge';el('detailBadgeCount').textContent=(badgeCounts[id]||0)+' member'+(badgeCounts[id]===1?'':'s')+' earned this badge';const assignButton=el('badgeDetailsModal').querySelector('[onclick="openAssignModal()"]');assignButton.hidden=badge.type==='event';let note=el('badge-assignment-note');if(!note){note=document.createElement('p');note.id='badge-assignment-note';note.className='p-space-md text-sm text-on-surface-variant';el('badgeStudentsList').before(note);}note.textContent=badge.type==='event'?(assigned?'Awarded after confirmed attendance.':'Assign this badge in the event editor.'):'';const rows=await api('/api/admin/badges/'+id+'/students');el('badgeStudentsList').innerHTML=rows.length?rows.map(s=>`<li class="py-2 border-b">${esc(s.name)} (${esc(s.email)})</li>`).join(''):'<li>No students have this badge yet.</li>';if(show)el('badgeDetailsModal').showModal();}
 window.openAssignModal=()=>{el('assignStudentSelect').innerHTML='<option value="">Select a student...</option>'+students.map(s=>`<option value="${esc(s.id)}">${esc(s.name)} (${esc(s.email)})</option>`).join('');el('assignBadgeModal').showModal();};
 window.handleAssignSubmit=event=>submit(event,async()=>{await api('/api/admin/badges/assign',{method:'POST',body:JSON.stringify({badgeId,studentId:value('assignStudentSelect')})});el('assignBadgeModal').close();await showBadge(badgeId,false);message('Badge assigned.');});
 el('eventBanner')?.addEventListener('change',()=>{if(bannerPreviewUrl)URL.revokeObjectURL(bannerPreviewUrl);const file=el('eventBanner').files[0];bannerPreviewUrl=file?URL.createObjectURL(file):null;previewBanner(bannerPreviewUrl||(editId?events.find(e=>e.id===editId)?.bannerUrl:''));});
-for(const modal of document.querySelectorAll('dialog'))modal.addEventListener('close',()=>{modal.querySelector('form')?.reset();if(modal.id==='addEventModal'){editId=null;previewBanner(null);if(bannerPreviewUrl)URL.revokeObjectURL(bannerPreviewUrl);bannerPreviewUrl=null;}if(el('resId'))el('resId').value='';if(el('resourceModalTitle'))el('resourceModalTitle').textContent='Add Resource';});
+el('appLogoFile')?.addEventListener('change',()=>{if(appLogoPreviewUrl)URL.revokeObjectURL(appLogoPreviewUrl);const file=el('appLogoFile').files[0];appLogoPreviewUrl=file?URL.createObjectURL(file):null;const preview=el('appLogoPreview');preview.hidden=!appLogoPreviewUrl;if(appLogoPreviewUrl)preview.src=appLogoPreviewUrl;else preview.removeAttribute('src');});
+for(const modal of document.querySelectorAll('dialog'))modal.addEventListener('close',()=>{modal.querySelector('form')?.reset();if(modal.id==='addEventModal'){editId=null;previewBanner(null);if(bannerPreviewUrl)URL.revokeObjectURL(bannerPreviewUrl);bannerPreviewUrl=null;}if(modal.id==='addAppLogoModal'){if(appLogoPreviewUrl)URL.revokeObjectURL(appLogoPreviewUrl);appLogoPreviewUrl=null;el('appLogoPreview').hidden=true;el('appLogoPreview').removeAttribute('src');}if(el('resId'))el('resId').value='';if(el('resourceModalTitle'))el('resourceModalTitle').textContent='Add Resource';});
 
 function renderBadges(){
  const grid=el('badgesGrid');if(!grid)return;

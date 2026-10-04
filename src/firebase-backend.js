@@ -1,11 +1,13 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, sendPasswordResetEmail, reload, signOut } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, linkWithPopup, signInAnonymously, signInWithEmailAndPassword, sendPasswordResetEmail, reload, signOut, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { getFirestore, collection, doc, getDoc, getDocs, query, where, setDoc, updateDoc, deleteDoc, runTransaction, onSnapshot } from 'firebase/firestore';
 import { firebaseConfig } from './firebase-config.js';
 import { publicResourceSeeds } from '../lib/public-resource-seeds.js';
 import { eventBadges } from '../lib/badges.js';
 
-const app = initializeApp(firebaseConfig);
+// Keep club administration signed in independently from member and guest flows.
+// Firebase Auth otherwise shares one account across all tabs on this origin.
+const app = /^\/admin(?:\/|$)/.test(location.pathname) ? initializeApp(firebaseConfig, 'club-admin') : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const adminEmail = 'developerclubapple@gmail.com';
@@ -89,6 +91,7 @@ export async function signInGoogle() {
 export async function signInAdminEmail(email, password) {
   await authReady;
   if (String(email).trim().toLowerCase() !== adminEmail) fail('This email does not have administrator access.', 403);
+  await setPersistence(auth, browserLocalPersistence);
   const result = await signInWithEmailAndPassword(auth, adminEmail, password);
   await reload(result.user);
   adminPasswordSession = (await result.user.getIdTokenResult(true)).claims.firebase?.sign_in_provider === 'password';
@@ -150,6 +153,24 @@ export async function firebaseApi(path, options = {}) {
     fail('Use Google sign-in for this account.', 400);
   }
   if (route[0] === 'admin' && route[1] === 'event-banner' && method === 'POST') { await requireAdmin(); return compressBanner(options.body); }
+  if (route[0] === 'app-logos' && method === 'GET') return (await all('appLogos')).sort((a,b) => a.createdAt.localeCompare(b.createdAt));
+  if (route[0] === 'admin' && route[1] === 'app-logos') {
+    await requireAdmin();
+    if (route.length === 2 && method === 'POST') {
+      const name = clean(value.name, 'app name', 80);
+      const imageUrl = clean(value.imageUrl, 'app logo', 700000);
+      if (!/^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/]+={0,2}$/.test(imageUrl)) fail('Choose a valid app logo image.');
+      const id = crypto.randomUUID();
+      const logo = { id, name, imageUrl, createdAt: now() };
+      await setDoc(ref('appLogos', id), logo);
+      return logo;
+    }
+    if (route.length === 3 && method === 'DELETE') {
+      if (!await byId('appLogos', route[2])) fail('App logo not found.', 404);
+      await deleteDoc(ref('appLogos', route[2]));
+      return null;
+    }
+  }
   if (route[0] === 'events' && route.length === 1 && method === 'GET') return publicEvents(await all('events'));
   if (route[0] === 'events' && route[2] === 'my-registration' && method === 'GET') {
     await auth.authStateReady();
@@ -236,7 +257,7 @@ export async function firebaseApi(path, options = {}) {
 
 export async function firebaseLive(refresh, role, intervalMs) {
   await auth.authStateReady();
-  const collections = role === 'admin' ? ['events','resources','badges','registrations','feedback','members','awards'] : role === 'student' ? ['events','resources','badges'] : ['events','resources','badges','team'];
+  const collections = role === 'admin' ? ['events','resources','badges','registrations','feedback','members','awards','appLogos'] : role === 'student' ? ['events','resources','badges'] : ['events','resources','badges','team','appLogos'];
   const stops = collections.map(name => onSnapshot(collection(db, name), refresh, error => console.error('Live update unavailable', error)));
   if (role === 'student' && auth.currentUser) {
     stops.push(onSnapshot(query(collection(db, 'registrations'), where('ownerUid', '==', auth.currentUser.uid)), refresh));

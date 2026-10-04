@@ -152,6 +152,7 @@ service cloud.firestore {
       allow write: if admin();
     }
     match /resources/{id} { allow read: if true; allow write: if admin(); }
+    match /appLogos/{id} { allow read: if true; allow write: if admin(); }
     match /badges/{id} { allow read: if true; allow write: if admin(); }
     match /team/{id} { allow read: if true; allow write: if admin(); }
     match /{document=**} { allow read, write: if false; }

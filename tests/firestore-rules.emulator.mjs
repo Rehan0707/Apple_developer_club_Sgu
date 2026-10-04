@@ -51,6 +51,12 @@ try {
   const oldGoogleAdmin=env.authenticatedContext('admin-google',{email:'developerclubapple@gmail.com',email_verified:true,firebase:{sign_in_provider:'google.com'}}).firestore();
   await assert.rejects(oldGoogleAdmin.doc(`registrations/${key}`).update({attended:true}));
   const adminDb=env.authenticatedContext('admin-1',{email:'developerclubapple@gmail.com',email_verified:true,firebase:{sign_in_provider:'password'}}).firestore();
+  const logo={id:'club-app',name:'Club App',imageUrl:'data:image/webp;base64,UklGRg==',createdAt:new Date().toISOString()};
+  await assert.rejects(memberDb.doc('appLogos/club-app').set(logo));
+  await assert.rejects(oldGoogleAdmin.doc('appLogos/club-app').set(logo));
+  await adminDb.doc('appLogos/club-app').set(logo);
+  assert.equal((await publicDb.doc('appLogos/club-app').get()).data().name,'Club App');
+  await adminDb.doc('appLogos/club-app').delete();
   await adminDb.doc(`registrations/${key}`).update({attended:true,completedAt:new Date().toISOString()});
   await memberDb.doc('members/member-1').set({id:'member-1',name:'Test Member',email:'test@example.com',joinedDate:new Date().toISOString()});
   assert.equal((await memberDb.collection('awards').where('memberId','==','member-1').get()).size,0);

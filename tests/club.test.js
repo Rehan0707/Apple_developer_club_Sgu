@@ -104,6 +104,21 @@ test('invalid fields and unsafe resource URLs are rejected',()=>server(config,as
  assert.equal((await req('/api/admin/resources/'+resource.id,{method:'PUT',cookie,body:{title:'Swift Docs',url:'https://www.swift.org/documentation/'}})).status,200);
  assert.equal((await req('/api/admin/resources/'+resource.id,{method:'DELETE',cookie})).status,204);
 }));
+test('admin publishes and removes app logos while visitors can read them',()=>server(config,async req=>{
+ const admin=await login(req),student=await login(req,'student');
+ const logo={name:'Club App',imageUrl:'data:image/webp;base64,UklGRg=='};
+ assert.deepEqual(await(await req('/api/app-logos')).json(),[]);
+ assert.equal((await req('/api/admin/app-logos',{method:'POST',cookie:student,body:logo})).status,403);
+ assert.equal((await req('/api/admin/app-logos',{method:'POST',cookie:admin,body:{...logo,imageUrl:'data:image/svg+xml;base64,PHN2Zz4='}})).status,400);
+ const created=await req('/api/admin/app-logos',{method:'POST',cookie:admin,body:logo});
+ assert.equal(created.status,201);
+ const row=await created.json();
+ assert.equal(row.name,'Club App');
+ assert.deepEqual((await(await req('/api/app-logos')).json()).map(item=>item.id),[row.id]);
+ assert.equal((await req('/api/admin/app-logos/'+row.id,{method:'DELETE',cookie:student})).status,403);
+ assert.equal((await req('/api/admin/app-logos/'+row.id,{method:'DELETE',cookie:admin})).status,204);
+ assert.deepEqual(await(await req('/api/app-logos')).json(),[]);
+}));
 test('admin can upload an event banner and publish it on public event data',async()=>{
  const directory=await mkdtemp(join(tmpdir(),'sgu-banners-'));
  try{await server({...config,UPLOADS_PATH:directory},async(req,base)=>{

@@ -356,10 +356,10 @@ function initGravityPhysicsBucket() {
   const bodyElements = [];
   const iconSize = 76;
 
-  // Function to spawn icons falling down from above
-  function spawnFallingBatch() {
-    iconData.forEach((item, index) => {
+  function spawnFallingItems(items) {
+    items.forEach((item, index) => {
       setTimeout(() => {
+        if (item.id && !iconData.some(icon => icon.id === item.id)) return;
         // Random horizontal drop position spread dynamically across full container width
         const spawnX = Math.random() * Math.max(100, width - 160) + 80;
         const spawnY = -60 - index * 20;
@@ -406,10 +406,11 @@ function initGravityPhysicsBucket() {
         Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.25);
         Body.setVelocity(body, { x: (Math.random() - 0.5) * 5, y: Math.random() * 3 + 2 });
 
-        bodyElements.push({ body, el });
+        bodyElements.push({ body, el, sourceId: item.id });
       }, index * 90);
     });
   }
+  const spawnFallingBatch = () => spawnFallingItems(iconData);
 
   // Drop icons in on initial scroll
   let hasDropped = false;
@@ -506,6 +507,24 @@ function initGravityPhysicsBucket() {
   }, { threshold: 0.2 });
 
   dropObserver.observe(container);
+
+  // Uploaded app logos use the same bodies, styling, and motion as the original icons.
+  live(async () => {
+    const logos = await api('/api/app-logos');
+    const nextIds = new Set(logos.map(logo => logo.id));
+    const existingIds = new Set(iconData.filter(icon => icon.id).map(icon => icon.id));
+    for (let index = bodyElements.length - 1; index >= 0; index--) {
+      const item = bodyElements[index];
+      if (item.sourceId && !nextIds.has(item.sourceId)) {
+        Composite.remove(engine.world, item.body);
+        item.el.remove();
+        bodyElements.splice(index, 1);
+      }
+    }
+    const added = logos.filter(logo => !existingIds.has(logo.id)).map(logo => ({ type: 'img', id: logo.id, src: logo.imageUrl, alt: logo.name }));
+    iconData.splice(iconData.findIndex(icon => icon.id) < 0 ? iconData.length : iconData.findIndex(icon => icon.id), iconData.length, ...logos.map(logo => ({ type: 'img', id: logo.id, src: logo.imageUrl, alt: logo.name })));
+    if (hasDropped && added.length) spawnFallingItems(added);
+  });
 
   // Device Orientation (Gyroscope Gravity for Mobile Phones!)
   if ('ontouchstart' in window && window.DeviceOrientationEvent) {
