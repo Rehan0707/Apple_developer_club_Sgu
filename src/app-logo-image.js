@@ -13,9 +13,21 @@ export async function prepareAppLogo(file) {
   context.imageSmoothingQuality = 'high';
   context.drawImage(bitmap, (1024 - width) / 2, (1024 - height) / 2, width, height);
   bitmap.close();
-  for (const quality of [.9, .8, .7, .55, .4, .25]) {
-    const imageUrl = canvas.toDataURL('image/webp', quality);
-    if (imageUrl.startsWith('data:image/webp;') && imageUrl.length <= 650000) return imageUrl;
+  // Some browsers fall back to PNG when WebP encoding is unavailable.
+  // Retry smaller square images when detail or alpha data exceeds the document budget.
+  const encoded = document.createElement('canvas');
+  for (const size of [1024, 768, 512, 384, 256, 128]) {
+    encoded.width = encoded.height = size;
+    const resized = encoded.getContext('2d');
+    resized.imageSmoothingEnabled = true;
+    resized.imageSmoothingQuality = 'high';
+    resized.drawImage(canvas, 0, 0, size, size);
+    for (const quality of [.9, .8, .65, .5, .35, .2]) {
+      const imageUrl = encoded.toDataURL('image/webp', quality);
+      if (/^data:image\/(webp|png|jpeg);base64,/.test(imageUrl) && imageUrl.length <= 650000) return imageUrl;
+      // PNG is lossless: lowering the quality parameter cannot reduce its size.
+      if (imageUrl.startsWith('data:image/png;')) break;
+    }
   }
-  throw new Error('This logo is too complex to save. Try a simpler PNG, JPEG, or WebP image.');
+  throw new Error('This image could not be prepared for upload. Please choose another PNG, JPEG, or WebP file.');
 }
