@@ -4,14 +4,14 @@ export async function prepareAppLogo(file) {
   let bitmap;
   try { bitmap = await createImageBitmap(file); }
   catch { throw new Error('This image could not be opened. Choose a valid app logo.'); }
-  if (bitmap.width !== 1024 || bitmap.height !== 1024) {
-    const size = `${bitmap.width}×${bitmap.height}`;
-    bitmap.close();
-    throw new Error(`App logos must be exactly 1024×1024 pixels. This image is ${size}.`);
-  }
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 1024;
-  canvas.getContext('2d').drawImage(bitmap, 0, 0);
+  const scale = Math.min(1024 / bitmap.width, 1024 / bitmap.height);
+  const width = bitmap.width * scale, height = bitmap.height * scale;
+  const context = canvas.getContext('2d');
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = 'high';
+  context.drawImage(bitmap, (1024 - width) / 2, (1024 - height) / 2, width, height);
   bitmap.close();
   for (const quality of [.9, .8, .7, .55, .4, .25]) {
     const imageUrl = canvas.toDataURL('image/webp', quality);

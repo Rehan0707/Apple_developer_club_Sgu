@@ -19,7 +19,7 @@ export function renderMemberProfile(me,projects){
 }
 export function setupProjectSubmission(refresh){
   const form=document.getElementById('project-submit-form');if(!form)return;
-  form.innerHTML=`${fields}<label>App logo · 1024 × 1024<input name="logo" type="file" accept="image/png,image/jpeg,image/webp" required></label><p class="community-muted">The team reviews your project before publishing it on the landing page.</p><button class="community-action" type="submit">Submit for review</button>`;
+  form.innerHTML=`${fields}<label>App logo · automatically fitted to 1024 × 1024<input name="logo" type="file" accept="image/png,image/jpeg,image/webp" required></label><p class="community-muted">The team reviews your project before publishing it on the landing page.</p><button class="community-action" type="submit">Submit for review</button>`;
   form.addEventListener('submit',event=>submit(event,async()=>{const data=new FormData(form),imageUrl=await prepareAppLogo(data.get('logo'));await api('/api/me/projects',{method:'POST',body:JSON.stringify({name:data.get('name'),description:data.get('description'),url:data.get('url'),imageUrl})});form.reset();await refresh();message('Project submitted for admin review.');}));
 }
 export function setupAdminCommunity(){
