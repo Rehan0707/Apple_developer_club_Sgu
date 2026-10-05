@@ -1,6 +1,6 @@
 # Apple Developer Club SGU
 
-Live site: https://appledeveloperacademysgu.web.app
+Live site: https://adcsgu.web.app
 
 The public website, member portal, and admin portal use Firebase Hosting, Authentication, and Cloud Firestore. The original UI and fonts are retained. Firestore listeners update open pages when event, registration, attendance, badge, and resource data changes.
 

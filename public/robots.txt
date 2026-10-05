@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /student/
 
-Sitemap: https://appledeveloperacademysgu.web.app/sitemap.xml
+Sitemap: https://adcsgu.web.app/sitemap.xml
