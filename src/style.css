@@ -3709,3 +3709,10 @@ button:disabled { cursor: not-allowed; }
 
 /* Hide static event templates until the published event snapshot arrives. */
 .apple-events-grid[aria-busy="true"] > .apple-events-card { display: none; }
+
+/* Closed desktop flyouts must not widen the mobile document. */
+@media (max-width: 700px) {
+  .nav-flyout-drawer { display: none; }
+  .nav-dropdown-item.mobile-expanded .nav-flyout-drawer { display: block; }
+  .nav-flyout-inner { min-width: 0; }
+}
